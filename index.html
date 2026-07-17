@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111">
+<title>Gestionale Noleggio</title>
+<style>
+:root{--bg:#0e0f10;--card:#191b1e;--line:#30343a;--text:#f7f7f7;--muted:#a9afb7;--yellow:#ffd400;--green:#48d395;--red:#ff6b6b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+header{padding:22px 16px 12px}h1,h2,h3,p{margin-top:0}h1{font-size:24px;margin-bottom:3px}.muted{color:var(--muted)}
+main{padding:0 14px 95px;max-width:650px;margin:auto}.screen{display:none}.screen.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:15px;margin-bottom:11px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat strong{display:block;font-size:28px;margin-top:5px}
+.btn{border:0;border-radius:13px;min-height:46px;padding:11px 14px;font-weight:bold;background:#25282d;color:white}
+.primary{background:var(--yellow);color:#111}.danger{background:#4b2225;color:#ffb1b1}.full{width:100%}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+label{display:block;font-size:12px;font-weight:bold;color:var(--muted);margin-bottom:10px}
+input,select,textarea{width:100%;margin-top:6px;background:#101214;color:white;border:1px solid var(--line);border-radius:12px;padding:12px;min-height:45px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stack{display:grid;gap:10px}
+.item{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+.itemhead{display:flex;justify-content:space-between;gap:10px}.badge{padding:6px 9px;border-radius:999px;font-size:12px;font-weight:bold;background:#292c31}
+.green{color:var(--green)}.red{color:var(--red)}.yellow{color:var(--yellow)}
+.empty{border:1px dashed var(--line);padding:18px;border-radius:14px;text-align:center;color:var(--muted)}
+nav{position:fixed;bottom:0;left:0;right:0;background:#111214;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:7px 5px calc(7px + env(safe-area-inset-bottom))}
+nav button{border:0;background:transparent;color:var(--muted);padding:7px 2px;font-size:11px;font-weight:bold}nav button.active{color:var(--yellow)}
+nav span{display:block;font-size:21px;margin-bottom:3px}
+.modal{position:fixed;inset:0;background:#000b;display:flex;align-items:flex-end;z-index:20}.hidden{display:none!important}
+.sheet{width:100%;max-height:96vh;overflow:auto;background:var(--bg);border-radius:22px 22px 0 0;padding:17px 14px 25px}
+.sheethead{display:flex;justify-content:space-between;align-items:center}.close{border:0;background:#282b30;color:white;border-radius:12px;width:42px;height:42px;font-size:24px}
+.bookingrow{display:grid;grid-template-columns:1fr 75px 42px;gap:7px;align-items:end}.bookingrow button{height:45px;border:0;border-radius:11px;background:#4b2225;color:#ffb1b1}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:white;color:#111;padding:12px 15px;border-radius:12px;font-weight:bold;z-index:50}
+@media(max-width:370px){.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+<h1>Bike & Scooter Lab</h1>
+<div class="muted">Gestionale noleggio bici</div>
+</header>
+
+<main>
+
+<section id="oggi" class="screen active">
+<div class="card">
+<div class="muted">Oggi</div>
+<h2 id="dataOggi"></h2>
+<button class="btn primary full" onclick="vai('disponibilita')">Nuova prenotazione</button>
+</div>
+
+<div class="grid">
+<div class="card stat"><span class="muted">Consegne</span><strong id="nConsegne">0</strong></div>
+<div class="card stat"><span class="muted">Rientri</span><strong id="nRientri">0</strong></div>
+<div class="card stat"><span class="muted">Bici fuori</span><strong id="nFuori">0</strong></div>
+<div class="card stat"><span class="muted">Ritardi</span><strong class="red" id="nRitardi">0</strong></div>
+</div>
+
+<h2>Consegne di oggi</h2>
+<div id="consegne" class="stack"></div>
+
+<h2>Rientri di oggi</h2>
+<div id="rientri" class="stack"></div>
+
+<h2>Ritardi</h2>
+<div id="ritardi" class="stack"></div>
+</section>
+
+<section id="disponibilita" class="screen">
+<h2>Verifica disponibilità</h2>
+<div class="card">
+<div class="row">
+<label>Ritiro<input type="date" id="dataInizio"></label>
+<label>Riconsegna<input type="date" id="dataFine"></label>
+</div>
+</div>
+<div id="listaDisponibilita" class="stack"></div>
+<button class="btn primary full" onclick="apriPrenotazione()">Continua</button>
+</section>
+
+<section id="prenotazioni" class="screen">
+<div class="itemhead">
+<h2>Prenotazioni</h2>
+<button class="btn primary" onclick="vai('disponibilita')">＋ Nuova</button>
+</div>
+<div class="card">
+<label>Cerca<input id="cerca" placeholder="Nome o telefono" oninput="renderPrenotazioni()"></label>
+<label>Stato
+<select id="filtroStato" onchange="renderPrenotazioni()">
+<option value="">Tutti</option>
+<option value="prenotata">Prenotata</option>
+<option value="ritirata">Ritirata</option>
+<option value="riconsegnata">Riconsegnata</option>
+<option value="annullata">Annullata</option>
+</select>
+</label>
+</div>
+<div id="listaPrenotazioni" class="stack"></div>
+</section>
+
+<section id="parco" class="screen">
+<div class="itemhead">
+<h2>Parco bici</h2>
+<button class="btn primary" onclick="apriParco()">＋ Aggiungi</button>
+</div>
+<p class="muted">Modifica quantità e categorie senza cambiare il codice.</p>
+<div id="listaParco" class="stack"></div>
+<div class="card">
+<h3>Backup</h3>
+<button class="btn full" onclick="esportaBackup()">Esporta backup</button>
+<label class="btn full" style="display:block;text-align:center;margin-top:8px">
+Importa backup
+<input type="file" hidden accept=".json" onchange="importaBackup(event)">
+</label>
+</div>
+</section>
+
+</main>
+
+<nav>
+<button class="active" data-nav="oggi" onclick="vai('oggi')"><span>⌂</span>Oggi</button>
+<button data-nav="disponibilita" onclick="vai('disponibilita')"><span>⌕</span>Disponibilità</button>
+<button data-nav="prenotazioni" onclick="vai('prenotazioni')"><span>≡</span>Prenotazioni</button>
+<button data-nav="parco" onclick="vai('parco')"><span>🚲</span>Parco bici</button>
+</nav>
+
+<div id="modalPrenotazione" class="modal hidden">
+<div class="sheet">
+<div class="sheethead"><h2 id="titoloPrenotazione">Nuova prenotazione</h2><button class="close" onclick="chiudi('modalPrenotazione')">×</button></div>
+<input type="hidden" id="prenotazioneId">
+
+<div class="card">
+<div class="row">
+<label>Ritiro<input type="date" id="pInizio"></label>
+<label>Riconsegna<input type="date" id="pFine"></label>
+</div>
+</div>
+
+<div class="card">
+<h3>Cliente</h3>
+<label>Nome e cognome<input id="pNome"></label>
+<div class="row">
+<label>Telefono<input id="pTelefono"></label>
+<label>Documento<input id="pDocumento"></label>
+</div>
+</div>
+
+<div class="card">
+<div class="itemhead">
+<h3>Bici e accessori</h3>
+<button class="btn primary" onclick="aggiungiRiga()">＋</button>
+</div>
+<div id="righePrenotazione" class="stack"></div>
+</div>
+
+<div class="card">
+<label>Note<textarea id="pNote"></textarea></label>
+<label>Stato
+<select id="pStato">
+<option value="prenotata">Prenotata</option>
+<option value="ritirata">Ritirata</option>
+<option value="riconsegnata">Riconsegnata</option>
+<option value="annullata">Annullata</option>
+</select>
+</label>
+</div>
+
+<button class="btn primary full" onclick="salvaPrenotazione()">Salva prenotazione</button>
+<button id="eliminaPrenotazione" class="btn danger full hidden" style="margin-top:8px" onclick="cancellaPrenotazione()">Elimina definitivamente</button>
+</div>
+</div>
+
+<div id="modalParco" class="modal hidden">
+<div class="sheet">
+<div class="sheethead"><h2 id="titoloParco">Aggiungi categoria</h2><button class="close" onclick="chiudi('modalParco')">×</button></div>
+<input type="hidden" id="parcoId">
+<label>Nome categoria<input id="parcoNome"></label>
+<div class="row">
+<label>Quantità totale<input type="number" min="0" id="parcoTotale"></label>
+<label>Fuori servizio<input type="number" min="0" id="parcoFuori"></label>
+</div>
+<label>Tipo
+<select id="parcoTipo">
+<option value="bike">Bici</option>
+<option value="accessory">Accessorio</option>
+</select>
+</label>
+<label><input type="checkbox" id="parcoAttivo" style="width:auto;min-height:auto"> Categoria attiva</label>
+<button class="btn primary full" onclick="salvaParco()">Salva</button>
+<button id="eliminaParco" class="btn danger full hidden" style="margin-top:8px" onclick="cancellaParco()">Elimina</button>
+</div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script>
+const KEY="bsl_gestionale_v1";
+
+const iniziali={
+parco:[
+{id:"f1",nome:"Donna senza cambio",totale:8,fuori:0,tipo:"bike",attivo:true},
+{id:"f2",nome:"Uomo senza cambio",totale:5,fuori:0,tipo:"bike",attivo:true},
+{id:"f3",nome:"Uomo con cambio",totale:5,fuori:0,tipo:"bike",attivo:true},
+{id:"f4",nome:"Donna con cambio",totale:3,fuori:0,tipo:"bike",attivo:true},
+{id:"f5",nome:'Bici 24"',totale:3,fuori:0,tipo:"bike",attivo:true},
+{id:"f6",nome:'Bici 20"',totale:2,fuori:0,tipo:"bike",attivo:true},
+{id:"f7",nome:"Seggiolino anteriore",totale:2,fuori:0,tipo:"accessory",attivo:true},
+{id:"f8",nome:"Seggiolino posteriore grande",totale:2,fuori:0,tipo:"accessory",attivo:true},
+{id:"f9",nome:"Seggiolino posteriore piccolo",totale:2,fuori:0,tipo:"accessory",attivo:true}
+],
+prenotazioni:[]
+};
+
+let stato=carica();
+
+function carica(){
+try{return JSON.parse(localStorage.getItem(KEY))||structuredClone(iniziali)}
+catch(e){return structuredClone(iniziali)}
+}
+function salva(){localStorage.setItem(KEY,JSON.stringify(stato))}
+function oggi(){return new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10)}
+function id(p){return p+Date.now()+Math.random().toString(36).slice(2,6)}
+function esc(v=""){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+function sovrapposte(a1,a2,b1,b2){return a1<b2&&a2>b1}
+function vuoto(t){return `<div class="empty">${t}</div>`}
+function nomeStato(s){return {prenotata:"Prenotata",ritirata:"Ritirata",riconsegnata:"Riconsegnata",annullata:"Annullata"}[s]}
+function formatta(d){return new Intl.DateTimeFormat("it-IT",{day:"2-digit",month:"short",year:"numeric"}).format(new Date(d+"T12:00:00"))}
+
+function vai(nome){
+document.querySelectorAll(".screen").forEach(x=>x.classList.toggle("active",x.id===nome));
+document.querySelectorAll("[data-nav]").forEach(x=>x.classList.toggle("active",x.dataset.nav===nome));
+window.scrollTo(0,0);
+if(nome==="oggi")renderOggi();
+if(nome==="disponibilita")renderDisponibilita();
+if(nome==="prenotazioni")renderPrenotazioni();
+if(nome==="parco")renderParco();
+}
+
+function prenotati(idParco,inizio,fine,escludi=""){
+return stato.prenotazioni
+.filter(p=>p.id!==escludi&&p.stato!=="annullata"&&sovrapposte(p.inizio,p.fine,inizio,fine))
+.reduce((n,p)=>n+(p.righe.find(r=>r.idParco===idParco)?.quantita||0),0)
+}
+
+function disponibili(f,inizio,fine,escludi=""){
+return Math.max(0,f.totale-f.fuori-prenotati(f.id,inizio,fine,escludi))
+}
+
+function riepilogo(p){
+return p.righe.map(r=>{
+const f=stato.parco.find(x=>x.id===r.idParco);
+return `${r.quantita}× ${f?f.nome:"Categoria rimossa"}`
+}).join(" · ")
+}
+
+function renderDisponibilita(){
+const a=dataInizio.value,b=dataFine.value;
+if(!a||!b||b<=a){listaDisponibilita.innerHTML=vuoto("Seleziona date valide.");return}
+listaDisponibilita.innerHTML=stato.parco.filter(f=>f.attivo).map(f=>{
+const n=disponibili(f,a,b);
+return `<div class="item itemhead"><div><strong>${esc(f.nome)}</strong><div class="muted">${f.tipo==="bike"?"Bici":"Accessorio"}</div></div><strong class="${n?"green":"red"}">${n}</strong></div>`
+}).join("")
+}
+
+function scheda(p,contesto=""){
+let bottone="";
+if(contesto==="consegna")bottone=`<button class="btn primary" onclick="cambiaStato('${p.id}','ritirata')">Segna ritirata</button>`;
+if(contesto==="rientro")bottone=`<button class="btn primary" onclick="cambiaStato('${p.id}','riconsegnata')">Segna riconsegnata</button>`;
+return `<div class="item"><div class="itemhead"><div><h3>${esc(p.nome)}</h3><div class="muted">${esc(p.telefono||"Nessun telefono")}<br>${esc(riepilogo(p))}</div></div><span class="badge">${nomeStato(p.stato)}</span></div><div class="actions">${bottone}<button class="btn" onclick="modificaPrenotazione('${p.id}')">Apri</button></div></div>`
+}
+
+function renderOggi(){
+const d=oggi();
+dataOggi.textContent=new Intl.DateTimeFormat("it-IT",{weekday:"long",day:"numeric",month:"long"}).format(new Date(d+"T12:00:00"));
+const c=stato.prenotazioni.filter(p=>p.inizio===d&&p.stato==="prenotata");
+const r=stato.prenotazioni.filter(p=>p.fine===d&&p.stato==="ritirata");
+const late=stato.prenotazioni.filter(p=>p.stato==="ritirata"&&p.fine<d);
+const fuori=stato.prenotazioni.filter(p=>p.stato==="ritirata").reduce((n,p)=>n+p.righe.reduce((s,r)=>{
+const f=stato.parco.find(x=>x.id===r.idParco);return s+(f?.tipo==="bike"?r.quantita:0)},0),0);
+nConsegne.textContent=c.length;nRientri.textContent=r.length;nRitardi.textContent=late.length;nFuori.textContent=fuori;
+consegne.innerHTML=c.length?c.map(p=>scheda(p,"consegna")).join(""):vuoto("Nessuna consegna oggi.");
+rientri.innerHTML=r.length?r.map(p=>scheda(p,"rientro")).join(""):vuoto("Nessun rientro oggi.");
+ritardi.innerHTML=late.length?late.map(p=>scheda(p)).join(""):vuoto("Nessun ritardo.");
+}
+
+function renderPrenotazioni(){
+const q=cerca.value.toLowerCase(),s=filtroStato.value;
+const arr=[...stato.prenotazioni].sort((a,b)=>b.inizio.localeCompare(a.inizio)).filter(p=>
+(!q||`${p.nome} ${p.telefono} ${p.note}`.toLowerCase().includes(q))&&(!s||p.stato===s));
+listaPrenotazioni.innerHTML=arr.length?arr.map(p=>`<div class="item">
+<div class="itemhead"><div><h3>${esc(p.nome)}</h3><div class="muted">${formatta(p.inizio)} → ${formatta(p.fine)}<br>${esc(riepilogo(p))}</div></div><span class="badge">${nomeStato(p.stato)}</span></div>
+<div class="actions"><button class="btn primary" onclick="modificaPrenotazione('${p.id}')">Modifica</button>${p.stato!=="annullata"?`<button class="btn" onclick="cambiaStato('${p.id}','annullata')">Annulla</button>`:""}</div></div>`).join(""):vuoto("Nessuna prenotazione.")
+}
+
+function renderParco(){
+listaParco.innerHTML=stato.parco.map(f=>`<div class="item">
+<div class="itemhead"><div><h3>${esc(f.nome)}</h3><div class="muted">${f.tipo==="bike"?"Bici":"Accessorio"} · ${f.attivo?"Attiva":"Disattivata"}</div></div><span class="badge">${Math.max(0,f.totale-f.fuori)} utilizzabili</span></div>
+<div class="actions"><span class="badge">Totale ${f.totale}</span><span class="badge">Fuori servizio ${f.fuori}</span><button class="btn primary" onclick="apriParco('${f.id}')">Modifica</button></div></div>`).join("")
+}
+
+function apriPrenotazione(){
+prenotazioneId.value="";titoloPrenotazione.textContent="Nuova prenotazione";
+pInizio.value=dataInizio.value;pFine.value=dataFine.value;pNome.value="";pTelefono.value="";pDocumento.value="";pNote.value="";pStato.value="prenotata";
+righePrenotazione.innerHTML="";aggiungiRiga();eliminaPrenotazione.classList.add("hidden");modalPrenotazione.classList.remove("hidden")
+}
+
+function modificaPrenotazione(x){
+const p=stato.prenotazioni.find(z=>z.id===x);if(!p)return;
+prenotazioneId.value=p.id;titoloPrenotazione.textContent="Modifica prenotazione";
+pInizio.value=p.inizio;pFine.value=p.fine;pNome.value=p.nome;pTelefono.value=p.telefono;pDocumento.value=p.documento;pNote.value=p.note;pStato.value=p.stato;
+righePrenotazione.innerHTML="";p.righe.forEach(aggiungiRiga);eliminaPrenotazione.classList.remove("hidden");modalPrenotazione.classList.remove("hidden")
+}
+
+function aggiungiRiga(r={idParco:"",quantita:1}){
+const d=document.createElement("div");d.className="bookingrow";
+d.innerHTML=`<label>Categoria<select class="rTipo"><option value="">Seleziona</option>${stato.parco.filter(f=>f.attivo||f.id===r.idParco).map(f=>`<option value="${f.id}" ${f.id===r.idParco?"selected":""}>${esc(f.nome)}</option>`).join("")}</select></label><label>Qtà<input class="rQta" type="number" min="1" value="${r.quantita}"></label><button onclick="this.parentElement.remove()">×</button>`;
+righePrenotazione.appendChild(d)
+}
+
+function salvaPrenotazione(){
+if(!pNome.value.trim()){avviso("Inserisci il nome cliente");return}
+if(!pInizio.value||!pFine.value||pFine.value<=pInizio.value){avviso("Controlla le date");return}
+const righe=[...document.querySelectorAll(".bookingrow")].map(x=>({idParco:x.querySelector(".rTipo").value,quantita:Number(x.querySelector(".rQta").value)})).filter(x=>x.idParco&&x.quantita>0);
+if(!righe.length){avviso("Aggiungi almeno una bici");return}
+const escludi=prenotazioneId.value;
+for(const r of righe){
+const f=stato.parco.find(x=>x.id===r.idParco);
+if(r.quantita>disponibili(f,pInizio.value,pFine.value,escludi)){avviso(`${f.nome}: disponibilità insufficiente`);return}
+}
+const p={id:escludi||id("p"),inizio:pInizio.value,fine:pFine.value,nome:pNome.value.trim(),telefono:pTelefono.value.trim(),documento:pDocumento.value.trim(),note:pNote.value.trim(),stato:pStato.value,righe};
+const i=stato.prenotazioni.findIndex(x=>x.id===p.id);if(i>=0)stato.prenotazioni[i]=p;else stato.prenotazioni.push(p);
+salva();chiudi("modalPrenotazione");renderTutto();avviso("Prenotazione salvata")
+}
+
+function cancellaPrenotazione(){
+if(!confirm("Eliminare definitivamente?"))return;
+stato.prenotazioni=stato.prenotazioni.filter(x=>x.id!==prenotazioneId.value);salva();chiudi("modalPrenotazione");renderTutto()
+}
+
+function cambiaStato(x,s){const p=stato.prenotazioni.find(z=>z.id===x);if(p){p.stato=s;salva();renderTutto()}}
+
+function apriParco(x=""){
+const f=stato.parco.find(z=>z.id===x);
+parcoId.value=f?.id||"";parcoNome.value=f?.nome||"";parcoTotale.value=f?.totale||0;parcoFuori.value=f?.fuori||0;parcoTipo.value=f?.tipo||"bike";parcoAttivo.checked=f?.attivo??true;
+titoloParco.textContent=f?"Modifica categoria":"Aggiungi categoria";eliminaParco.classList.toggle("hidden",!f);modalParco.classList.remove("hidden")
+}
+
+function salvaParco(){
+const totale=Number(parcoTotale.value),fuori=Number(parcoFuori.value);
+if(!parcoNome.value.trim()){avviso("Inserisci il nome");return}
+if(fuori>totale){avviso("Fuori servizio non può superare il totale");return}
+const f={id:parcoId.value||id("f"),nome:parcoNome.value.trim(),totale,fuori,tipo:parcoTipo.value,attivo:parcoAttivo.checked};
+const i=stato.parco.findIndex(x=>x.id===f.id);if(i>=0)stato.parco[i]=f;else stato.parco.push(f);
+salva();chiudi("modalParco");renderTutto()
+}
+
+function cancellaParco(){
+const x=parcoId.value;
+if(stato.prenotazioni.some(p=>p.righe.some(r=>r.idParco===x))){avviso("Categoria usata nello storico: disattivala");return}
+if(confirm("Eliminare categoria?")){stato.parco=stato.parco.filter(f=>f.id!==x);salva();chiudi("modalParco");renderTutto()}
+}
+
+function chiudi(x){document.getElementById(x).classList.add("hidden")}
+function avviso(t){toast.textContent=t;toast.classList.remove("hidden");setTimeout(()=>toast.classList.add("hidden"),2200)}
+function esportaBackup(){
+const blob=new Blob([JSON.stringify(stato,null,2)],{type:"application/json"}),a=document.createElement("a");
+a.href=URL.createObjectURL(blob);a.download=`backup-noleggio-${oggi()}.json`;a.click()
+}
+function importaBackup(e){
+const f=e.target.files[0];if(!f)return;
+const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x.parco||!x.prenotazioni)throw 0;stato=x;salva();renderTutto();avviso("Backup importato")}catch{alert("Backup non valido")}};r.readAsText(f)
+}
+function renderTutto(){renderOggi();renderDisponibilita();renderPrenotazioni();renderParco()}
+
+const d=oggi(),domani=new Date(d+"T12:00:00");domani.setDate(domani.getDate()+1);
+dataInizio.value=d;dataFine.value=domani.toISOString().slice(0,10);
+dataInizio.onchange=renderDisponibilita;dataFine.onchange=renderDisponibilita;
+renderTutto();
+</script>
+</body>
+</html>
