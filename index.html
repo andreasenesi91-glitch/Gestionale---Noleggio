@@ -1,382 +1,4156 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#111">
-<title>Gestionale Noleggio</title>
-<style>
-:root{--bg:#0e0f10;--card:#191b1e;--line:#30343a;--text:#f7f7f7;--muted:#a9afb7;--yellow:#ffd400;--green:#48d395;--red:#ff6b6b}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
-button,input,select,textarea{font:inherit}button{cursor:pointer}
-header{padding:22px 16px 12px}h1,h2,h3,p{margin-top:0}h1{font-size:24px;margin-bottom:3px}.muted{color:var(--muted)}
-main{padding:0 14px 95px;max-width:650px;margin:auto}.screen{display:none}.screen.active{display:block}
-.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:15px;margin-bottom:11px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat strong{display:block;font-size:28px;margin-top:5px}
-.btn{border:0;border-radius:13px;min-height:46px;padding:11px 14px;font-weight:bold;background:#25282d;color:white}
-.primary{background:var(--yellow);color:#111}.danger{background:#4b2225;color:#ffb1b1}.full{width:100%}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-label{display:block;font-size:12px;font-weight:bold;color:var(--muted);margin-bottom:10px}
-input,select,textarea{width:100%;margin-top:6px;background:#101214;color:white;border:1px solid var(--line);border-radius:12px;padding:12px;min-height:45px}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stack{display:grid;gap:10px}
-.item{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
-.itemhead{display:flex;justify-content:space-between;gap:10px}.badge{padding:6px 9px;border-radius:999px;font-size:12px;font-weight:bold;background:#292c31}
-.green{color:var(--green)}.red{color:var(--red)}.yellow{color:var(--yellow)}
-.empty{border:1px dashed var(--line);padding:18px;border-radius:14px;text-align:center;color:var(--muted)}
-nav{position:fixed;bottom:0;left:0;right:0;background:#111214;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:7px 5px calc(7px + env(safe-area-inset-bottom))}
-nav button{border:0;background:transparent;color:var(--muted);padding:7px 2px;font-size:11px;font-weight:bold}nav button.active{color:var(--yellow)}
-nav span{display:block;font-size:21px;margin-bottom:3px}
-.modal{position:fixed;inset:0;background:#000b;display:flex;align-items:flex-end;z-index:20}.hidden{display:none!important}
-.sheet{width:100%;max-height:96vh;overflow:auto;background:var(--bg);border-radius:22px 22px 0 0;padding:17px 14px 25px}
-.sheethead{display:flex;justify-content:space-between;align-items:center}.close{border:0;background:#282b30;color:white;border-radius:12px;width:42px;height:42px;font-size:24px}
-.bookingrow{display:grid;grid-template-columns:1fr 75px 42px;gap:7px;align-items:end}.bookingrow button{height:45px;border:0;border-radius:11px;background:#4b2225;color:#ffb1b1}
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:white;color:#111;padding:12px 15px;border-radius:12px;font-weight:bold;z-index:50}
-@media(max-width:370px){.row{grid-template-columns:1fr}}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#111111" />
+  <meta name="description" content="Gestionale mobile per attività di noleggio" />
+  <style>
+:root {
+  --bg: #0b0b0b;
+  --panel: #171717;
+  --panel-2: #202020;
+  --yellow: #ffd400;
+  --yellow-dark: #d9b400;
+  --text: #f7f7f7;
+  --muted: #a7a7a7;
+  --border: #303030;
+  --danger: #ff5c5c;
+  --success: #3ddc84;
+  --warning: #ffb020;
+  --radius: 18px;
+  --shadow: 0 12px 32px rgba(0,0,0,.28);
+}
+
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; }
+
+.app-shell {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  min-height: 100vh;
+  padding-bottom: 24px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  padding: 20px 16px 12px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(11,11,11,.94);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+
+
+/* Menu principale a tendina */
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  min-width: 0;
+  margin-left: auto;
+}
+.business-name-header {
+  display: block;
+  max-width: 180px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-weight: 800;
+  font-size: .9rem;
+  text-align: right;
+}
+.menu-wrap {
+  position: relative;
+  flex: 0 0 auto;
+}
+.hamburger-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-size: 1.7rem;
+}
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 1000;
+  width: min(290px, calc(100vw - 32px));
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #171717;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 18px 45px rgba(0,0,0,.55);
+}
+.dropdown-menu[hidden] { display: none !important; }
+.menu-item {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 13px;
+  margin: 0;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  font-weight: 750;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+.menu-item span {
+  width: 26px;
+  flex: 0 0 26px;
+  text-align: center;
+  font-size: 1.15rem;
+}
+.menu-item:hover,
+.menu-item:focus-visible {
+  background: var(--panel-2);
+  outline: none;
+}
+.menu-item:active { transform: scale(.99); }
+.menu-item.active {
+  background: var(--yellow);
+  color: #111;
+}
+.menu-divider {
+  height: 1px;
+  margin: 4px 6px;
+  background: var(--border);
+}
+@media (max-width: 520px) {
+  .topbar { gap: 8px; padding-left: 12px; padding-right: 12px; }
+  .brand-inline { min-width: 0; }
+  .business-name-header { max-width: 115px; font-size: .8rem; }
+  .dropdown-menu { position: fixed; top: 76px; right: 12px; }
+}
+
+.topbar h1, h2, h3, p { margin-top: 0; }
+.topbar h1 { margin-bottom: 0; font-size: 1.35rem; }
+.eyebrow {
+  color: var(--yellow);
+  letter-spacing: .11em;
+  font-size: .72rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+.muted { color: var(--muted); }
+
+.page { display: none; padding: 12px 16px 24px; }
+.page.active { display: block; }
+
+.icon-btn {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  font-size: 1.25rem;
+}
+
+.hero-card, .form-card, .availability-panel {
+  background: linear-gradient(145deg, var(--panel), #111);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.hero-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px;
+}
+.hero-card h2 { margin-bottom: 0; }
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 14px 0 22px;
+}
+.stat-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+.stat-card span { color: var(--muted); font-size: .82rem; display: block; margin-bottom: 6px; }
+.stat-card strong { font-size: 1.65rem; }
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 16px 0 12px;
+}
+.section-head h2, .section-head h3 { margin-bottom: 0; }
+.section-head.no-margin { margin: 0 0 12px; }
+
+.sticky-head {
+  position: sticky;
+  top: 78px;
+  z-index: 10;
+  padding: 8px 0;
+  background: var(--bg);
+}
+
+.form-card {
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.form-card h3 { margin-top: 8px; }
+
+label {
+  display: block;
+  color: var(--muted);
+  font-size: .88rem;
+  margin-bottom: 14px;
+}
+input, select, textarea {
+  width: 100%;
+  margin-top: 7px;
+  border: 1px solid var(--border);
+  background: #101010;
+  color: var(--text);
+  border-radius: 14px;
+  min-height: 50px;
+  padding: 12px 14px;
+  outline: none;
+}
+textarea { resize: vertical; }
+input:focus, select:focus, textarea:focus {
+  border-color: var(--yellow);
+  box-shadow: 0 0 0 3px rgba(255,212,0,.12);
+}
+
+.two-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.subsection {
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+  padding-top: 14px;
+}
+
+.quantity-list { display: grid; gap: 10px; }
+.quantity-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  background: #111;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 10px 12px;
+}
+.quantity-row small { display: block; color: var(--muted); margin-top: 3px; }
+.quantity-row-bike { align-items: flex-start; flex-wrap: wrap; }
+.inline-seats { width: 100%; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+.inline-seats-title { display:block; color: var(--yellow); font-size:.82rem; font-weight:800; margin-bottom:8px; }
+.inline-seat-grid { display:grid; gap:8px; }
+.inline-seat-row { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.inline-seat-row span { font-size:.88rem; color:var(--text); }
+.inline-seat-row .quantity-control { min-width:132px; }
+.home-date-nav { display:flex; align-items:center; gap:8px; }
+.home-date-nav .icon-btn { width:42px; height:42px; }
+.home-date-copy { min-width:0; flex:1; }
+.home-date-copy h2 { margin-bottom:0; text-transform:capitalize; }
+.home-today-btn { margin-top:5px; }
+
+.quantity-control {
+  display: grid;
+  grid-template-columns: 38px 48px 38px;
+  align-items: center;
+  gap: 6px;
+}
+.qty-btn {
+  border: 0;
+  border-radius: 11px;
+  height: 38px;
+  background: var(--panel-2);
+  color: var(--text);
+  font-size: 1.2rem;
+}
+.qty-input {
+  margin: 0;
+  min-height: 38px;
+  height: 38px;
+  padding: 0;
+  text-align: center;
+  border-radius: 10px;
+}
+
+.primary-btn, .secondary-btn, .danger-btn, .text-btn, .file-label {
+  border-radius: 14px;
+  min-height: 48px;
+  padding: 12px 16px;
+  font-weight: 800;
+  border: 1px solid transparent;
+}
+.primary-btn {
+  background: var(--yellow);
+  color: #111;
+}
+.primary-btn:active { background: var(--yellow-dark); }
+.secondary-btn {
+  background: var(--panel-2);
+  color: var(--text);
+  border-color: var(--border);
+}
+.danger-btn {
+  background: rgba(255,92,92,.12);
+  color: #ff8585;
+  border-color: rgba(255,92,92,.28);
+}
+.text-btn {
+  min-height: auto;
+  padding: 7px 0;
+  color: var(--yellow);
+  background: transparent;
+}
+.compact { min-height: 42px; padding: 9px 13px; }
+.full { width: 100%; margin-top: 8px; }
+
+.card-list { display: grid; gap: 12px; }
+.empty-state {
+  text-align: center;
+  color: var(--muted);
+  padding: 34px 16px;
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+}
+
+.rental-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 15px;
+}
+.rental-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 10px;
+}
+.rental-card h3 { margin-bottom: 4px; }
+.rental-meta, .rental-items, .rental-notes { color: var(--muted); margin-bottom: 8px; }
+.rental-items { white-space: pre-line; line-height: 1.45; }
+.rental-item-line { display:block; }
+.rental-notes:empty { display: none; }
+
+.status-pill, .availability-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 6px 9px;
+  font-size: .72rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+.status-prenotata { background: rgba(255,212,0,.12); color: var(--yellow); }
+.status-ritirata { background: rgba(61,220,132,.12); color: var(--success); }
+.status-restituita { background: rgba(120,160,255,.12); color: #8fb2ff; }
+.status-annullata { background: rgba(255,92,92,.12); color: #ff8585; }
+.availability-ok { background: rgba(61,220,132,.12); color: var(--success); }
+.availability-no { background: rgba(255,92,92,.12); color: #ff8585; }
+
+.card-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+.card-actions button { padding: 9px 8px; min-height: 42px; font-size: .8rem; }
+
+.calendar-controls {
+  display: grid;
+  grid-template-columns: 52px 1fr 52px;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.calendar-controls input { margin: 0; }
+.fleet-range-center {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.fleet-date-field {
+  display: grid;
+  gap: 5px;
+}
+.fleet-date-field span {
+  color: var(--muted);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding-left: 2px;
+}
+.fleet-range-search {
+  width: 100%;
+  margin: 0 0 12px;
+}
+@media (max-width: 430px) {
+  .calendar-controls.fleet-range-controls {
+    grid-template-columns: 52px minmax(0, 1fr) 52px;
+  }
+  .fleet-range-center { gap: 6px; }
+  .fleet-range-center input { padding-left: 10px; padding-right: 8px; font-size: .88rem; }
+}
+.availability-panel { padding: 14px; margin-bottom: 14px; }
+.availability-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.availability-line:last-child { border-bottom: 0; }
+
+.search-input { margin: 0 0 14px; }
+.customer-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 15px;
+}
+.customer-card h3 { margin-bottom: 4px; }
+.customer-card p { margin-bottom: 5px; color: var(--muted); }
+
+.file-label {
+  display: block;
+  text-align: center;
+  background: var(--panel-2);
+  color: var(--text);
+  border-color: var(--border);
+  margin-top: 10px;
+}
+.file-label input { display: none; }
+
+.bottom-nav {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 760px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: rgba(16,16,16,.97);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+  z-index: 30;
+}
+.nav-btn {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  min-height: 58px;
+  border-radius: 14px;
+  font-size: .72rem;
+  font-weight: 800;
+}
+.nav-btn span { display: block; font-size: 1.25rem; margin-bottom: 3px; }
+.nav-btn.active { color: #111; background: var(--yellow); }
+
+@media (max-width: 430px) {
+  .two-cols { grid-template-columns: 1fr; gap: 0; }
+  .card-actions { grid-template-columns: 1fr 1fr; }
+  .card-actions .delete-btn { grid-column: 1 / -1; }
+}
+
+
+.fleet-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.fleet-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 15px;
+}
+
+.fleet-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 12px;
+}
+
+.fleet-numbers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.fleet-number {
+  background: #111;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+}
+
+.fleet-number span {
+  display: block;
+  color: var(--muted);
+  font-size: .72rem;
+  margin-bottom: 4px;
+}
+
+.fleet-number strong {
+  font-size: 1.2rem;
+}
+
+.fleet-card-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.fleet-card-actions-three .manage-units-btn {
+  grid-column: 1 / -1;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.72);
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  z-index: 100;
+}
+
+.modal-backdrop.hidden {
+  display: none;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 460px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.setup-personalize-note {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #111;
+  color: var(--muted);
+  font-size: .9rem;
+  line-height: 1.4;
+}
+
+.unit-list {
+  display: grid;
+  gap: 10px;
+  max-height: 52vh;
+  overflow-y: auto;
+  margin: 12px 0 16px;
+  padding-right: 2px;
+}
+
+.unit-row {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.unit-row-number {
+  display: grid;
+  place-items: center;
+  min-height: 46px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #111;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.unit-helper {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: .86rem;
+  line-height: 1.4;
+}
+
+.small-icon {
+  width: 42px;
+  height: 42px;
+  min-height: 42px;
+}
+
+.bottom-nav {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+@media (max-width: 430px) {
+  .fleet-summary-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .fleet-number {
+    padding: 8px 4px;
+  }
+
+  .bottom-nav {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .nav-btn {
+    font-size: .62rem;
+  }
+}
+
+
+/* Listino e prezzo automatico */
+.price-summary-card { background: linear-gradient(145deg, rgba(255,213,0,.13), rgba(255,255,255,.03)); border:1px solid rgba(255,213,0,.35); border-radius:20px; padding:16px; margin:16px 0; }
+.price-summary-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+.price-summary-card h3 { margin:0; }
+.price-days { color:var(--muted); margin:5px 0 0; font-size:.92rem; }
+.price-total-row { display:grid; grid-template-columns:1fr auto; align-items:end; gap:12px; margin-top:14px; }
+.price-total-row label { margin:0; }
+.price-input-wrap { position:relative; }
+.price-input-wrap input { padding-right:42px; font-size:1.35rem; font-weight:800; }
+.price-input-wrap span { position:absolute; right:16px; top:50%; transform:translateY(-50%); font-weight:800; }
+.price-auto-note { display:block; color:var(--muted); margin-top:8px; font-size:.84rem; }
+.pricing-grid { display:grid; gap:12px; }
+.pricing-row { display:grid; grid-template-columns:1fr 120px; gap:12px; align-items:center; padding:12px 0; border-bottom:1px solid var(--border); }
+.pricing-row:last-child { border-bottom:0; }
+.pricing-row label { margin:0; font-weight:700; }
+.pricing-row .price-input-wrap input { text-align:right; }
+.pricing-preview { margin-top:16px; padding:14px; border-radius:16px; background:rgba(255,255,255,.04); }
+.pricing-preview-line { display:flex; justify-content:space-between; gap:12px; padding:6px 0; color:var(--muted); }
+.rental-price { font-weight:800; color:var(--yellow); white-space:pre-line; margin-top:7px; }
+.settings-link-card { cursor:pointer; }
+
+/* Configurazione inventario iniziale */
+.inventory-setup-screen {
+  position: fixed; inset: 0; z-index: 10003; overflow-y: auto;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 34px 18px; background: #0b0b0b;
+}
+.inventory-setup-screen[hidden] { display: none; }
+.inventory-setup-content { width: 100%; max-width: 520px; margin: auto; }
+.inventory-setup-list { display: grid; gap: 14px; margin-bottom: 14px; }
+.setup-category-card { padding: 16px; border: 1px solid var(--border); border-radius: var(--radius); background: linear-gradient(145deg, var(--panel), #111); }
+.setup-category-grid, .setup-object-row { display: grid; grid-template-columns: minmax(0,1fr) 92px auto; gap: 9px; align-items: end; }
+.setup-object-list { display: grid; gap: 9px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.setup-object-heading { color: var(--yellow); font-weight: 900; font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; }
+.setup-mini-btn { min-height: 44px; padding: 9px 11px; border-radius: 12px; border: 1px solid var(--border); background: #222; color: var(--text); font-weight: 800; }
+.setup-remove-btn { min-width: 44px; color: #ff8d8d; }
+.setup-add-category { width: 100%; margin-bottom: 16px; }
+@media (max-width: 430px) {
+  .setup-category-grid, .setup-object-row { grid-template-columns: minmax(0,1fr) 78px auto; }
+}
+
+
+.setup-section-block { margin: 18px 0 24px; padding: 16px; border: 1px solid var(--border); border-radius: 20px; background: rgba(255,255,255,.02); }
+.setup-section-block > .eyebrow { margin: 0 0 12px; }
+
+
+/* Centro Promemoria */
+.reminder-filters { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; margin: 4px 0 16px; }
+.reminder-filter { min-height:42px; padding:9px 14px; border-radius:999px; border:1px solid var(--border); background:var(--panel); color:var(--text); font-weight:800; white-space:nowrap; }
+.reminder-filter.active { background:var(--yellow); color:#111; border-color:var(--yellow); }
+.reminder-section { margin-bottom:22px; }
+.reminder-section-title { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:0 0 10px; }
+.reminder-section-title h3 { margin:0; }
+.reminder-count { min-width:30px; height:30px; padding:0 9px; display:inline-flex; align-items:center; justify-content:center; border-radius:999px; background:var(--panel-2); color:var(--yellow); font-weight:900; }
+.reminder-list { display:grid; gap:10px; }
+.reminder-card { width:100%; border:1px solid var(--border); border-radius:16px; background:linear-gradient(145deg,var(--panel),#111); color:var(--text); padding:14px; text-align:left; box-shadow:var(--shadow); }
+.reminder-card:active { transform:scale(.995); }
+.reminder-card-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:8px; }
+.reminder-card h4 { margin:0; font-size:1rem; }
+.reminder-kind { flex:0 0 auto; padding:5px 9px; border-radius:999px; font-size:.74rem; font-weight:900; }
+.reminder-kind.delivery { background:rgba(255,212,0,.14); color:var(--yellow); }
+.reminder-kind.return { background:rgba(255,176,32,.14); color:var(--warning); }
+.reminder-kind.late { background:rgba(255,92,92,.14); color:var(--danger); }
+.reminder-time { color:var(--muted); font-size:.86rem; margin-bottom:7px; }
+.reminder-items { white-space:pre-line; line-height:1.45; font-size:.91rem; }
+.reminder-open { color:var(--yellow); font-weight:850; font-size:.82rem; margin-top:10px; }
+.reminder-empty { border:1px dashed var(--border); border-radius:15px; padding:16px; color:var(--muted); text-align:center; }
+
+
+/* Accesso account Rentix Lab */
+.welcome-growth{margin:10px 0 18px;color:var(--yellow);font-size:1.08rem}.welcome-points{margin:0 auto 22px;max-width:390px;text-align:left;color:#ddd;line-height:1.45}.welcome-points p{margin:9px 0}
+.auth-screen { position:fixed; inset:0; z-index:1200; min-height:100dvh; overflow-y:auto; padding:max(24px,env(safe-area-inset-top)) 20px max(24px,env(safe-area-inset-bottom)); display:flex; justify-content:center; background:radial-gradient(circle at 50% 8%,rgba(255,212,0,.10),transparent 30%),linear-gradient(180deg,#111 0%,#050505 100%); }
+.auth-screen[hidden]{display:none!important}.auth-content{width:100%;max-width:480px;margin:auto}.auth-hero{text-align:center;margin-bottom:24px}.auth-logo-large{width:86px;height:86px;color:var(--yellow);margin:0 auto 2px}.auth-logo-large svg{width:100%;height:100%}.auth-brand-large{margin:0;font-size:1.65rem;font-weight:950;letter-spacing:-.04em}.auth-brand-large span,.auth-title span,.auth-security strong{color:var(--yellow)}.auth-kicker{margin:2px 0 0;color:#d6d6d6;font-size:.88rem}.auth-title{text-align:center;margin:0 0 10px;font-size:clamp(1.8rem,7vw,2.4rem)}.auth-copy{text-align:center;margin:0 0 20px;color:#d0d0d0;font-size:1.05rem}.auth-security{text-align:center;margin:0 auto 22px;max-width:390px;color:#ddd;line-height:1.5}.auth-security-icon{width:64px;height:64px;margin:0 auto 14px;border:1px solid var(--yellow);border-radius:50%;display:grid;place-items:center;color:var(--yellow);font-size:1.8rem;box-shadow:0 0 25px rgba(255,212,0,.15)}.auth-security p{margin:0}.auth-card{padding:16px;border:1px solid var(--border);border-radius:24px;background:linear-gradient(145deg,rgba(23,23,23,.96),#0d0d0d);box-shadow:var(--shadow)}.auth-card label{display:block;margin-bottom:14px;color:#cfcfcf}.auth-card input[type=email],.auth-card input[type=password],.auth-card input[type=text]{margin-top:8px;min-height:58px;background:#111;border-color:#383838}.password-field{position:relative;margin-top:8px}.password-field input{margin-top:0!important;padding-right:58px}.password-toggle{position:absolute;right:7px;top:50%;transform:translateY(-50%);width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:var(--muted);font-size:1.15rem}.auth-consent{display:grid!important;grid-template-columns:22px 1fr;gap:10px;align-items:start;margin:4px 0 14px!important;color:var(--muted)!important;font-size:.9rem;line-height:1.4}.auth-consent input{width:20px;height:20px;margin:0;accent-color:var(--yellow)}.auth-error{min-height:21px;margin:0 0 9px;color:var(--danger);font-size:.88rem}.auth-success{margin:0 0 12px;padding:12px;border:1px solid rgba(61,220,132,.35);border-radius:12px;background:rgba(61,220,132,.08);color:var(--success);line-height:1.4}.auth-submit{width:100%;min-height:56px}.auth-submit:disabled{opacity:.65;cursor:wait}.auth-switch{display:flex;align-items:center;gap:12px;margin:18px 0 0;color:var(--muted)}.auth-switch:before,.auth-switch:after{content:"";height:1px;flex:1;background:var(--border)}.auth-switch span{white-space:nowrap}.auth-switch button{border:0;padding:0;background:none;color:var(--yellow);font-weight:900;font-size:1rem}.auth-benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:20px;padding-top:18px;border-top:1px solid var(--border)}.auth-benefits div{text-align:center;display:grid;gap:7px;color:var(--muted);font-size:.72rem;line-height:1.25}.auth-benefits b{color:var(--yellow);font-size:1.45rem}.login-mode #confirmPasswordLabel,.login-mode #registrationConsentLabel{display:none!important}.login-mode .auth-security{display:none}.login-mode .auth-title{margin-top:12px}.forgot-password-btn{display:none;width:100%;margin:-2px 0 14px;border:0;background:none;color:var(--yellow);font-weight:850;text-align:right;padding:0 2px}.login-mode .forgot-password-btn{display:block}.recovery-mode #registrationPasswordLabel,.recovery-mode #confirmPasswordLabel,.recovery-mode #registrationConsentLabel,.recovery-mode .auth-switch,.recovery-mode .auth-benefits,.recovery-mode .forgot-password-btn{display:none!important}.new-password-mode #registrationEmailLabel,.new-password-mode #registrationConsentLabel,.new-password-mode .auth-switch,.new-password-mode .auth-benefits,.new-password-mode .forgot-password-btn{display:none!important}.new-password-mode #confirmPasswordLabel{display:block!important}body.auth-open{overflow:hidden}@media(max-width:420px){.auth-benefits{gap:4px}.auth-switch{font-size:.88rem}.auth-logo-large{width:72px;height:72px}}
+
+.account-flow-screen {
+  position: fixed; inset: 0; z-index: 1190; overflow-y: auto; padding: 28px 18px;
+  background: radial-gradient(circle at top, rgba(255,213,0,.12), transparent 33%), var(--bg);
+  display: flex; align-items: center; justify-content: center;
+}
+.account-flow-screen[hidden] { display: none; }
+.account-flow-content { width: 100%; max-width: 430px; }
+.account-flow-card { padding: 20px; border: 1px solid var(--border); border-radius: var(--radius); background: linear-gradient(145deg, var(--panel), #111); box-shadow: var(--shadow); }
+.account-flow-badge { width: 58px; height: 58px; margin: 0 auto 14px; border-radius: 50%; display:grid; place-items:center; background:var(--yellow); color:#050505; font-size:1.55rem; font-weight:900; }
+.account-flow-step { margin:0 0 10px; color:var(--yellow); font-size:.76rem; font-weight:900; letter-spacing:.11em; text-transform:uppercase; text-align:center; }
+.account-flow-title { margin:0 0 10px; text-align:center; font-size:clamp(1.65rem,7vw,2.25rem); line-height:1.08; }
+.account-flow-copy { margin:0 0 20px; color:var(--muted); line-height:1.5; text-align:center; }
+.account-flow-email { margin:0 0 18px; padding:14px; border:1px solid var(--border); border-radius:14px; background:#0b0b0b; }
+.account-flow-email small { display:block; margin-bottom:5px; color:var(--muted); font-weight:800; }
+.account-flow-email strong { display:block; overflow-wrap:anywhere; }
+.account-flow-status { margin:0 0 18px; color:#c9f7cf; text-align:center; font-weight:800; }
+.account-flow-actions { display:grid; gap:10px; }
+.account-delete-zone { margin-top:18px; padding-top:18px; border-top:1px solid #3a2222; }
+.account-delete-note { margin:0 0 10px; color:#bdbdbd; font-size:.86rem; line-height:1.45; text-align:center; }
+.account-delete-btn { width:100%; min-height:52px; border:1px solid rgba(255,80,80,.65); border-radius:14px; background:rgba(160,20,20,.16); color:#ff7878; font-weight:900; font-size:1rem; }
+.account-delete-btn:disabled { opacity:.6; cursor:wait; }
+
+
+.fleet-range-center{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;}
+.calendar-controls.fleet-range-controls{display:block;}
+
+/* Back navigation button */
+.back-btn {
+  flex: 0 0 auto;
+  width: 37px;
+  height: 37px;
+  min-width: 37px;
+  border-radius: 50%;
+  border: none;
+  box-shadow: 0 0 0 1.5px rgba(255, 212, 0, 0.18), 0 0 10px rgba(255, 212, 0, 0.07);
+  background: transparent;
+  color: #ffd400;
+  font-size: 1.4rem;
+  font-weight: 900;
+  -webkit-text-stroke: 0.5px #ffd400;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 2px;
+  transition: transform 0.13s ease, background 0.13s ease, box-shadow 0.13s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.back-btn:active {
+  transform: scale(0.95);
+  background: rgba(255, 212, 0, 0.09);
+  box-shadow: 0 0 0 1.5px rgba(255, 212, 0, 0.40), 0 0 12px rgba(255, 212, 0, 0.14);
+}
+.back-btn[hidden] { display: none !important; }
 </style>
+  <title>Rentix Lab Lite</title>
+
+<style>
+  .bottom-nav { grid-template-columns: repeat(5, 1fr); }
+  .stat-action {
+    width: 100%;
+    color: var(--text);
+    text-align: left;
+    cursor: pointer;
+    appearance: none;
+  }
+  .stat-action small {
+    display: block;
+    margin-top: 7px;
+    color: var(--yellow);
+    font-size: .68rem;
+    font-weight: 800;
+  }
+  .stat-action:active { transform: scale(.98); }
+  .stat-action.selected {
+    border-color: var(--yellow);
+    box-shadow: 0 0 0 2px rgba(255,212,0,.12);
+  }
+  .month-calendar {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .month-header {
+    display: grid;
+    grid-template-columns: 48px 1fr 48px;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .month-header strong {
+    display: block;
+    font-size: 1.15rem;
+    text-transform: capitalize;
+  }
+  .month-arrow { padding: 0; min-height: 46px; }
+  .today-jump { font-size: .73rem; padding-top: 4px; }
+  .weekdays, .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+  }
+  .weekdays {
+    margin-bottom: 5px;
+    color: var(--muted);
+    font-size: .67rem;
+    font-weight: 900;
+    text-align: center;
+  }
+  .calendar-day {
+    position: relative;
+    min-height: 54px;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    background: #111;
+    color: var(--text);
+    padding: 6px 3px;
+    text-align: center;
+    font-weight: 800;
+  }
+  .calendar-day.other-month { opacity: .28; }
+  .calendar-day.today { border-color: var(--yellow); }
+  .calendar-day.selected {
+    background: var(--yellow);
+    color: #111;
+    border-color: var(--yellow);
+  }
+  .calendar-day .day-number { display: block; }
+  .calendar-day .booking-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 19px;
+    height: 19px;
+    margin-top: 4px;
+    border-radius: 999px;
+    padding: 0 5px;
+    background: rgba(255,212,0,.15);
+    color: var(--yellow);
+    font-size: .65rem;
+  }
+  .calendar-day.selected .booking-count {
+    background: #111;
+    color: var(--yellow);
+  }
+  .calendar-date-hidden { display: none; }
+  .selected-day-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 10px;
+    margin: 10px 0;
+  }
+  .selected-day-head h3 { margin-bottom: 0; text-transform: capitalize; }
+  @media (max-width: 380px) {
+    .calendar-day { min-height: 48px; font-size: .82rem; }
+    .calendar-grid, .weekdays { gap: 3px; }
+    .nav-btn { font-size: .62rem; }
+  }
+</style>
+
+
+<style>
+  .quantity-row small {
+    line-height: 1.3;
+  }
+  .availability-warning-text {
+    color: var(--danger) !important;
+    font-weight: 800;
+  }
+</style>
+
+
+
+
+
+<style>
+  .branded-topbar {
+    align-items: center;
+    padding-top: 12px;
+    padding-bottom: 14px;
+  }
+  .brand-inline {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-width: 0;
+  }
+  .brand-mark {
+    width: 112px;
+    height: 76px;
+    object-fit: contain;
+    object-position: center;
+    flex: 0 0 auto;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,.25));
+  }
+  .brand-title-wrap {
+    display: flex;
+    flex-direction: column;
+    line-height: .92;
+    min-width: 0;
+  }
+  .brand-title-line {
+    font-size: clamp(1.45rem, 5vw, 2.05rem);
+    font-weight: 900;
+    letter-spacing: -.04em;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .brand-title-line.accent {
+    color: var(--yellow);
+  }
+  @media (max-width: 390px) {
+    .brand-inline { gap: 9px; }
+    .brand-mark {
+      width: 92px;
+      height: 66px;
+    }
+    .brand-title-line {
+      font-size: 1.42rem;
+    }
+  }
+
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    min-width: 0;
+    margin-left: auto;
+  }
+  .business-name-header {
+    max-width: min(42vw, 220px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text);
+    font-size: .86rem;
+    font-weight: 800;
+    text-align: right;
+  }
+  @media (max-width: 430px) {
+    .brand-mark { width: 82px; height: 58px; }
+    .brand-title-line { font-size: .92rem; }
+    .business-name-header { max-width: 30vw; font-size: .78rem; }
+    .topbar-actions { gap: 6px; }
+  }
+</style>
+
+
+<style>
+  .customer-card { cursor: pointer; transition: transform .15s ease, border-color .15s ease; }
+  .customer-card:active { transform: scale(.99); }
+  .customer-card-hint { color: var(--yellow) !important; font-weight: 800; }
+
+  .bike-assignment-master-list { display:grid; gap:12px; margin-top:14px; }
+  .bike-assignment-category { display:grid; gap:10px; }
+  .bike-assignment-category-title { margin:0; color:var(--yellow); font-size:.82rem; font-weight:900; text-transform:uppercase; letter-spacing:.04em; }
+  .unit-assignment-field { display:grid; gap:6px; margin-top:10px; }
+  .unit-assignment-field span { font-size:.78rem; color:var(--muted); font-weight:800; }
+  .bike-assignment-list { grid-column: 1 / -1; display: grid; gap: 10px; margin-top: 12px; width: 100%; }
+  .quantity-row-bike > div:first-child { min-width: 0; }
+  .quantity-row-bike .quantity-control { align-self: center; }
+  .bike-assignment-list:empty { display:none; }
+  .bike-assignment-title { color: var(--yellow); font-size: .78rem; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; margin: 2px 0 0; }
+  .bike-assignment-row { display: grid; grid-template-columns: minmax(0,1fr) minmax(150px,1fr); align-items: center; gap: 10px; padding: 13px; border-radius: 14px; background: #191919; border: 1px solid rgba(255,212,0,.42); }
+  .bike-assignment-number { color: var(--yellow); font-size:.75rem; font-weight:900; text-transform:uppercase; display:block; margin-bottom:3px; }
+  .bike-assignment-row strong { font-size: .9rem; line-height: 1.2; }
+  .bike-assignment-row select { width: 100%; min-width: 0; padding: 10px 30px 10px 10px; }
+  .customer-detail-list { display: grid; gap: 10px; max-height: 62vh; overflow: auto; padding-right: 2px; }
+  .customer-detail-card { padding: 12px; border-radius: 14px; background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.09); }
+  .customer-detail-card h4 { margin: 0 0 5px; }
+  .customer-detail-card p { margin: 4px 0; color: var(--muted); }
+  .customer-detail-card .status-pill { display: inline-flex; margin-top: 5px; }
+  @media (max-width: 390px) { .bike-assignment-row { grid-template-columns: 1fr; gap: 6px; } }
+  .accessory-quantity-list { grid-column: 1 / -1; display: grid; gap: 8px; margin-top: 8px; }
+  .accessory-quantity-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0; border-top:1px solid var(--border); }
+  .accessory-quantity-row:first-child { border-top:0; }
+  .accessory-quantity-row strong { font-size:.92rem; }
+  .accessory-quantity-row .quantity-control { flex:0 0 auto; }
+  .accessory-quantity-row .qty-btn { width:42px; height:42px; }
+  .accessory-quantity-row .qty-input { width:58px; min-height:42px; padding:6px; text-align:center; margin:0; }
+  #accessoryFields { display:none !important; }
+
+
+  .rentix-logo{display:grid;place-items:center;color:var(--yellow);width:78px;height:68px;flex:0 0 auto;filter:drop-shadow(0 4px 12px rgba(255,212,0,.18));}
+  .rentix-logo svg{width:100%;height:100%;display:block;}
+  .price-list{display:grid;gap:10px;margin-top:12px;}
+  .price-list-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 2px;border-bottom:1px solid var(--border);}
+  .price-list-row:last-child{border-bottom:0;}
+  .price-list-row strong{font-size:1.1rem;color:var(--yellow);}
+  .price-note{margin-top:14px;padding:12px;border-radius:14px;background:rgba(255,212,0,.08);color:var(--muted);}
+
+/* Schermata di benvenuto: componente isolato dal gestionale */
+.welcome-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: max(24px, env(safe-area-inset-top)) 22px max(24px, env(safe-area-inset-bottom));
+  background:
+    radial-gradient(circle at 50% 20%, rgba(255,212,0,.13), transparent 34%),
+    linear-gradient(180deg, #111 0%, #080808 100%);
+}
+.welcome-screen[hidden] { display: none; }
+.welcome-content {
+  width: 100%;
+  max-width: 430px;
+  text-align: center;
+}
+.welcome-logo {
+  width: 142px;
+  height: 126px;
+  margin: 0 auto 22px;
+  color: var(--yellow);
+  filter: drop-shadow(0 8px 22px rgba(255,212,0,.22));
+}
+.welcome-logo svg { width: 100%; height: 100%; display: block; }
+.welcome-brand {
+  margin: 0;
+  font-size: clamp(2.15rem, 10vw, 3.2rem);
+  line-height: .95;
+  font-weight: 950;
+  letter-spacing: -.055em;
+}
+.welcome-brand span { color: var(--yellow); }
+.welcome-title {
+  margin: 22px 0 10px;
+  font-size: clamp(1.35rem, 6vw, 1.8rem);
+  line-height: 1.15;
+}
+.welcome-subtitle {
+  max-width: 340px;
+  margin: 0 auto 34px;
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.55;
+}
+.welcome-start-btn {
+  width: 100%;
+  min-height: 56px;
+  font-size: 1.05rem;
+  box-shadow: 0 10px 28px rgba(255,212,0,.16);
+}
+body.welcome-open { overflow: hidden; }
+
+
+/* Secondo passaggio configurazione: scelta del tipo di attività */
+.activity-setup-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: max(24px, env(safe-area-inset-top)) 22px max(24px, env(safe-area-inset-bottom));
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255,212,0,.11), transparent 35%),
+    linear-gradient(180deg, #111 0%, #080808 100%);
+}
+.activity-setup-screen[hidden] { display: none; }
+.activity-setup-content { width: 100%; max-width: 430px; }
+.activity-step { margin: 0 0 10px; color: var(--yellow); font-size: .76rem; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }
+.activity-setup-title { margin: 0 0 10px; font-size: clamp(1.65rem, 7vw, 2.25rem); line-height: 1.08; }
+.activity-setup-copy { margin: 0 0 25px; color: var(--muted); line-height: 1.5; }
+.activity-setup-card { padding: 18px; border: 1px solid var(--border); border-radius: var(--radius); background: linear-gradient(145deg, var(--panel), #111); box-shadow: var(--shadow); }
+.activity-setup-card label { margin-bottom: 16px; }
+.activity-setup-card select { margin-top: 9px; }
+.activity-custom-wrap[hidden] { display: none; }
+.setup-actions { display: grid; grid-template-columns: 1fr 1.35fr; gap: 10px; margin-top: 2px; }
+.setup-back-btn,
+.activity-continue-btn,
+.setup-back-btn { background: #222; color: var(--text); border: 1px solid var(--border); }
+.setup-back-btn:active { transform: translateY(1px); }
+.activity-error { min-height: 20px; margin: -4px 0 10px; color: var(--danger); font-size: .86rem; }
+body.setup-open { overflow: hidden; }
+
+
+/* Terzo passaggio configurazione: nome attività e valuta */
+.business-setup-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: max(24px, env(safe-area-inset-top)) 22px max(24px, env(safe-area-inset-bottom));
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255,212,0,.11), transparent 35%),
+    linear-gradient(180deg, #111 0%, #080808 100%);
+}
+.business-setup-screen[hidden] { display: none; }
+.business-setup-content { width: 100%; max-width: 430px; }
+.business-step { margin: 0 0 10px; color: var(--yellow); font-size: .76rem; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }
+.business-setup-title { margin: 0 0 10px; font-size: clamp(1.65rem, 7vw, 2.25rem); line-height: 1.08; }
+.business-setup-copy { margin: 0 0 25px; color: var(--muted); line-height: 1.5; }
+.business-setup-card { padding: 18px; border: 1px solid var(--border); border-radius: var(--radius); background: linear-gradient(145deg, var(--panel), #111); box-shadow: var(--shadow); }
+.business-setup-card label { margin-bottom: 16px; }
+.business-setup-card input,
+.business-setup-card select { margin-top: 9px; }
+.business-error { min-height: 20px; margin: -4px 0 10px; color: var(--danger); font-size: .86rem; }
+
+</style>
+
 </head>
 <body>
 
-<header>
-<h1>Bike & Scooter Lab</h1>
-<div class="muted">Gestionale noleggio bici</div>
-</header>
+  <section class="auth-screen" id="registrationScreen" aria-labelledby="registrationTitle">
+    <div class="auth-content">
+      <div class="auth-hero">
+        <div class="auth-logo-large" aria-hidden="true"><svg viewBox="0 0 120 120"><path d="M25 19H76C93 19 104 29 104 44C104 59 93 69 76 69H51L92 104H64L27 72V53H76C83 53 87 50 87 44C87 38 83 35 76 35H38L25 19Z" fill="currentColor"/><circle cx="25" cy="94" r="9" fill="currentColor"/></svg></div>
+        <p class="auth-brand-large">RENTIX <span>LAB</span></p>
+        <p class="auth-kicker">GESTIONALE NOLEGGIO</p>
+      </div>
+      <h1 class="auth-title" id="registrationTitle">Benvenuto in <span>Rentix Lab</span></h1>
+      <p class="auth-copy">Il modo più semplice per gestire il tuo noleggio.</p>
+      <div class="auth-security">
+        <div class="auth-security-icon">♙</div>
+        <p>Con il tuo account potrai conservare <strong>al sicuro</strong> prenotazioni, clienti e impostazioni, così saranno <strong>sempre disponibili</strong> quando ne avrai bisogno.</p>
+      </div>
+      <form class="auth-card" id="registrationForm" novalidate>
+        <label id="registrationEmailLabel" for="registrationEmail">Email
+          <input id="registrationEmail" type="email" autocomplete="email" inputmode="email" placeholder="nome@email.it" required>
+        </label>
+        <label id="registrationPasswordLabel" for="registrationPassword">Password
+          <div class="password-field">
+            <input id="registrationPassword" type="password" autocomplete="current-password" minlength="8" placeholder="Almeno 8 caratteri" required>
+            <button class="password-toggle" type="button" data-password-target="registrationPassword" aria-label="Mostra password">👁</button>
+          </div>
+        </label>
+        <label id="confirmPasswordLabel" for="registrationPasswordConfirm">Conferma password
+          <div class="password-field">
+            <input id="registrationPasswordConfirm" type="password" autocomplete="new-password" minlength="8" placeholder="Ripeti la password">
+            <button class="password-toggle" type="button" data-password-target="registrationPasswordConfirm" aria-label="Mostra password">👁</button>
+          </div>
+        </label>
+        <label class="auth-consent" id="registrationConsentLabel" for="registrationConsent">
+          <input id="registrationConsent" type="checkbox">
+          <span>Accetto la Privacy Policy e i Termini e condizioni di Rentix Lab.</span>
+        </label>
+        <button type="button" class="forgot-password-btn" id="forgotPasswordBtn">Password dimenticata?</button>
+        <p class="auth-error" id="registrationError" role="alert"></p>
+        <p class="auth-success" id="registrationSuccess" role="status" hidden></p>
+        <button type="submit" class="primary-btn auth-submit" id="registrationSubmitBtn">Crea account</button>
+        <div class="auth-switch"><span id="authSwitchText">Hai già un account?</span><button type="button" id="registrationLoginBtn">Accedi</button></div>
+        <div class="auth-benefits">
+          <div><b>☁✓</b><span>I tuoi dati al sicuro</span></div>
+          <div><b>◷</b><span>Tutto a portata di mano</span></div>
+          <div><b>▯▭</b><span>Da qualsiasi dispositivo</span></div>
+        </div>
+      </form>
+    </div>
+  </section>
 
-<main>
 
-<section id="oggi" class="screen active">
-<div class="card">
-<div class="muted">Oggi</div>
-<h2 id="dataOggi"></h2>
-<button class="btn primary full" onclick="vai('disponibilita')">Nuova prenotazione</button>
-</div>
+  <section class="account-flow-screen" id="accountFlowScreen" aria-labelledby="accountFlowTitle" hidden>
+    <div class="account-flow-content">
+      <p class="account-flow-step">Configurazione · Passaggio 1</p>
+      <div class="account-flow-card">
+        <div class="account-flow-badge" aria-hidden="true">✓</div>
+        <h1 class="account-flow-title" id="accountFlowTitle">Il tuo account</h1>
+        <p class="account-flow-copy">Il tuo account Rentix Lab è attivo e sarà usato per collegare la tua attività e i tuoi dati.</p>
+        <div class="account-flow-email">
+          <small>Email dell’account</small>
+          <strong id="accountFlowEmail">—</strong>
+        </div>
+        <p class="account-flow-status">Account collegato correttamente</p>
+        <div class="account-flow-actions">
+          <button type="button" class="primary-btn" id="accountFlowContinueBtn">Continua</button>
+          <button type="button" class="setup-back-btn" id="accountFlowLogoutBtn">Esci dall’account</button>
+        </div>
+        <div class="account-delete-zone">
+          <p class="account-delete-note">Elimina definitivamente l’account e ricomincia da zero. Prenotazioni, clienti, inventario e impostazioni associati non potranno essere recuperati.</p>
+          <button type="button" class="account-delete-btn" id="deleteAccountBtn">🗑️ Elimina account</button>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<div class="grid">
-<div class="card stat"><span class="muted">Consegne</span><strong id="nConsegne">0</strong></div>
-<div class="card stat"><span class="muted">Rientri</span><strong id="nRientri">0</strong></div>
-<div class="card stat"><span class="muted">Bici fuori</span><strong id="nFuori">0</strong></div>
-<div class="card stat"><span class="muted">Ritardi</span><strong class="red" id="nRitardi">0</strong></div>
-</div>
+  <section class="welcome-screen" id="welcomeScreen" aria-labelledby="welcomeTitle" hidden>
+    <div class="welcome-content">
+      <div class="welcome-logo" aria-hidden="true">
+        <svg viewBox="0 0 120 120"><path d="M25 19H76C93 19 104 29 104 44C104 59 93 69 76 69H51L92 104H64L27 72V53H76C83 53 87 50 87 44C87 38 83 35 76 35H38L25 19Z" fill="currentColor"/><circle cx="25" cy="94" r="9" fill="currentColor"/></svg>
+      </div>
+      <p class="welcome-brand">RENTIX<br><span>LAB</span></p>
+      <h1 class="welcome-title" id="welcomeTitle">Benvenuto in Rentix Lab 👋</h1>
+      <p class="welcome-subtitle">Il semplice gestionale per la tua attività di noleggio.</p>
+      <p class="welcome-growth"><strong>Risparmia tempo. Fai crescere il tuo noleggio.</strong></p>
+      <div class="welcome-points">
+        <p>✓ Gestisci prenotazioni e disponibilità con facilità.</p>
+        <p>✓ Organizza clienti, attrezzature e accessori in un unico posto.</p>
+        <p>✓ Accedi ai tuoi dati ovunque, in totale sicurezza.</p>
+      </div>
+      <button type="button" class="primary-btn welcome-start-btn" id="welcomeStartBtn">Iniziamo</button>
+    </div>
+  </section>
 
-<h2>Consegne di oggi</h2>
-<div id="consegne" class="stack"></div>
 
-<h2>Rientri di oggi</h2>
-<div id="rientri" class="stack"></div>
+  <section class="activity-setup-screen" id="activitySetupScreen" aria-labelledby="activitySetupTitle" hidden>
+    <div class="activity-setup-content">
+      <p class="activity-step">Configurazione · Passaggio 2</p>
+      <h1 class="activity-setup-title" id="activitySetupTitle">Configura la tua attività</h1>
+      <p class="activity-setup-copy">Inserisci il nome e scegli il tipo di attività. Subito dopo personalizzerai l’inventario.</p>
+      <div class="activity-setup-card">
+        <label for="setupBusinessNameInput">Nome attività
+          <input id="setupBusinessNameInput" type="text" maxlength="100" placeholder="Es. Bike &amp; Scooter Lab" autocomplete="organization">
+        </label>
+        <label for="activityTypeSelect">Tipo di attività
+          <select id="activityTypeSelect">
+            <option value="">Seleziona un'attività</option>
+            <optgroup label="Mobilità e veicoli">
+              <option>Noleggio biciclette</option>
+              <option>Noleggio e-bike</option>
+              <option>Noleggio monopattini</option>
+              <option>Noleggio scooter e moto</option>
+              <option>Noleggio auto</option>
+              <option>Noleggio furgoni e veicoli commerciali</option>
+              <option>Noleggio camper e caravan</option>
+              <option>Noleggio mezzi d'epoca o speciali</option>
+            </optgroup>
+            <optgroup label="Mare e attività acquatiche">
+              <option>Noleggio barche</option>
+              <option>Noleggio gommoni</option>
+              <option>Noleggio canoe, kayak e SUP</option>
+              <option>Noleggio moto d'acqua</option>
+              <option>Noleggio attrezzatura da immersione</option>
+              <option>Noleggio attrezzatura da spiaggia</option>
+            </optgroup>
+            <optgroup label="Sport e tempo libero">
+              <option>Noleggio sci e snowboard</option>
+              <option>Noleggio attrezzatura sportiva</option>
+              <option>Noleggio attrezzatura da campeggio</option>
+              <option>Noleggio giochi e gonfiabili</option>
+              <option>Noleggio abbigliamento e costumi</option>
+            </optgroup>
+            <optgroup label="Eventi e spettacolo">
+              <option>Noleggio attrezzatura audio e video</option>
+              <option>Noleggio attrezzatura fotografica</option>
+              <option>Noleggio luci e attrezzatura per eventi</option>
+              <option>Noleggio arredi e allestimenti</option>
+              <option>Noleggio stoviglie e attrezzatura catering</option>
+            </optgroup>
+            <optgroup label="Casa, lavoro e professionisti">
+              <option>Noleggio utensili e attrezzatura da lavoro</option>
+              <option>Noleggio macchinari edili</option>
+              <option>Noleggio macchine agricole e da giardinaggio</option>
+              <option>Noleggio elettrodomestici</option>
+              <option>Noleggio mobili e complementi d'arredo</option>
+              <option>Noleggio dispositivi informatici ed elettronici</option>
+              <option>Noleggio strumenti musicali</option>
+              <option>Noleggio attrezzatura sanitaria e ausili</option>
+            </optgroup>
+            <option value="Altro">Altro tipo di noleggio</option>
+          </select>
+        </label>
+        <label class="activity-custom-wrap" id="activityCustomWrap" for="activityCustomInput" hidden>Specifica la tua attività
+          <input id="activityCustomInput" type="text" maxlength="80" placeholder="Es. Noleggio decorazioni" autocomplete="organization-title">
+        </label>
+        <p class="activity-error" id="activityError" role="alert"></p>
+        <div class="setup-actions">
+          <button type="button" class="setup-back-btn" id="activityBackBtn">← Indietro</button>
+          <button type="button" class="primary-btn activity-continue-btn" id="activityContinueBtn">Continua</button>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<h2>Ritardi</h2>
-<div id="ritardi" class="stack"></div>
-</section>
 
-<section id="disponibilita" class="screen">
-<h2>Verifica disponibilità</h2>
-<div class="card">
-<div class="row">
-<label>Ritiro<input type="date" id="dataInizio"></label>
-<label>Riconsegna<input type="date" id="dataFine"></label>
-</div>
-</div>
-<div id="listaDisponibilita" class="stack"></div>
-<button class="btn primary full" onclick="apriPrenotazione()">Continua</button>
-</section>
+  <section class="business-setup-screen" id="businessSetupScreen" aria-labelledby="businessSetupTitle" hidden>
+    <div class="business-setup-content">
+      <p class="business-step">Configurazione · Passaggio 3</p>
+      <h1 class="business-setup-title" id="businessSetupTitle">Parlaci della tua attività</h1>
+      <p class="business-setup-copy">Inserisci il nome che vuoi associare a Rentix Lab e scegli la valuta utilizzata.</p>
+      <div class="business-setup-card">
+        <label for="businessNameInput">Nome attività
+          <input id="businessNameInput" type="text" maxlength="100" placeholder="Es. Bike &amp; Scooter Lab" autocomplete="organization">
+        </label>
+        <label for="currencySelect">Valuta
+          <select id="currencySelect">
+            <option value="EUR">€ Euro (EUR)</option>
+            <option value="USD">$ Dollaro USA (USD)</option>
+            <option value="GBP">£ Sterlina britannica (GBP)</option>
+            <option value="CHF">CHF Franco svizzero (CHF)</option>
+          </select>
+        </label>
+        <p class="business-error" id="businessError" role="alert"></p>
+        <div class="setup-actions">
+          <button type="button" class="setup-back-btn" id="businessBackBtn">← Indietro</button>
+          <button type="button" class="primary-btn business-continue-btn" id="businessContinueBtn">Continua</button>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<section id="prenotazioni" class="screen">
-<div class="itemhead">
-<h2>Prenotazioni</h2>
-<button class="btn primary" onclick="vai('disponibilita')">＋ Nuova</button>
-</div>
-<div class="card">
-<label>Cerca<input id="cerca" placeholder="Nome o telefono" oninput="renderPrenotazioni()"></label>
-<label>Stato
-<select id="filtroStato" onchange="renderPrenotazioni()">
-<option value="">Tutti</option>
-<option value="prenotata">Prenotata</option>
-<option value="ritirata">Ritirata</option>
-<option value="riconsegnata">Riconsegnata</option>
-<option value="annullata">Annullata</option>
-</select>
-</label>
-</div>
-<div id="listaPrenotazioni" class="stack"></div>
-</section>
+  <section class="inventory-setup-screen" id="inventorySetupScreen" aria-labelledby="inventorySetupTitle" hidden>
+    <div class="inventory-setup-content">
+      <p class="business-step">Configurazione · Passaggio 3</p>
+      <h1 class="business-setup-title" id="inventorySetupTitle">Configura il tuo inventario</h1>
+      <p class="business-setup-copy">Inserisci prima le categorie principali e poi, in una sezione separata, gli accessori disponibili.</p>
+      <p class="setup-personalize-note">💡 In seguito potrai personalizzare il nome o il numero di ogni singolo mezzo direttamente dalla sezione Inventario.</p>
+      <div class="setup-section-block">
+        <p class="eyebrow">CATEGORIE</p>
+        <div id="inventorySetupList" class="inventory-setup-list"></div>
+        <button type="button" class="secondary-btn setup-add-category" id="addSetupCategoryBtn">+ Aggiungi categoria</button>
+      </div>
+      <div class="setup-section-block">
+        <p class="eyebrow">ACCESSORI</p>
+        <div id="inventorySetupAccessoriesList" class="inventory-setup-list"></div>
+        <button type="button" class="secondary-btn setup-add-category" id="addSetupAccessoryBtn">+ Aggiungi accessorio</button>
+      </div>
+      <p class="business-error" id="inventorySetupError" role="alert"></p>
+      <div class="setup-actions">
+        <button type="button" class="setup-back-btn" id="inventoryBackBtn">← Indietro</button>
+        <button type="button" class="primary-btn" id="inventoryFinishBtn">Entra nel gestionale</button>
+      </div>
+    </div>
+  </section>
 
-<section id="parco" class="screen">
-<div class="itemhead">
-<h2>Parco bici</h2>
-<button class="btn primary" onclick="apriParco()">＋ Aggiungi</button>
-</div>
-<p class="muted">Modifica quantità e categorie senza cambiare il codice.</p>
-<div id="listaParco" class="stack"></div>
-<div class="card">
-<h3>Backup</h3>
-<button class="btn full" onclick="esportaBackup()">Esporta backup</button>
-<label class="btn full" style="display:block;text-align:center;margin-top:8px">
-Importa backup
-<input type="file" hidden accept=".json" onchange="importaBackup(event)">
-</label>
-</div>
-</section>
+  <div class="app-shell">
+    <header class="topbar branded-topbar">
+      <button id="backBtn" type="button" class="icon-btn back-btn" aria-label="Indietro" hidden>←</button>
+      <div class="brand-inline">
+        <div class="brand-mark rentix-logo" aria-label="Rentix Lab"><svg viewBox="0 0 120 120" aria-hidden="true"><path d="M25 19H76C93 19 104 29 104 44C104 59 93 69 76 69H51L92 104H64L27 72V53H76C83 53 87 50 87 44C87 38 83 35 76 35H38L25 19Z" fill="currentColor"/><circle cx="25" cy="94" r="9" fill="currentColor"/></svg></div>
+        <div class="brand-title-wrap">
+          <span class="brand-title-line">RENTIX</span>
+          <span class="brand-title-line accent">LAB LITE</span>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <span class="business-name-header" id="businessNameHeader" aria-label="Nome attività"></span>
+        <div class="menu-wrap">
+          <button class="icon-btn hamburger-btn" id="menuToggleBtn" type="button" aria-label="Apri menu" aria-expanded="false" aria-controls="mainDropdownMenu">☰</button>
+          <div class="dropdown-menu" id="mainDropdownMenu" hidden>
+            <button type="button" class="menu-item active" data-page="homePage"><span>🏠</span>Home</button>
+            <button type="button" class="menu-item" data-page="newRentalPage"><span>➕</span>Nuovo noleggio</button>
+            <button type="button" class="menu-item" data-page="calendarPage"><span>📅</span>Calendario</button>
+            <button type="button" class="menu-item" data-page="fleetPage"><span>📦</span>Inventario</button>
+            <button type="button" class="menu-item" data-page="customersPage"><span>👥</span>Clienti</button>
+            <button type="button" class="menu-item" data-page="remindersPage"><span>🔔</span>Promemoria</button>
+            <div class="menu-divider"></div>
+            <button type="button" class="menu-item" data-page="pricingPage"><span>💰</span>Listino</button>
+            <button type="button" class="menu-item" data-page="settingsPage"><span>⚙️</span>Impostazioni</button>
+            <div class="menu-divider"></div>
+            <button type="button" class="menu-item" id="accountMenuBtn"><span>👤</span>Account</button>
+            <button type="button" class="menu-item" id="logoutBtn"><span>↪️</span>Esci</button>
+          </div>
+        </div>
+      </div>
+    </header>
 
+    <main id="app">
+      <section class="page active" id="homePage">
+        <div class="hero-card">
+          <div class="home-date-nav">
+            <button type="button" class="icon-btn" id="homePrevDayBtn" aria-label="Giorno precedente">←</button>
+            <div class="home-date-copy">
+              <p class="muted" id="homeDateCaption">Oggi</p>
+              <h2 id="todayLabel"></h2>
+              <button type="button" class="text-btn home-today-btn" id="homeTodayBtn">Torna a oggi</button>
+            </div>
+            <button type="button" class="icon-btn" id="homeNextDayBtn" aria-label="Giorno successivo">→</button>
+          </div>
+          <button class="primary-btn compact" id="quickAddBtn">+ Nuovo</button>
+        </div>
+
+        <div class="stats-grid">
+          <button type="button" class="stat-card stat-action" data-home-filter="all">
+            <span>Prenotazioni</span>
+            <strong id="statBookings">0</strong>
+            <small>Tocca per vedere</small>
+          </button>
+          <button type="button" class="stat-card stat-action" data-home-filter="pickup">
+            <span>Da ritirare</span>
+            <strong id="statPickup">0</strong>
+            <small>Tocca per vedere</small>
+          </button>
+          <button type="button" class="stat-card stat-action" data-home-filter="return">
+            <span>Da restituire</span>
+            <strong id="statReturn">0</strong>
+            <small>Tocca per vedere</small>
+          </button>
+          <button type="button" class="stat-card stat-action" data-home-filter="bikes">
+            <span>Articoli impegnati</span>
+            <strong id="statBikes">0</strong>
+            <small>Tocca per vedere</small>
+          </button>
+        </div>
+
+        <div class="section-head">
+          <h3 id="todayListTitle">Noleggi di oggi</h3>
+          <button class="text-btn" data-page="calendarPage">Vedi calendario</button>
+        </div>
+        <div id="todayRentals" class="card-list"></div>
+      </section>
+
+      <section class="page" id="newRentalPage">
+        <div class="section-head sticky-head">
+          <div>
+            <p class="eyebrow">INSERIMENTO RAPIDO</p>
+            <h2>Nuovo noleggio</h2>
+          </div>
+          <button class="secondary-btn compact" id="clearFormBtn">Pulisci</button>
+        </div>
+
+        <form id="rentalForm" class="form-card">
+          <input type="hidden" id="rentalId" />
+
+          <label>Nome e cognome
+            <input id="customerName" required autocomplete="name" placeholder="Es. Mario Rossi" />
+          </label>
+
+          <div class="two-cols">
+            <label>Telefono
+              <input id="customerPhone" inputmode="tel" autocomplete="tel" placeholder="Numero cliente" />
+            </label>
+            <label>Documento
+              <input id="customerDocument" placeholder="Carta identità / patente" />
+            </label>
+          </div>
+
+          <div class="two-cols">
+            <label>Data ritiro
+              <input type="date" id="startDate" required />
+            </label>
+            <label>Data restituzione
+              <input type="date" id="endDate" required />
+            </label>
+          </div>
+
+          <div class="two-cols">
+            <label>Ora ritiro
+              <input type="time" id="pickupTime" value="09:00" />
+            </label>
+            <label>Ora restituzione
+              <input type="time" id="returnTime" value="19:00" />
+            </label>
+          </div>
+
+          <div class="subsection">
+            <div class="section-head no-margin">
+              <h3>Articoli</h3>
+              <span class="availability-badge" id="availabilityStatus">Disponibilità da verificare</span>
+            </div>
+            <div id="bikeFields" class="quantity-list"></div>
+            <div id="assignmentFields" class="bike-assignment-master-list"></div>
+          </div>
+
+          <div id="accessoryFields" class="hidden"></div>
+
+          <div class="price-summary-card">
+            <div class="price-summary-top">
+              <div>
+                <h3>Prezzo noleggio</h3>
+                <p class="price-days" id="priceDaysLabel">1 giorno · 0 articoli</p>
+              </div>
+              <button type="button" class="text-btn" id="openPricingFromRentalBtn">Listino</button>
+            </div>
+            <div class="price-total-row">
+              <label>Totale
+                <div class="price-input-wrap">
+                  <input type="number" id="rentalPrice" min="0" step="1" inputmode="decimal" value="0" />
+                  <span>€</span>
+                </div>
+              </label>
+              <button type="button" class="secondary-btn compact" id="restoreAutoPriceBtn">Automatico</button>
+            </div>
+            <small class="price-auto-note" id="priceAutoNote">Calcolato automaticamente dal listino. Accessori inclusi.</small>
+          </div>
+
+                    <label>Stato
+            <select id="rentalStatus">
+              <option value="prenotata">Prenotata</option>
+              <option value="ritirata">Ritirata</option>
+              <option value="restituita">Restituita</option>
+              <option value="annullata">Annullata</option>
+            </select>
+          </label>
+
+          <label>Note
+            <textarea id="rentalNotes" rows="3" placeholder="Caschi, orari, richieste particolari..."></textarea>
+          </label>
+
+          <button type="submit" class="primary-btn full">Salva noleggio</button>
+        </form>
+      </section>
+
+      <section class="page" id="calendarPage">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">PROGRAMMAZIONE</p>
+            <h2>Calendario</h2>
+          </div>
+          <button class="primary-btn compact" data-page="newRentalPage">+ Nuovo</button>
+        </div>
+
+        <div class="month-calendar">
+          <div class="month-header">
+            <button class="secondary-btn month-arrow" id="prevMonthBtn" aria-label="Mese precedente">←</button>
+            <div>
+              <strong id="calendarMonthLabel"></strong>
+              <button type="button" class="text-btn today-jump" id="calendarTodayBtn">Vai a oggi</button>
+            </div>
+            <button class="secondary-btn month-arrow" id="nextMonthBtn" aria-label="Mese successivo">→</button>
+          </div>
+          <div class="weekdays">
+            <span>Lun</span><span>Mar</span><span>Mer</span><span>Gio</span><span>Ven</span><span>Sab</span><span>Dom</span>
+          </div>
+          <div id="calendarGrid" class="calendar-grid"></div>
+          <input type="date" id="calendarDate" class="calendar-date-hidden" /><button id="prevDayBtn" hidden></button><button id="nextDayBtn" hidden></button>
+        </div>
+
+        <div class="selected-day-head">
+          <div>
+            <p class="eyebrow">GIORNO SELEZIONATO</p>
+            <h3 id="selectedDateTitle"></h3>
+          </div>
+          <button class="primary-btn compact" id="newForSelectedDateBtn">+ Prenota</button>
+        </div>
+        <div id="dayAvailability" class="availability-panel"></div>
+        <div id="calendarRentals" class="card-list"></div>
+      </section>
+
+
+      <section class="page" id="fleetPage">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">GESTIONE MEZZI</p>
+            <h2>Inventario</h2>
+          </div>
+          <button class="primary-btn compact" id="addBikeTypeBtn">+ Aggiungi tipo</button>
+        </div>
+
+        <div class="calendar-controls fleet-range-controls">
+          <div class="fleet-range-center">
+            <label class="fleet-date-field">
+              <span>Dal</span>
+              <input type="date" id="fleetDate" />
+            </label>
+            <label class="fleet-date-field">
+              <span>Al</span>
+              <input type="date" id="fleetEndDate" />
+            </label>
+          </div>
+        </div>
+        <button class="primary-btn fleet-range-search" id="fleetSearchBtn">Verifica disponibilità</button>
+
+        <div class="fleet-summary-grid">
+          <article class="stat-card">
+            <span>Totali</span>
+            <strong id="fleetTotalCount">0</strong>
+          </article>
+          <article class="stat-card">
+            <span>Occupate</span>
+            <strong id="fleetUsedCount">0</strong>
+          </article>
+          <article class="stat-card">
+            <span>Libere</span>
+            <strong id="fleetFreeCount">0</strong>
+          </article>
+        </div>
+
+        <div id="fleetList" class="card-list"></div>
+
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">ACCESSORI</p>
+            <h3>Accessori</h3>
+          </div>
+        </div>
+        <div id="fleetAccessoriesList" class="card-list"></div>
+      </section>
+
+      <section class="page" id="customersPage">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">ARCHIVIO</p>
+            <h2>Clienti</h2>
+          </div>
+        </div>
+        <input class="search-input" id="customerSearch" placeholder="Cerca nome o telefono..." />
+        <div id="customersList" class="card-list"></div>
+      </section>
+
+
+
+
+      <section class="page" id="remindersPage">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">CENTRO PROMEMORIA</p>
+            <h2>Promemoria</h2>
+          </div>
+        </div>
+        <div class="reminder-filters" aria-label="Filtra promemoria">
+          <button type="button" class="reminder-filter active" data-reminder-filter="all">Tutti</button>
+          <button type="button" class="reminder-filter" data-reminder-filter="delivery">Consegne</button>
+          <button type="button" class="reminder-filter" data-reminder-filter="return">Rientri</button>
+        </div>
+        <div id="remindersContent"></div>
+      </section>
+
+      <section class="page" id="pricingPage">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">PREZZI NOLEGGIO</p>
+            <h2>Listino</h2>
+          </div>
+          <button class="secondary-btn compact" data-page="newRentalPage">Torna al noleggio</button>
+        </div>
+
+        <div class="form-card">
+          <p class="muted">Modifica i prezzi base. I giorni mancanti vengono calcolati automaticamente tra una fascia e la successiva.</p>
+          <div id="pricingFields" class="pricing-grid"></div>
+          <button type="button" class="primary-btn full" id="savePricingBtn">Salva listino</button>
+        </div>
+
+        <div class="form-card">
+          <h3>Anteprima giorni intermedi</h3>
+          <div id="pricingPreview" class="pricing-preview"></div>
+          <small class="muted">Il conteggio è inclusivo: dal 12 al 14 sono 3 giorni. Il prezzo indicato è per un articolo; gli accessori sono inclusi.</small>
+        </div>
+      </section>
+
+      <section class="page" id="settingsPage">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">CONFIGURAZIONE</p>
+            <h2>Impostazioni</h2>
+          </div>
+        </div>
+
+
+        <div class="form-card">
+          <p class="eyebrow">DATI ATTIVITÀ</p>
+          <h3>Informazioni attività</h3>
+
+          <label for="settingsActivityType">Tipo di attività
+            <select id="settingsActivityType">
+              <option value="">Seleziona un'attività</option>
+              <optgroup label="Mobilità e veicoli">
+                <option>Noleggio biciclette</option><option>Noleggio e-bike</option><option>Noleggio monopattini</option><option>Noleggio scooter e moto</option><option>Noleggio auto</option><option>Noleggio furgoni e veicoli commerciali</option><option>Noleggio camper e caravan</option><option>Noleggio mezzi d'epoca o speciali</option>
+              </optgroup>
+              <optgroup label="Mare e attività acquatiche">
+                <option>Noleggio barche</option><option>Noleggio gommoni</option><option>Noleggio canoe, kayak e SUP</option><option>Noleggio moto d'acqua</option><option>Noleggio attrezzatura da immersione</option><option>Noleggio attrezzatura da spiaggia</option>
+              </optgroup>
+              <optgroup label="Sport e tempo libero">
+                <option>Noleggio sci e snowboard</option><option>Noleggio attrezzatura sportiva</option><option>Noleggio attrezzatura da campeggio</option><option>Noleggio giochi e gonfiabili</option><option>Noleggio abbigliamento e costumi</option>
+              </optgroup>
+              <optgroup label="Eventi e spettacolo">
+                <option>Noleggio attrezzatura audio e video</option><option>Noleggio attrezzatura fotografica</option><option>Noleggio luci e attrezzatura per eventi</option><option>Noleggio arredi e allestimenti</option><option>Noleggio stoviglie e attrezzatura catering</option>
+              </optgroup>
+              <optgroup label="Casa, lavoro e professionisti">
+                <option>Noleggio utensili e attrezzatura da lavoro</option><option>Noleggio macchinari edili</option><option>Noleggio macchine agricole e da giardinaggio</option><option>Noleggio elettrodomestici</option><option>Noleggio mobili e complementi d'arredo</option><option>Noleggio dispositivi informatici ed elettronici</option><option>Noleggio strumenti musicali</option><option>Noleggio attrezzatura sanitaria e ausili</option>
+              </optgroup>
+              <option value="Altro">Altro tipo di noleggio</option>
+            </select>
+          </label>
+
+          <label id="settingsActivityCustomWrap" for="settingsActivityCustom" hidden>Specifica la tua attività
+            <input id="settingsActivityCustom" type="text" maxlength="80" placeholder="Es. Noleggio decorazioni">
+          </label>
+
+          <label for="settingsBusinessName">Nome attività
+            <input id="settingsBusinessName" type="text" maxlength="100" placeholder="Es. Bike &amp; Scooter Lab">
+          </label>
+
+          <label for="settingsCurrency">Valuta
+            <select id="settingsCurrency">
+              <option value="EUR">€ Euro (EUR)</option>
+              <option value="USD">$ Dollaro USA (USD)</option>
+              <option value="GBP">£ Sterlina britannica (GBP)</option>
+              <option value="CHF">CHF Franco svizzero (CHF)</option>
+            </select>
+          </label>
+
+          <button class="primary-btn full" id="saveBusinessSettingsBtn">Salva dati attività</button>
+        </div>
+
+        <div class="form-card">
+          <h3>Inventario</h3>
+          <div id="inventorySettings" class="quantity-list"></div>
+
+          <h3>Accessori</h3>
+          <div id="accessorySettings" class="quantity-list"></div>
+
+          <button class="primary-btn full" id="saveSettingsBtn">Salva disponibilità</button>
+        </div>
+
+        <div class="form-card settings-link-card" id="openPricingSettingsCard">
+          <div class="section-head no-margin">
+            <div>
+              <p class="eyebrow">PREZZI</p>
+              <h3>Listino noleggio</h3>
+            </div>
+            <span style="font-size:1.5rem">›</span>
+          </div>
+          <p class="muted">Modifica le fasce e i prezzi usati nel calcolo automatico.</p>
+        </div>
+
+        <div class="form-card">
+          <h3>Backup dati</h3>
+          <button class="secondary-btn full" id="exportBtn">Esporta backup</button>
+          <label class="file-label">
+            Importa backup
+            <input type="file" id="importInput" accept=".json,application/json" />
+          </label>
+          <button class="danger-btn full" id="resetBtn">Cancella tutti i dati</button>
+        </div>
+      </section>
+    
 </main>
+  </div>
 
-<nav>
-<button class="active" data-nav="oggi" onclick="vai('oggi')"><span>⌂</span>Oggi</button>
-<button data-nav="disponibilita" onclick="vai('disponibilita')"><span>⌕</span>Disponibilità</button>
-<button data-nav="prenotazioni" onclick="vai('prenotazioni')"><span>≡</span>Prenotazioni</button>
-<button data-nav="parco" onclick="vai('parco')"><span>🚲</span>Parco bici</button>
-</nav>
 
-<div id="modalPrenotazione" class="modal hidden">
-<div class="sheet">
-<div class="sheethead"><h2 id="titoloPrenotazione">Nuova prenotazione</h2><button class="close" onclick="chiudi('modalPrenotazione')">×</button></div>
-<input type="hidden" id="prenotazioneId">
+  <div class="modal-backdrop hidden" id="bikeTypeModal">
+    <div class="modal-card">
+      <div class="section-head no-margin">
+        <h3 id="bikeTypeModalTitle">Aggiungi categoria</h3>
+        <button class="icon-btn small-icon" id="closeBikeTypeModalBtn">✕</button>
+      </div>
+      <input type="hidden" id="bikeTypeKey" />
+      <label>Nome tipologia
+        <input id="bikeTypeLabel" placeholder="Es. Gommone 40 CV" />
+      </label>
+      <label>Quantità totale
+        <input type="number" min="0" id="bikeTypeTotal" value="1" />
+      </label>
+      <button class="primary-btn full" id="saveBikeTypeBtn">Salva tipologia</button>
+    </div>
+  </div>
 
-<div class="card">
-<div class="row">
-<label>Ritiro<input type="date" id="pInizio"></label>
-<label>Riconsegna<input type="date" id="pFine"></label>
-</div>
-</div>
 
-<div class="card">
-<h3>Cliente</h3>
-<label>Nome e cognome<input id="pNome"></label>
-<div class="row">
-<label>Telefono<input id="pTelefono"></label>
-<label>Documento<input id="pDocumento"></label>
-</div>
-</div>
+  <div class="modal-backdrop hidden" id="unitsModal">
+    <div class="modal-card">
+      <div class="section-head no-margin">
+        <div>
+          <p class="eyebrow">SINGOLI MEZZI</p>
+          <h3 id="unitsModalTitle">Gestisci mezzi</h3>
+        </div>
+        <button class="icon-btn small-icon" id="closeUnitsModalBtn">✕</button>
+      </div>
+      <p class="unit-helper">Assegna a ogni mezzo un nome o un numero. Lasciando il campo vuoto verrà usato il numero progressivo.</p>
+      <input type="hidden" id="unitsCategoryKey" />
+      <div class="unit-list" id="unitsList"></div>
+      <button class="primary-btn full" id="saveUnitsBtn">Salva mezzi</button>
+    </div>
+  </div>
 
-<div class="card">
-<div class="itemhead">
-<h3>Bici e accessori</h3>
-<button class="btn primary" onclick="aggiungiRiga()">＋</button>
-</div>
-<div id="righePrenotazione" class="stack"></div>
-</div>
 
-<div class="card">
-<label>Note<textarea id="pNote"></textarea></label>
-<label>Stato
-<select id="pStato">
-<option value="prenotata">Prenotata</option>
-<option value="ritirata">Ritirata</option>
-<option value="riconsegnata">Riconsegnata</option>
-<option value="annullata">Annullata</option>
-</select>
-</label>
-</div>
+  <div class="modal-backdrop hidden" id="customerDetailModal">
+    <div class="modal-card">
+      <div class="section-head no-margin">
+        <div>
+          <p class="eyebrow">PRENOTAZIONI CLIENTE</p>
+          <h3 id="customerDetailTitle">Cliente</h3>
+        </div>
+        <button class="icon-btn small-icon" id="closeCustomerDetailBtn">✕</button>
+      </div>
+      <div id="customerDetailInfo"></div>
+      <div id="customerDetailRentals" class="customer-detail-list"></div>
+    </div>
+  </div>
 
-<button class="btn primary full" onclick="salvaPrenotazione()">Salva prenotazione</button>
-<button id="eliminaPrenotazione" class="btn danger full hidden" style="margin-top:8px" onclick="cancellaPrenotazione()">Elimina definitivamente</button>
-</div>
-</div>
+  <template id="rentalCardTemplate">
+    <article class="rental-card">
+      <div class="rental-card-top">
+        <div>
+          <h3 class="rental-name"></h3>
+          <p class="rental-meta"></p>
+        </div>
+        <span class="status-pill"></span>
+      </div>
+      <p class="rental-items"></p>
+      <p class="rental-price"></p>
+      <p class="rental-notes"></p>
+      <div class="card-actions">
+        <button class="secondary-btn edit-btn">Modifica</button>
+        <button class="secondary-btn status-btn">Cambia stato</button>
+        <button class="danger-btn delete-btn">Elimina</button>
+      </div>
+    </article>
+  </template>
 
-<div id="modalParco" class="modal hidden">
-<div class="sheet">
-<div class="sheethead"><h2 id="titoloParco">Aggiungi categoria</h2><button class="close" onclick="chiudi('modalParco')">×</button></div>
-<input type="hidden" id="parcoId">
-<label>Nome categoria<input id="parcoNome"></label>
-<div class="row">
-<label>Quantità totale<input type="number" min="0" id="parcoTotale"></label>
-<label>Fuori servizio<input type="number" min="0" id="parcoFuori"></label>
-</div>
-<label>Tipo
-<select id="parcoTipo">
-<option value="bike">Bici</option>
-<option value="accessory">Accessorio</option>
-</select>
-</label>
-<label><input type="checkbox" id="parcoAttivo" style="width:auto;min-height:auto"> Categoria attiva</label>
-<button class="btn primary full" onclick="salvaParco()">Salva</button>
-<button id="eliminaParco" class="btn danger full hidden" style="margin-top:8px" onclick="cancellaParco()">Elimina</button>
-</div>
-</div>
+  <script>
 
-<div id="toast" class="toast hidden"></div>
+// Configurazione iniziale, isolata dai dati del gestionale.
+// Le chiavi qui sotto sono separate da prenotazioni, listino e inventario.
+(function initFirstSetupSteps() {
+  // Nuova chiave per il flusso con navigazione Indietro della v1.7.
+  const SETUP_FLOW_KEY = "rentixLabInitialSetupCompleted_v18_4_clean_20260720";
+  const ACTIVITY_KEY = "rentixLabActivityType_v18_4_clean_20260720";
+  const BUSINESS_NAME_KEY = "rentixLabBusinessName_v18_4_clean_20260720";
+  const CURRENCY_KEY = "rentixLabCurrency_v18_4_clean_20260720";
 
-<script>
-const KEY="bsl_gestionale_v1";
+  const accountFlowScreen = document.getElementById("accountFlowScreen");
+  const accountFlowEmail = document.getElementById("accountFlowEmail");
+  const accountFlowContinueBtn = document.getElementById("accountFlowContinueBtn");
+  const accountFlowLogoutBtn = document.getElementById("accountFlowLogoutBtn");
+  const accountMenuBtn = document.getElementById("accountMenuBtn");
+  const welcomeScreen = document.getElementById("welcomeScreen");
+  const welcomeStartBtn = document.getElementById("welcomeStartBtn");
+  const activityScreen = document.getElementById("activitySetupScreen");
+  const activitySelect = document.getElementById("activityTypeSelect");
+  const setupBusinessNameInput = document.getElementById("setupBusinessNameInput");
+  const activityCustomWrap = document.getElementById("activityCustomWrap");
+  const activityCustomInput = document.getElementById("activityCustomInput");
+  const activityBackBtn = document.getElementById("activityBackBtn");
+  const activityContinueBtn = document.getElementById("activityContinueBtn");
+  const activityError = document.getElementById("activityError");
+  const businessScreen = document.getElementById("businessSetupScreen");
+  const businessNameInput = document.getElementById("businessNameInput");
+  const currencySelect = document.getElementById("currencySelect");
+  const businessBackBtn = document.getElementById("businessBackBtn");
+  const businessContinueBtn = document.getElementById("businessContinueBtn");
+  const businessError = document.getElementById("businessError");
+  const inventoryScreen = document.getElementById("inventorySetupScreen");
+  const inventorySetupList = document.getElementById("inventorySetupList");
+  const addSetupCategoryBtn = document.getElementById("addSetupCategoryBtn");
+  const inventorySetupAccessoriesList = document.getElementById("inventorySetupAccessoriesList");
+  const addSetupAccessoryBtn = document.getElementById("addSetupAccessoryBtn");
+  const inventoryBackBtn = document.getElementById("inventoryBackBtn");
+  const inventoryFinishBtn = document.getElementById("inventoryFinishBtn");
+  const inventorySetupError = document.getElementById("inventorySetupError");
+  const businessNameHeader = document.getElementById("businessNameHeader");
 
-const iniziali={
-parco:[
-{id:"f1",nome:"Donna senza cambio",totale:8,fuori:0,tipo:"bike",attivo:true},
-{id:"f2",nome:"Uomo senza cambio",totale:5,fuori:0,tipo:"bike",attivo:true},
-{id:"f3",nome:"Uomo con cambio",totale:5,fuori:0,tipo:"bike",attivo:true},
-{id:"f4",nome:"Donna con cambio",totale:3,fuori:0,tipo:"bike",attivo:true},
-{id:"f5",nome:'Bici 24"',totale:3,fuori:0,tipo:"bike",attivo:true},
-{id:"f6",nome:'Bici 20"',totale:2,fuori:0,tipo:"bike",attivo:true},
-{id:"f7",nome:"Seggiolino anteriore",totale:2,fuori:0,tipo:"accessory",attivo:true},
-{id:"f8",nome:"Seggiolino posteriore grande",totale:2,fuori:0,tipo:"accessory",attivo:true},
-{id:"f9",nome:"Seggiolino posteriore piccolo",totale:2,fuori:0,tipo:"accessory",attivo:true}
-],
-prenotazioni:[]
+  if (!accountFlowScreen || !accountFlowContinueBtn || !welcomeScreen || !welcomeStartBtn || !activityScreen || !activitySelect ||
+      !activityBackBtn || !activityContinueBtn || !setupBusinessNameInput || !businessScreen || !businessNameInput ||
+      !currencySelect || !businessBackBtn || !businessContinueBtn || !inventoryScreen ||
+      !inventorySetupList || !addSetupCategoryBtn || !inventorySetupAccessoriesList || !addSetupAccessoryBtn ||
+      !inventoryBackBtn || !inventoryFinishBtn) return;
+
+  const accountKey = key => {
+    const id = window.rentixAccountId || sessionStorage.getItem("rentixActiveAccountId") || "guest";
+    return `${key}__${id}`;
+  };
+  const safeGet = key => {
+    try { return localStorage.getItem(accountKey(key)) || ""; } catch (_) { return ""; }
+  };
+  const safeSet = (key, value) => {
+    try { localStorage.setItem(accountKey(key), value); } catch (_) {}
+  };
+  window.rentixSetupStore = {
+    keys: { setup: SETUP_FLOW_KEY, activity: ACTIVITY_KEY, businessName: BUSINESS_NAME_KEY, currency: CURRENCY_KEY },
+    get: safeGet,
+    set: safeSet,
+    refresh: () => applyAccountSetup()
+  };
+  const updateBusinessNameHeader = value => {
+    if (!businessNameHeader) return;
+    const name = (value || "").trim();
+    businessNameHeader.textContent = name;
+    businessNameHeader.title = name;
+    businessNameHeader.hidden = !name;
+  };
+
+  function showOnly(screen) {
+    accountFlowScreen.hidden = screen !== accountFlowScreen;
+    welcomeScreen.hidden = screen !== welcomeScreen;
+    activityScreen.hidden = screen !== activityScreen;
+    businessScreen.hidden = screen !== businessScreen;
+    inventoryScreen.hidden = screen !== inventoryScreen;
+    document.body.classList.toggle("welcome-open", screen === welcomeScreen || screen === accountFlowScreen);
+    document.body.classList.toggle("setup-open", screen === activityScreen || screen === businessScreen || screen === inventoryScreen);
+  }
+
+  function closeSetup() {
+    accountFlowScreen.hidden = true;
+    welcomeScreen.hidden = true;
+    activityScreen.hidden = true;
+    businessScreen.hidden = true;
+    inventoryScreen.hidden = true;
+    document.body.classList.remove("welcome-open", "setup-open");
+  }
+
+  function applyAccountSetup() {
+    const setupCompleted = safeGet(SETUP_FLOW_KEY) === "1";
+    const savedActivity = safeGet(ACTIVITY_KEY);
+    const savedBusinessName = safeGet(BUSINESS_NAME_KEY);
+    const savedCurrency = safeGet(CURRENCY_KEY);
+    updateBusinessNameHeader(savedBusinessName);
+    setupBusinessNameInput.value = savedBusinessName || "";
+    if (savedActivity) {
+      const matchingOption = Array.from(activitySelect.options).find(option => option.value === savedActivity);
+      if (matchingOption) activitySelect.value = savedActivity;
+      else { activitySelect.value = "Altro"; activityCustomWrap.hidden = false; activityCustomInput.value = savedActivity; }
+    }
+    if (savedCurrency && Array.from(currencySelect.options).some(option => option.value === savedCurrency)) currencySelect.value = savedCurrency;
+    const currentEmail = window.rentixAccountEmail || sessionStorage.getItem("rentixActiveAccountEmail") || "";
+    if (accountFlowEmail) accountFlowEmail.textContent = currentEmail || "Account autenticato";
+    accountFlowContinueBtn.textContent = setupCompleted ? "Torna al gestionale" : "Continua";
+    if (!setupCompleted) showOnly(accountFlowScreen); else closeSetup();
+  }
+  window.rentixApplyAccountSetup = applyAccountSetup;
+  applyAccountSetup();
+
+  accountFlowContinueBtn.addEventListener("click", () => {
+    const setupCompleted = safeGet(SETUP_FLOW_KEY) === "1";
+    if (setupCompleted) { closeSetup(); renderHome(); } else showOnly(welcomeScreen);
+  });
+  accountFlowLogoutBtn?.addEventListener("click", () => document.getElementById("logoutBtn")?.click());
+  accountMenuBtn?.addEventListener("click", () => {
+    const currentEmail = window.rentixAccountEmail || sessionStorage.getItem("rentixActiveAccountEmail") || "";
+    if (accountFlowEmail) accountFlowEmail.textContent = currentEmail || "Account autenticato";
+    accountFlowContinueBtn.textContent = "Torna al gestionale";
+    showOnly(accountFlowScreen);
+    document.getElementById("mainDropdownMenu")?.setAttribute("hidden", "");
+  });
+
+  welcomeStartBtn.addEventListener("click", () => showOnly(activityScreen));
+  activityBackBtn.addEventListener("click", () => {
+    activityError.textContent = "";
+    showOnly(welcomeScreen);
+  });
+
+  activitySelect.addEventListener("change", () => {
+    const isOther = activitySelect.value === "Altro";
+    activityCustomWrap.hidden = !isOther;
+    activityError.textContent = "";
+    if (isOther) activityCustomInput.focus();
+  });
+
+  activityContinueBtn.addEventListener("click", () => {
+    const businessName = setupBusinessNameInput.value.trim();
+    if (!businessName) {
+      activityError.textContent = "Inserisci il nome della tua attività per continuare.";
+      setupBusinessNameInput.focus();
+      return;
+    }
+    let activity = activitySelect.value.trim();
+    if (!activity) {
+      activityError.textContent = "Seleziona il tipo di attività per continuare.";
+      activitySelect.focus();
+      return;
+    }
+    if (activity === "Altro") {
+      activity = activityCustomInput.value.trim();
+      if (!activity) {
+        activityError.textContent = "Scrivi il tipo di attività che gestisci.";
+        activityCustomInput.focus();
+        return;
+      }
+    }
+    safeSet(ACTIVITY_KEY, activity);
+    safeSet(BUSINESS_NAME_KEY, businessName);
+    safeSet(CURRENCY_KEY, "EUR");
+    updateBusinessNameHeader(businessName);
+    if (!inventorySetupList.children.length) addSetupCategory();
+    showOnly(inventoryScreen);
+  });
+
+  businessBackBtn.addEventListener("click", () => {
+    businessError.textContent = "";
+    showOnly(activityScreen);
+  });
+
+  businessNameInput.addEventListener("input", () => {
+    businessError.textContent = "";
+  });
+
+  businessContinueBtn.addEventListener("click", () => {
+    const businessName = businessNameInput.value.trim();
+    if (!businessName) {
+      businessError.textContent = "Inserisci il nome della tua attività per continuare.";
+      businessNameInput.focus();
+      return;
+    }
+    safeSet(BUSINESS_NAME_KEY, businessName);
+    safeSet(CURRENCY_KEY, currencySelect.value || "EUR");
+    updateBusinessNameHeader(businessName);
+    if (!inventorySetupList.children.length) addSetupCategory();
+    showOnly(inventoryScreen);
+  });
+
+  function escapeSetupValue(value) {
+    return String(value || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+  }
+
+  function addSetupCategory(preset = {}) {
+    const card = document.createElement("div");
+    card.className = "setup-category-card";
+    card.innerHTML = `<div class="setup-category-grid">
+      <label>Categoria<input class="setup-category-name" maxlength="80" placeholder="Es. Gommone 40 CV" value="${escapeSetupValue(preset.label)}"></label>
+      <label>Quantità<input class="setup-category-qty" type="number" min="0" step="1" value="${Math.max(0, Number(preset.total ?? 1))}"></label>
+      <button type="button" class="setup-mini-btn setup-remove-btn" aria-label="Rimuovi categoria">×</button>
+    </div>`;
+    card.querySelector(".setup-remove-btn").addEventListener("click", () => card.remove());
+    inventorySetupList.appendChild(card);
+  }
+
+  function addSetupAccessory(preset = {}) {
+    const card = document.createElement("div");
+    card.className = "setup-category-card";
+    card.innerHTML = `<div class="setup-category-grid">
+      <label>Accessorio<input class="setup-accessory-name" maxlength="80" placeholder="Es. Tendalino" value="${escapeSetupValue(preset.label)}"></label>
+      <label>Quantità<input class="setup-accessory-qty" type="number" min="0" step="1" value="${Math.max(0, Number(preset.total ?? 1))}"></label>
+      <button type="button" class="setup-mini-btn setup-remove-btn" aria-label="Rimuovi accessorio">×</button>
+    </div>`;
+    card.querySelector(".setup-remove-btn").addEventListener("click", () => card.remove());
+    inventorySetupAccessoriesList.appendChild(card);
+  }
+
+  addSetupCategoryBtn.addEventListener("click", () => addSetupCategory());
+  addSetupAccessoryBtn.addEventListener("click", () => addSetupAccessory());
+  inventoryBackBtn.addEventListener("click", () => {
+    inventorySetupError.textContent = "";
+    showOnly(activityScreen);
+  });
+  inventoryFinishBtn.addEventListener("click", async () => {
+    const inventory = {};
+    const accessories = {};
+    let categoryCount = 0;
+    const slug = value => value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "") || "articolo";
+    [...inventorySetupList.querySelectorAll(".setup-category-card")].forEach(card => {
+      const label = card.querySelector(".setup-category-name").value.trim();
+      if (!label) return;
+      let key = slug(label), n = 2;
+      while (inventory[key]) key = `${slug(label)}_${n++}`;
+      const total = Math.max(0, Number(card.querySelector(".setup-category-qty").value || 0));
+      inventory[key] = { label, total, units: Array.from({ length: total }, (_, index) => ({ id: `unit_${index + 1}`, name: "" })) };
+      categoryCount++;
+    });
+    [...inventorySetupAccessoriesList.querySelectorAll(".setup-category-card")].forEach(card => {
+      const label = card.querySelector(".setup-accessory-name").value.trim();
+      if (!label) return;
+      let key = slug(label), n = 2;
+      while (accessories[key]) key = `${slug(label)}_${n++}`;
+      accessories[key] = { label, total: Math.max(0, Number(card.querySelector(".setup-accessory-qty").value || 0)) };
+    });
+    if (!categoryCount) {
+      inventorySetupError.textContent = "Aggiungi almeno una categoria per continuare.";
+      inventorySetupList.querySelector(".setup-category-name")?.focus();
+      return;
+    }
+    state.inventory = inventory;
+    state.accessories = accessories;
+    state.customInventoryConfigured = true;
+    saveState();
+    resetRentalForm();
+    safeSet(SETUP_FLOW_KEY, "1");
+    inventoryFinishBtn.disabled = true;
+    inventoryFinishBtn.textContent = "Salvataggio...";
+    const cloudSaved = await window.rentixCloudPhase1?.saveNow?.();
+    inventoryFinishBtn.disabled = false;
+    inventoryFinishBtn.textContent = "Entra nel gestionale";
+    if (cloudSaved === false) {
+      inventorySetupError.textContent = "Dati salvati sul telefono, ma non nel cloud. Controlla Internet e riprova.";
+      return;
+    }
+    closeSetup();
+    renderHome();
+  });
+})();
+
+const DEFAULT_INVENTORY = {};
+
+const DEFAULT_ACCESSORIES = {};
+
+const DEFAULT_PRICING = {
+  1: 10, 2: 15, 3: 18, 4: 20, 5: 23, 6: 25, 7: 30, 14: 45, 30: 70
 };
 
-let stato=carica();
+const STORAGE_KEY_BASE = "rentixLabRentalApp_v18_4_clean_20260720";
+const getStorageKey = () => `${STORAGE_KEY_BASE}__${window.rentixAccountId || sessionStorage.getItem("rentixActiveAccountId") || "guest"}`;
 
-function carica(){
-try{return JSON.parse(localStorage.getItem(KEY))||structuredClone(iniziali)}
-catch(e){return structuredClone(iniziali)}
-}
-function salva(){localStorage.setItem(KEY,JSON.stringify(stato))}
-function oggi(){return new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10)}
-function id(p){return p+Date.now()+Math.random().toString(36).slice(2,6)}
-function esc(v=""){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
-function sovrapposte(a1,a2,b1,b2){return a1<b2&&a2>b1}
-function vuoto(t){return `<div class="empty">${t}</div>`}
-function nomeStato(s){return {prenotata:"Prenotata",ritirata:"Ritirata",riconsegnata:"Riconsegnata",annullata:"Annullata"}[s]}
-function formatta(d){return new Intl.DateTimeFormat("it-IT",{day:"2-digit",month:"short",year:"numeric"}).format(new Date(d+"T12:00:00"))}
+let state = loadState();
+let selectedHomeDate = todayISO();
 
-function vai(nome){
-document.querySelectorAll(".screen").forEach(x=>x.classList.toggle("active",x.id===nome));
-document.querySelectorAll("[data-nav]").forEach(x=>x.classList.toggle("active",x.dataset.nav===nome));
-window.scrollTo(0,0);
-if(nome==="oggi")renderOggi();
-if(nome==="disponibilita")renderDisponibilita();
-if(nome==="prenotazioni")renderPrenotazioni();
-if(nome==="parco")renderParco();
-}
-
-function prenotati(idParco,inizio,fine,escludi=""){
-return stato.prenotazioni
-.filter(p=>p.id!==escludi&&p.stato!=="annullata"&&sovrapposte(p.inizio,p.fine,inizio,fine))
-.reduce((n,p)=>n+(p.righe.find(r=>r.idParco===idParco)?.quantita||0),0)
+function loadState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(getStorageKey()));
+    return {
+      rentals: saved?.rentals || [],
+      customers: Array.isArray(saved?.customers) ? saved.customers : [],
+      inventory: saved?.customInventoryConfigured ? (saved.inventory || {}) : { ...DEFAULT_INVENTORY, ...(saved?.inventory || {}) },
+      accessories: saved?.customInventoryConfigured ? (saved.accessories || {}) : { ...DEFAULT_ACCESSORIES, ...(saved?.accessories || {}) },
+      pricing: { ...DEFAULT_PRICING, ...(saved?.pricing || {}) },
+      customInventoryConfigured: Boolean(saved?.customInventoryConfigured)
+    };
+  } catch {
+    return {
+      rentals: [],
+      customers: [],
+      inventory: structuredClone(DEFAULT_INVENTORY),
+      accessories: structuredClone(DEFAULT_ACCESSORIES),
+      pricing: structuredClone(DEFAULT_PRICING),
+      customInventoryConfigured: false
+    };
+  }
 }
 
-function disponibili(f,inizio,fine,escludi=""){
-return Math.max(0,f.totale-f.fuori-prenotati(f.id,inizio,fine,escludi))
+function saveState() {
+  localStorage.setItem(getStorageKey(), JSON.stringify(state));
+  window.rentixCloudPhase1?.scheduleSave?.();
 }
 
-function riepilogo(p){
-return p.righe.map(r=>{
-const f=stato.parco.find(x=>x.id===r.idParco);
-return `${r.quantita}× ${f?f.nome:"Categoria rimossa"}`
-}).join(" · ")
+window.rentixReloadLocalState = () => {
+  state = loadState();
+};
+
+// Sincronizzazione cloud - Fase 1: attività, inventario e accessori.
+window.rentixCloudPhase1 = (() => {
+  let saveTimer = null;
+  let loading = false;
+
+  const currentUserId = () => window.rentixAccountId || sessionStorage.getItem("rentixActiveAccountId") || "";
+  const setup = () => window.rentixSetupStore;
+
+  function payload() {
+    const store = setup();
+    const keys = store?.keys || {};
+    return {
+      user_id: currentUserId(),
+      business_name: store?.get?.(keys.businessName) || "",
+      activity_type: store?.get?.(keys.activity) || "",
+      currency: store?.get?.(keys.currency) || "EUR",
+      inventory: state.inventory || {},
+      accessories: state.accessories || {},
+      setup_completed: store?.get?.(keys.setup) === "1",
+      updated_at: new Date().toISOString()
+    };
+  }
+
+  async function saveNow() {
+    const client = window.rentixSupabase;
+    const userId = currentUserId();
+    if (!client || !userId || loading) return false;
+    const data = payload();
+    if (!data.business_name && !data.setup_completed && !Object.keys(data.inventory).length) return true;
+    const { error } = await client.from("rentix_account_setup").upsert(data, { onConflict: "user_id" });
+    if (error) {
+      console.error("Sincronizzazione cloud non riuscita", error);
+      window.rentixCloudLastError = error;
+      return false;
+    } else {
+      window.rentixCloudLastError = null;
+      return true;
+    }
+  }
+
+  function scheduleSave() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => saveNow().catch(error => { window.rentixCloudLastError = error; console.error(error); }), 500);
+  }
+
+  async function load() {
+    const client = window.rentixSupabase;
+    const userId = currentUserId();
+    if (!client || !userId) return false;
+    loading = true;
+    try {
+      const { data, error } = await client.from("rentix_account_setup").select("*").eq("user_id", userId).maybeSingle();
+      if (error) throw error;
+      const store = setup();
+      const keys = store?.keys || {};
+
+      if (!data) {
+        // Primo accesso dopo l'aggiornamento: migra automaticamente gli eventuali dati locali.
+        loading = false;
+        await saveNow();
+        loading = true;
+        return false;
+      }
+
+      store?.set?.(keys.businessName, data.business_name || "");
+      store?.set?.(keys.activity, data.activity_type || "");
+      store?.set?.(keys.currency, data.currency || "EUR");
+      store?.set?.(keys.setup, data.setup_completed ? "1" : "");
+
+      state.inventory = data.inventory || {};
+      state.accessories = data.accessories || {};
+      state.customInventoryConfigured = Boolean(data.setup_completed || Object.keys(state.inventory).length);
+      localStorage.setItem(getStorageKey(), JSON.stringify(state));
+
+      store?.refresh?.();
+      resetRentalForm();
+      renderHome();
+      renderSettings();
+      return true;
+    } catch (error) {
+      console.error("Caricamento dati cloud non riuscito", error);
+      window.rentixCloudLastError = error;
+      return false;
+    } finally {
+      loading = false;
+    }
+  }
+
+  return { load, saveNow, scheduleSave };
+})();
+
+// Sincronizzazione cloud - Fase 3: prenotazioni.
+window.rentixCloudRentals = (() => {
+  let loading = false;
+  const currentUserId = () => window.rentixAccountId || sessionStorage.getItem("rentixActiveAccountId") || "";
+
+  function toCloud(rental) {
+    return {
+      id: rental.id,
+      user_id: currentUserId(),
+      customer_name: rental.customerName || "",
+      customer_phone: rental.customerPhone || "",
+      customer_document: rental.customerDocument || "",
+      start_date: rental.startDate,
+      end_date: rental.endDate,
+      pickup_time: rental.pickupTime || "",
+      return_time: rental.returnTime || "",
+      bikes: rental.bikes || {},
+      bike_assignments: rental.bikeAssignments || [],
+      accessories: rental.accessories || {},
+      status: rental.status || "prenotata",
+      notes: rental.notes || "",
+      price_total: Math.max(0, Number(rental.priceTotal || 0)),
+      price_manual: Boolean(rental.priceManual),
+      pricing_days: Math.max(1, Number(rental.pricingDays || 1)),
+      updated_at: rental.updatedAt || new Date().toISOString()
+    };
+  }
+
+  function fromCloud(row) {
+    return {
+      id: row.id,
+      customerName: row.customer_name || "",
+      customerPhone: row.customer_phone || "",
+      customerDocument: row.customer_document || "",
+      startDate: row.start_date,
+      endDate: row.end_date,
+      pickupTime: row.pickup_time || "",
+      returnTime: row.return_time || "",
+      bikes: row.bikes || {},
+      bikeAssignments: row.bike_assignments || [],
+      accessories: row.accessories || {},
+      status: row.status || "prenotata",
+      notes: row.notes || "",
+      priceTotal: Number(row.price_total || 0),
+      priceManual: Boolean(row.price_manual),
+      pricingDays: Math.max(1, Number(row.pricing_days || 1)),
+      createdAt: row.created_at || "",
+      updatedAt: row.updated_at || row.created_at || new Date().toISOString()
+    };
+  }
+
+  async function upsertRental(rental) {
+    const client = window.rentixSupabase;
+    const userId = currentUserId();
+    if (!client || !userId || !rental?.id) return false;
+    const { error } = await client.from("rentix_rentals").upsert(toCloud(rental), { onConflict: "id" });
+    if (error) {
+      console.error("Salvataggio prenotazione nel cloud non riuscito", error);
+      window.rentixRentalsLastError = error;
+      return false;
+    }
+    window.rentixRentalsLastError = null;
+    return true;
+  }
+
+  async function deleteRental(id) {
+    const client = window.rentixSupabase;
+    const userId = currentUserId();
+    if (!client || !userId || !id) return false;
+
+    // Chiediamo a Supabase di restituire la riga eliminata: in questo modo
+    // non consideriamo riuscita una DELETE bloccata o che non ha trovato l'id.
+    const { data, error } = await client
+      .from("rentix_rentals")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", userId)
+      .select("id");
+
+    if (error || !Array.isArray(data) || data.length !== 1) {
+      const deleteError = error || new Error("La prenotazione non è stata eliminata dal cloud.");
+      console.error("Eliminazione prenotazione dal cloud non riuscita", deleteError);
+      window.rentixRentalsLastError = deleteError;
+      return false;
+    }
+
+    window.rentixRentalsLastError = null;
+    return true;
+  }
+
+  async function migrateLocalRentals() {
+    const client = window.rentixSupabase;
+    const userId = currentUserId();
+    const localRows = (state.rentals || []).filter(r => r?.id && r?.startDate && r?.endDate).map(toCloud);
+    if (!client || !userId) return false;
+    if (!localRows.length) return true;
+    const { error } = await client.from("rentix_rentals").upsert(localRows, { onConflict: "id" });
+    if (error) {
+      console.error("Migrazione prenotazioni nel cloud non riuscita", error);
+      window.rentixRentalsLastError = error;
+      return false;
+    }
+    return true;
+  }
+
+  async function load() {
+    const client = window.rentixSupabase;
+    const userId = currentUserId();
+    if (!client || !userId || loading) return false;
+    loading = true;
+    try {
+      // Prima leggiamo il cloud. Non carichiamo più alla cieca i dati locali:
+      // un telefono con una copia vecchia potrebbe altrimenti sovrascrivere
+      // una modifica più recente effettuata da un altro dispositivo.
+      let { data, error } = await client.from("rentix_rentals")
+        .select("*")
+        .eq("user_id", userId)
+        .order("start_date", { ascending: true })
+        .order("pickup_time", { ascending: true });
+      if (error) throw error;
+
+      const cloudRows = Array.isArray(data) ? data : [];
+      const cloudById = new Map(cloudRows.map(row => [row.id, row]));
+      const localRentals = (state.rentals || []).filter(r => r?.id && r?.startDate && r?.endDate);
+      const rowsToUpload = [];
+      const migrationKey = `rentixRentalsCloudMigrationComplete_${userId}`;
+      const migrationComplete = localStorage.getItem(migrationKey) === "1";
+
+      for (const localRental of localRentals) {
+        const cloudRow = cloudById.get(localRental.id);
+        if (!cloudRow) {
+          // Carichiamo righe presenti solo sul telefono esclusivamente durante
+          // la prima migrazione. Dopo il primo caricamento il cloud è autorevole:
+          // così una copia vecchia su un altro telefono non ricrea un noleggio eliminato.
+          if (!migrationComplete) rowsToUpload.push(toCloud(localRental));
+          continue;
+        }
+
+        const localTime = Date.parse(localRental.updatedAt || localRental.createdAt || "") || 0;
+        const cloudTime = Date.parse(cloudRow.updated_at || cloudRow.created_at || "") || 0;
+        if (localTime > cloudTime) {
+          // Il telefono contiene davvero una modifica più recente.
+          rowsToUpload.push(toCloud(localRental));
+        }
+      }
+
+      if (rowsToUpload.length) {
+        const { error: uploadError } = await client.from("rentix_rentals")
+          .upsert(rowsToUpload, { onConflict: "id" });
+        if (uploadError) throw uploadError;
+
+        // Rilettura finale per usare su ogni dispositivo la stessa versione.
+        const refreshed = await client.from("rentix_rentals")
+          .select("*")
+          .eq("user_id", userId)
+          .order("start_date", { ascending: true })
+          .order("pickup_time", { ascending: true });
+        if (refreshed.error) throw refreshed.error;
+        data = refreshed.data;
+      }
+
+      state.rentals = Array.isArray(data) ? data.map(fromCloud) : [];
+      localStorage.setItem(getStorageKey(), JSON.stringify(state));
+      localStorage.setItem(migrationKey, "1");
+      renderHome();
+      renderCalendar();
+      renderCustomers(document.getElementById("customerSearch")?.value || "");
+      window.rentixRentalsLastError = null;
+      return true;
+    } catch (error) {
+      console.error("Caricamento prenotazioni cloud non riuscito", error);
+      window.rentixRentalsLastError = error;
+      return false;
+    } finally {
+      loading = false;
+    }
+  }
+
+  return { load, upsertRental, deleteRental, migrateLocalRentals };
+})();
+
+let rentixLastCloudRefresh = 0;
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState !== "visible") return;
+  const now = Date.now();
+  if (now - rentixLastCloudRefresh < 3000) return;
+  rentixLastCloudRefresh = now;
+  window.rentixCloudRentals?.load?.();
+});
+
+// Sincronizzazione cloud - Fase 2: archivio clienti.
+window.rentixCloudCustomers = (() => {
+  let loading = false;
+  const currentUserId = () => window.rentixAccountId || sessionStorage.getItem("rentixActiveAccountId") || "";
+  const normalizedKey = (name, phone) => `${(name || "").trim()}|${(phone || "").trim()}`.toLowerCase();
+
+  function localCustomersFromRentals() {
+    const map = new Map();
+    (state.rentals || []).forEach(r => {
+      const name = (r.customerName || "").trim();
+      if (!name) return;
+      const phone = (r.customerPhone || "").trim();
+      const key = normalizedKey(name, phone);
+      const old = map.get(key);
+      map.set(key, {
+        normalized_key: key,
+        name,
+        phone,
+        document: (r.customerDocument || old?.document || "").trim(),
+        updated_at: r.updatedAt || new Date().toISOString()
+      });
+    });
+    return [...map.values()];
+  }
+
+  async function upsertCustomer(customer) {
+    const client = window.rentixSupabase;
+    const userId = currentUserId();
+    const name = (customer?.name || customer?.customerName || "").trim();
+    if (!client || !userId || !name) return false;
+    const phone = (customer?.phone || customer?.customerPhone || "").trim();
+    const documentValue = (customer?.document || customer?.customerDocument || "").trim();
+    const row = {
+      user_id: userId,
+      normalized_key: normalizedKey(name, phone),
+      name,
+      phone,
+      document: documentValue,
+      updated_at: new Date().toISOString()
+    };
+    const { error } = await client.from("rentix_customers").upsert(row, { onConflict: "user_id,normalized_key" });
+    if (error) {
+      console.error("Salvataggio cliente nel cloud non riuscito", error);
+      window.rentixCustomersLastError = error;
+      return false;
+    }
+    const existing = (state.customers || []).findIndex(c => c.normalized_key === row.normalized_key);
+    if (existing >= 0) state.customers[existing] = { ...(state.customers[existing] || {}), ...row };
+    else state.customers.push(row);
+    localStorage.setItem(getStorageKey(), JSON.stringify(state));
+    window.rentixCustomersLastError = null;
+    return true;
+  }
+
+  async function migrateLocalCustomers() {
+    const rows = localCustomersFromRentals();
+    if (!rows.length) return true;
+    const client = window.rentixSupabase;
+    const userId = currentUserId();
+    if (!client || !userId) return false;
+    const payload = rows.map(row => ({ ...row, user_id: userId }));
+    const { error } = await client.from("rentix_customers").upsert(payload, { onConflict: "user_id,normalized_key" });
+    if (error) {
+      console.error("Migrazione clienti nel cloud non riuscita", error);
+      window.rentixCustomersLastError = error;
+      return false;
+    }
+    return true;
+  }
+
+  async function load() {
+    const client = window.rentixSupabase;
+    const userId = currentUserId();
+    if (!client || !userId || loading) return false;
+    loading = true;
+    try {
+      await migrateLocalCustomers();
+      const { data, error } = await client.from("rentix_customers")
+        .select("id,normalized_key,name,phone,document,created_at,updated_at")
+        .eq("user_id", userId)
+        .order("name", { ascending: true });
+      if (error) throw error;
+      state.customers = Array.isArray(data) ? data : [];
+      localStorage.setItem(getStorageKey(), JSON.stringify(state));
+      renderCustomers(document.getElementById("customerSearch")?.value || "");
+      window.rentixCustomersLastError = null;
+      return true;
+    } catch (error) {
+      console.error("Caricamento clienti cloud non riuscito", error);
+      window.rentixCustomersLastError = error;
+      return false;
+    } finally {
+      loading = false;
+    }
+  }
+
+  return { load, upsertCustomer, migrateLocalCustomers };
+})();
+
+const $ = (id) => document.getElementById(id);
+
+function todayISO() {
+  const d = new Date();
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0, 10);
 }
 
-function renderDisponibilita(){
-const a=dataInizio.value,b=dataFine.value;
-if(!a||!b||b<=a){listaDisponibilita.innerHTML=vuoto("Seleziona date valide.");return}
-listaDisponibilita.innerHTML=stato.parco.filter(f=>f.attivo).map(f=>{
-const n=disponibili(f,a,b);
-return `<div class="item itemhead"><div><strong>${esc(f.nome)}</strong><div class="muted">${f.tipo==="bike"?"Bici":"Accessorio"}</div></div><strong class="${n?"green":"red"}">${n}</strong></div>`
-}).join("")
+function addDays(dateStr, days) {
+  const d = new Date(dateStr + "T12:00:00");
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
 }
 
-function scheda(p,contesto=""){
-let bottone="";
-if(contesto==="consegna")bottone=`<button class="btn primary" onclick="cambiaStato('${p.id}','ritirata')">Segna ritirata</button>`;
-if(contesto==="rientro")bottone=`<button class="btn primary" onclick="cambiaStato('${p.id}','riconsegnata')">Segna riconsegnata</button>`;
-return `<div class="item"><div class="itemhead"><div><h3>${esc(p.nome)}</h3><div class="muted">${esc(p.telefono||"Nessun telefono")}<br>${esc(riepilogo(p))}</div></div><span class="badge">${nomeStato(p.stato)}</span></div><div class="actions">${bottone}<button class="btn" onclick="modificaPrenotazione('${p.id}')">Apri</button></div></div>`
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+  return new Intl.DateTimeFormat("it-IT", {
+    weekday: "short", day: "2-digit", month: "2-digit", year: "numeric"
+  }).format(new Date(dateStr + "T12:00:00"));
 }
 
-function renderOggi(){
-const d=oggi();
-dataOggi.textContent=new Intl.DateTimeFormat("it-IT",{weekday:"long",day:"numeric",month:"long"}).format(new Date(d+"T12:00:00"));
-const c=stato.prenotazioni.filter(p=>p.inizio===d&&p.stato==="prenotata");
-const r=stato.prenotazioni.filter(p=>p.fine===d&&p.stato==="ritirata");
-const late=stato.prenotazioni.filter(p=>p.stato==="ritirata"&&p.fine<d);
-const fuori=stato.prenotazioni.filter(p=>p.stato==="ritirata").reduce((n,p)=>n+p.righe.reduce((s,r)=>{
-const f=stato.parco.find(x=>x.id===r.idParco);return s+(f?.tipo==="bike"?r.quantita:0)},0),0);
-nConsegne.textContent=c.length;nRientri.textContent=r.length;nRitardi.textContent=late.length;nFuori.textContent=fuori;
-consegne.innerHTML=c.length?c.map(p=>scheda(p,"consegna")).join(""):vuoto("Nessuna consegna oggi.");
-rientri.innerHTML=r.length?r.map(p=>scheda(p,"rientro")).join(""):vuoto("Nessun rientro oggi.");
-ritardi.innerHTML=late.length?late.map(p=>scheda(p)).join(""):vuoto("Nessun ritardo.");
+function rangesOverlap(startA, endA, startB, endB) {
+  return startA <= endB && endA >= startB;
 }
 
-function renderPrenotazioni(){
-const q=cerca.value.toLowerCase(),s=filtroStato.value;
-const arr=[...stato.prenotazioni].sort((a,b)=>b.inizio.localeCompare(a.inizio)).filter(p=>
-(!q||`${p.nome} ${p.telefono} ${p.note}`.toLowerCase().includes(q))&&(!s||p.stato===s));
-listaPrenotazioni.innerHTML=arr.length?arr.map(p=>`<div class="item">
-<div class="itemhead"><div><h3>${esc(p.nome)}</h3><div class="muted">${formatta(p.inizio)} → ${formatta(p.fine)}<br>${esc(riepilogo(p))}</div></div><span class="badge">${nomeStato(p.stato)}</span></div>
-<div class="actions"><button class="btn primary" onclick="modificaPrenotazione('${p.id}')">Modifica</button>${p.stato!=="annullata"?`<button class="btn" onclick="cambiaStato('${p.id}','annullata')">Annulla</button>`:""}</div></div>`).join(""):vuoto("Nessuna prenotazione.")
+function activeRentalsForDate(date, excludeId = null) {
+  return state.rentals.filter(r =>
+    r.id !== excludeId &&
+    r.status !== "annullata" &&
+    rangesOverlap(r.startDate, r.endDate, date, date)
+  );
 }
 
-function renderParco(){
-listaParco.innerHTML=stato.parco.map(f=>`<div class="item">
-<div class="itemhead"><div><h3>${esc(f.nome)}</h3><div class="muted">${f.tipo==="bike"?"Bici":"Accessorio"} · ${f.attivo?"Attiva":"Disattivata"}</div></div><span class="badge">${Math.max(0,f.totale-f.fuori)} utilizzabili</span></div>
-<div class="actions"><span class="badge">Totale ${f.totale}</span><span class="badge">Fuori servizio ${f.fuori}</span><button class="btn primary" onclick="apriParco('${f.id}')">Modifica</button></div></div>`).join("")
+function usedQuantity(date, category, type = "bikes", excludeId = null) {
+  return activeRentalsForDate(date, excludeId)
+    .reduce((sum, rental) => sum + Number((rental[type] || {})[category] || 0), 0);
 }
 
-function apriPrenotazione(){
-prenotazioneId.value="";titoloPrenotazione.textContent="Nuova prenotazione";
-pInizio.value=dataInizio.value;pFine.value=dataFine.value;pNome.value="";pTelefono.value="";pDocumento.value="";pNote.value="";pStato.value="prenotata";
-righePrenotazione.innerHTML="";aggiungiRiga();eliminaPrenotazione.classList.add("hidden");modalPrenotazione.classList.remove("hidden")
+function maxUsedInRange(startDate, endDate, category, type, excludeId = null) {
+  let cursor = startDate;
+  let max = 0;
+  while (cursor <= endDate) {
+    max = Math.max(max, usedQuantity(cursor, category, type, excludeId));
+    cursor = addDays(cursor, 1);
+  }
+  return max;
 }
 
-function modificaPrenotazione(x){
-const p=stato.prenotazioni.find(z=>z.id===x);if(!p)return;
-prenotazioneId.value=p.id;titoloPrenotazione.textContent="Modifica prenotazione";
-pInizio.value=p.inizio;pFine.value=p.fine;pNome.value=p.nome;pTelefono.value=p.telefono;pDocumento.value=p.documento;pNote.value=p.note;pStato.value=p.stato;
-righePrenotazione.innerHTML="";p.righe.forEach(aggiungiRiga);eliminaPrenotazione.classList.remove("hidden");modalPrenotazione.classList.remove("hidden")
+function showPage(pageId) {
+  document.querySelectorAll(".page").forEach(p => p.classList.toggle("active", p.id === pageId));
+  document.querySelectorAll(".nav-btn, .menu-item[data-page]").forEach(b => b.classList.toggle("active", b.dataset.page === pageId));
+  closeMainMenu();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
+  if (pageId === "homePage") renderHome();
+renderFleet();
+  if (pageId === "calendarPage") renderCalendar();
+  if (pageId === "fleetPage") renderFleet();
+  if (pageId === "customersPage") renderCustomers();
+  if (pageId === "remindersPage") renderReminders();
+  if (pageId === "settingsPage") renderSettings();
+  if (pageId === "pricingPage") renderPricing();
 }
 
-function aggiungiRiga(r={idParco:"",quantita:1}){
-const d=document.createElement("div");d.className="bookingrow";
-d.innerHTML=`<label>Categoria<select class="rTipo"><option value="">Seleziona</option>${stato.parco.filter(f=>f.attivo||f.id===r.idParco).map(f=>`<option value="${f.id}" ${f.id===r.idParco?"selected":""}>${esc(f.nome)}</option>`).join("")}</select></label><label>Qtà<input class="rQta" type="number" min="1" value="${r.quantita}"></label><button onclick="this.parentElement.remove()">×</button>`;
-righePrenotazione.appendChild(d)
+function makeQuantityRows(container, source, prefix, settings = false) {
+  container.innerHTML = "";
+  Object.entries(source).forEach(([key, item]) => {
+    const row = document.createElement("div");
+    row.className = `quantity-row ${prefix === "bike" && !settings ? "quantity-row-bike" : ""}`;
+    row.innerHTML = `
+      <div>
+        <strong>${escapeHtml(item.label)}</strong>
+        <small>${settings ? "Quantità totale disponibile" : `Totale: ${item.total}`}</small>
+      </div>
+      <div class="quantity-control">
+        <button type="button" class="qty-btn" data-action="minus">−</button>
+        <input class="qty-input" type="number" min="0" step="1" id="${prefix}_${key}" value="${settings ? item.total : 0}">
+        <button type="button" class="qty-btn" data-action="plus">+</button>
+      </div>`;
+
+    container.appendChild(row);
+
+    row.querySelectorAll(".qty-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const input = btn.closest(".quantity-control").querySelector("input");
+        const delta = btn.dataset.action === "plus" ? 1 : -1;
+        input.value = Math.max(0, Number(input.value || 0) + delta);
+        input.dispatchEvent(new Event("input", { bubbles:true }));
+      });
+    });
+
+    const qtyInput = row.querySelector(".qty-input");
+    if (prefix === "bike" && !settings && qtyInput) {
+      qtyInput.dataset.bikeKey = key;
+      qtyInput.addEventListener("input", () => {
+        renderAllBikeAssignments();
+        updateAvailabilityIndicator();
+      });
+    }
+  });
+  if (prefix === "bike" && !settings) renderAllBikeAssignments();
 }
 
-function salvaPrenotazione(){
-if(!pNome.value.trim()){avviso("Inserisci il nome cliente");return}
-if(!pInizio.value||!pFine.value||pFine.value<=pInizio.value){avviso("Controlla le date");return}
-const righe=[...document.querySelectorAll(".bookingrow")].map(x=>({idParco:x.querySelector(".rTipo").value,quantita:Number(x.querySelector(".rQta").value)})).filter(x=>x.idParco&&x.quantita>0);
-if(!righe.length){avviso("Aggiungi almeno una bici");return}
-const escludi=prenotazioneId.value;
-for(const r of righe){
-const f=stato.parco.find(x=>x.id===r.idParco);
-if(r.quantita>disponibili(f,pInizio.value,pFine.value,escludi)){avviso(`${f.nome}: disponibilità insufficiente`);return}
-}
-const p={id:escludi||id("p"),inizio:pInizio.value,fine:pFine.value,nome:pNome.value.trim(),telefono:pTelefono.value.trim(),documento:pDocumento.value.trim(),note:pNote.value.trim(),stato:pStato.value,righe};
-const i=stato.prenotazioni.findIndex(x=>x.id===p.id);if(i>=0)stato.prenotazioni[i]=p;else stato.prenotazioni.push(p);
-salva();chiudi("modalPrenotazione");renderTutto();avviso("Prenotazione salvata")
-}
-
-function cancellaPrenotazione(){
-if(!confirm("Eliminare definitivamente?"))return;
-stato.prenotazioni=stato.prenotazioni.filter(x=>x.id!==prenotazioneId.value);salva();chiudi("modalPrenotazione");renderTutto()
+function normalizeAssignment(value) {
+  if (!value) return {};
+  if (typeof value === "string") return value ? { [value]: 1 } : {};
+  if (typeof value === "object" && !Array.isArray(value)) {
+    const out = {};
+    Object.entries(value).forEach(([key, qty]) => {
+      if (key === "_unitId" || key === "_unitName") {
+        if (qty) out[key] = String(qty);
+      } else {
+        const n = Math.max(0, Number(qty || 0));
+        if (n) out[key] = n;
+      }
+    });
+    return out;
+  }
+  return {};
 }
 
-function cambiaStato(x,s){const p=stato.prenotazioni.find(z=>z.id===x);if(p){p.stato=s;salva();renderTutto()}}
-
-function apriParco(x=""){
-const f=stato.parco.find(z=>z.id===x);
-parcoId.value=f?.id||"";parcoNome.value=f?.nome||"";parcoTotale.value=f?.totale||0;parcoFuori.value=f?.fuori||0;parcoTipo.value=f?.tipo||"bike";parcoAttivo.checked=f?.attivo??true;
-titoloParco.textContent=f?"Modifica categoria":"Aggiungi categoria";eliminaParco.classList.toggle("hidden",!f);modalParco.classList.remove("hidden")
+function assignmentFromRow(row) {
+  const out = {};
+  const unitSelect = row.querySelector(".unit-assignment-select");
+  if (unitSelect?.value) {
+    out._unitId = unitSelect.value;
+    out._unitName = unitSelect.selectedOptions[0]?.dataset.unitName || unitSelect.selectedOptions[0]?.textContent || unitSelect.value;
+  }
+  row.querySelectorAll(".inline-accessory-qty").forEach(input => {
+    const qty = Math.max(0, Number(input.value || 0));
+    if (qty) out[input.dataset.accessory] = qty;
+  });
+  return out;
 }
 
-function salvaParco(){
-const totale=Number(parcoTotale.value),fuori=Number(parcoFuori.value);
-if(!parcoNome.value.trim()){avviso("Inserisci il nome");return}
-if(fuori>totale){avviso("Fuori servizio non può superare il totale");return}
-const f={id:parcoId.value||id("f"),nome:parcoNome.value.trim(),totale,fuori,tipo:parcoTipo.value,attivo:parcoAttivo.checked};
-const i=stato.parco.findIndex(x=>x.id===f.id);if(i>=0)stato.parco[i]=f;else stato.parco.push(f);
-salva();chiudi("modalParco");renderTutto()
+function unitDisplayName(item, unit, index) {
+  return String(unit?.name || `${item?.label || "Mezzo"} #${index + 1}`);
 }
 
-function cancellaParco(){
-const x=parcoId.value;
-if(stato.prenotazioni.some(p=>p.righe.some(r=>r.idParco===x))){avviso("Categoria usata nello storico: disattivala");return}
-if(confirm("Eliminare categoria?")){stato.parco=stato.parco.filter(f=>f.id!==x);salva();chiudi("modalParco");renderTutto()}
+function unitBusyInRange(start, end, bikeKey, unitId, excludeId = null) {
+  if (!start || !end || !unitId) return false;
+  return state.rentals.some(rental => {
+    if (rental.id === excludeId || rental.status === "annullata" || rental.status === "restituita") return false;
+    if (!rangesOverlap(start, end, rental.startDate, rental.endDate)) return false;
+    return (rental.bikeAssignments?.[bikeKey] || []).some(a => normalizeAssignment(a)._unitId === unitId);
+  });
 }
 
-function chiudi(x){document.getElementById(x).classList.add("hidden")}
-function avviso(t){toast.textContent=t;toast.classList.remove("hidden");setTimeout(()=>toast.classList.add("hidden"),2200)}
-function esportaBackup(){
-const blob=new Blob([JSON.stringify(stato,null,2)],{type:"application/json"}),a=document.createElement("a");
-a.href=URL.createObjectURL(blob);a.download=`backup-noleggio-${oggi()}.json`;a.click()
+function currentAssignmentPresets() {
+  const out = {};
+  document.querySelectorAll("#assignmentFields .bike-assignment-row").forEach(row => {
+    const bikeKey = row.dataset.bikeKey;
+    if (!bikeKey) return;
+    (out[bikeKey] ||= []).push(assignmentFromRow(row));
+  });
+  return out;
 }
-function importaBackup(e){
-const f=e.target.files[0];if(!f)return;
-const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x.parco||!x.prenotazioni)throw 0;stato=x;salva();renderTutto();avviso("Backup importato")}catch{alert("Backup non valido")}};r.readAsText(f)
-}
-function renderTutto(){renderOggi();renderDisponibilita();renderPrenotazioni();renderParco()}
 
-const d=oggi(),domani=new Date(d+"T12:00:00");domani.setDate(domani.getDate()+1);
-dataInizio.value=d;dataFine.value=domani.toISOString().slice(0,10);
-dataInizio.onchange=renderDisponibilita;dataFine.onchange=renderDisponibilita;
-renderTutto();
+function renderAllBikeAssignments(forcedPresets = null) {
+  const holder = $("assignmentFields");
+  if (!holder) return;
+  const presets = forcedPresets || currentAssignmentPresets();
+  holder.innerHTML = "";
+
+  Object.entries(state.inventory || {}).forEach(([bikeKey, item]) => {
+    const qty = Math.max(0, Number(document.getElementById(`bike_${bikeKey}`)?.value || 0));
+    if (!qty) return;
+
+    const category = document.createElement("section");
+    category.className = "bike-assignment-category";
+    category.innerHTML = `<h4 class="bike-assignment-category-title">Dettagli ${escapeHtml(item.label || bikeKey)}</h4><div class="bike-assignment-list"></div>`;
+    const list = category.querySelector(".bike-assignment-list");
+    const previous = Array.isArray(presets[bikeKey]) ? presets[bikeKey] : [];
+    const units = normalizedUnits(item);
+    const startDate = $("startDate")?.value;
+    const endDate = $("endDate")?.value;
+    const excludeId = $("rentalId")?.value || null;
+
+    for (let i = 0; i < qty; i++) {
+      const values = normalizeAssignment(previous[i]);
+      const alreadyChosen = new Set(previous.map((a, idx) => idx === i ? "" : normalizeAssignment(a)._unitId).filter(Boolean));
+      const options = units.map((unit, unitIndex) => {
+        const name = unitDisplayName(item, unit, unitIndex);
+        const selected = values._unitId === unit.id;
+        const busy = unitBusyInRange(startDate, endDate, bikeKey, unit.id, excludeId);
+        const duplicate = alreadyChosen.has(unit.id);
+        const disabled = !selected && (busy || duplicate);
+        const suffix = busy ? " — già prenotato" : duplicate ? " — già scelto" : "";
+        return `<option value="${escapeHtml(unit.id)}" data-unit-name="${escapeHtml(name)}" ${selected ? "selected" : ""} ${disabled ? "disabled" : ""}>${escapeHtml(name + suffix)}</option>`;
+      }).join("");
+      const unitHtml = units.length ? `<label class="unit-assignment-field"><span>Scegli il mezzo</span><select class="unit-assignment-select"><option value="">Non assegnato</option>${options}</select></label>` : `<small class="muted">Nessun mezzo disponibile in questa categoria</small>`;
+
+      const allowedAccessories = Object.entries(state.accessories || {});
+      const accessoriesHtml = allowedAccessories.length
+        ? allowedAccessories.map(([accKey, acc]) => `<div class="accessory-quantity-row"><strong>${escapeHtml(acc.label || accKey)}</strong><div class="quantity-control"><button type="button" class="qty-btn" data-action="minus">−</button><input class="qty-input inline-accessory-qty" data-accessory="${escapeHtml(accKey)}" type="number" min="0" step="1" value="${values[accKey] || 0}"><button type="button" class="qty-btn" data-action="plus">+</button></div></div>`).join("")
+        : `<small class="muted">Nessun oggetto configurato nell'inventario</small>`;
+
+      const row = document.createElement("div");
+      row.className = "bike-assignment-row";
+      row.dataset.bikeKey = bikeKey;
+      row.innerHTML = `<div><span class="bike-assignment-number">Articolo ${i + 1}</span><strong>1× ${escapeHtml(item.label || bikeKey)}</strong>${unitHtml}</div><div class="accessory-quantity-list">${accessoriesHtml}</div>`;
+      row.querySelectorAll(".qty-btn").forEach(btn => btn.addEventListener("click", () => {
+        const input = btn.closest(".quantity-control").querySelector("input");
+        input.value = Math.max(0, Number(input.value || 0) + (btn.dataset.action === "plus" ? 1 : -1));
+        input.dispatchEvent(new Event("input", { bubbles:true }));
+      }));
+      row.querySelectorAll(".inline-accessory-qty").forEach(input => input.addEventListener("input", updateAvailabilityIndicator));
+      row.querySelector(".unit-assignment-select")?.addEventListener("change", () => {
+        renderAllBikeAssignments(currentAssignmentPresets());
+        updateAvailabilityIndicator();
+      });
+      list.appendChild(row);
+    }
+    holder.appendChild(category);
+  });
+}
+
+function renderBikeAssignments(bikeKey, preset = null) {
+  const presets = currentAssignmentPresets();
+  if (preset) presets[bikeKey] = Array.isArray(preset) ? preset : [];
+  renderAllBikeAssignments(presets);
+}
+
+function collectBikeAssignments() {
+  const out = {};
+  Object.keys(state.inventory || {}).forEach(key => out[key] = []);
+  document.querySelectorAll("#assignmentFields .bike-assignment-row").forEach(row => {
+    const key = row.dataset.bikeKey;
+    if (key && out[key]) out[key].push(assignmentFromRow(row));
+  });
+  return out;
+}
+
+function collectQuantities(prefix, source) {
+  const out = {};
+  Object.keys(source).forEach(key => out[key] = Math.max(0, Number($(`${prefix}_${key}`)?.value || 0)));
+  return out;
+}
+
+function collectInlineSeats() {
+  const totals = {};
+  Object.keys(state.accessories).forEach(key => totals[key] = 0);
+  document.querySelectorAll(".inline-accessory-qty").forEach(input => {
+    totals[input.dataset.accessory] = (totals[input.dataset.accessory] || 0) + Math.max(0, Number(input.value || 0));
+  });
+  return totals;
+}
+
+function loadBikeAssignments(rental) {
+  const presets = {};
+  if (rental?.bikeAssignments) {
+    Object.entries(rental.bikeAssignments).forEach(([bikeKey, values]) => {
+      presets[bikeKey] = Array.isArray(values) ? values : [];
+    });
+  } else {
+    const pending = [];
+    Object.entries(rental?.accessories || {}).forEach(([accKey, qty]) => {
+      for (let i = 0; i < Number(qty || 0); i++) pending.push(accKey);
+    });
+    Object.keys(state.inventory || {}).forEach(bikeKey => {
+      const articleQty = Math.max(0, Number(document.getElementById(`bike_${bikeKey}`)?.value || 0));
+      presets[bikeKey] = Array.from({length: articleQty}, () => {
+        const key = pending.shift();
+        return key ? { [key]: 1 } : {};
+      });
+    });
+  }
+  renderAllBikeAssignments(presets);
+}
+
+function inclusiveDays(start, end) {
+  if (!start || !end || end < start) return 0;
+  const a = new Date(start + "T12:00:00");
+  const b = new Date(end + "T12:00:00");
+  return Math.round((b - a) / 86400000) + 1;
+}
+
+function bikeCountFromForm() {
+  return Object.values(collectQuantities("bike", state.inventory)).reduce((sum, qty) => sum + Number(qty || 0), 0);
+}
+
+function pricePerBikeForDays(days, pricing = state.pricing) {
+  days = Math.max(0, Math.floor(Number(days || 0)));
+  if (!days) return 0;
+  const tiers = Object.entries(pricing || DEFAULT_PRICING)
+    .map(([d,p]) => [Number(d), Number(p)])
+    .filter(([d,p]) => d > 0 && Number.isFinite(p))
+    .sort((a,b) => a[0]-b[0]);
+  if (!tiers.length) return 0;
+  const exact = tiers.find(([d]) => d === days);
+  if (exact) return exact[1];
+  if (days < tiers[0][0]) return tiers[0][1];
+  const last = tiers[tiers.length - 1];
+  if (days > last[0]) {
+    const fullBlocks = Math.floor(days / last[0]);
+    const remainder = days % last[0];
+    return fullBlocks * last[1] + (remainder ? pricePerBikeForDays(remainder, pricing) : 0);
+  }
+  for (let i=0; i<tiers.length-1; i++) {
+    const [d1,p1] = tiers[i], [d2,p2] = tiers[i+1];
+    if (days > d1 && days < d2) {
+      const value = p1 + (p2-p1) * ((days-d1)/(d2-d1));
+      return Math.round(value);
+    }
+  }
+  return last[1];
+}
+
+let priceManuallyEdited = false;
+
+function updateRentalPrice(force = false) {
+  const days = inclusiveDays($("startDate").value, $("endDate").value);
+  const bikes = bikeCountFromForm();
+  const perBike = pricePerBikeForDays(days);
+  const automaticTotal = perBike * bikes;
+  $("priceDaysLabel").textContent = `${days || 0} ${days === 1 ? "giorno" : "giorni"} · ${bikes} ${bikes === 1 ? "articolo" : "articoli"} · ${formatEuro(perBike)} per articolo`;
+  if (force || !priceManuallyEdited) $("rentalPrice").value = automaticTotal;
+  $("priceAutoNote").textContent = priceManuallyEdited
+    ? `Prezzo modificato manualmente. Automatico: ${formatEuro(automaticTotal)}. Accessori inclusi.`
+    : "Calcolato automaticamente dal listino. Accessori inclusi.";
+}
+
+function formatEuro(value) {
+  return new Intl.NumberFormat("it-IT", { style:"currency", currency:"EUR", maximumFractionDigits:2 }).format(Number(value || 0));
+}
+
+function renderPricing() {
+  const holder = $("pricingFields");
+  if (!holder) return;
+  holder.innerHTML = "";
+  Object.keys(DEFAULT_PRICING).map(Number).sort((a,b)=>a-b).forEach(days => {
+    const row = document.createElement("div");
+    row.className = "pricing-row";
+    row.innerHTML = `<label for="pricing_${days}">${days === 30 ? "1 mese / 30 giorni" : days === 14 ? "2 settimane / 14 giorni" : `${days} ${days === 1 ? "giorno" : "giorni"}`}</label>
+      <div class="price-input-wrap"><input id="pricing_${days}" type="number" min="0" step="1" inputmode="decimal" value="${Number(state.pricing?.[days] ?? DEFAULT_PRICING[days])}"><span>€</span></div>`;
+    holder.appendChild(row);
+  });
+  holder.querySelectorAll("input").forEach(input => input.addEventListener("input", renderPricingPreview));
+  renderPricingPreview();
+}
+
+function pricingFromFields() {
+  const result = {};
+  Object.keys(DEFAULT_PRICING).forEach(days => {
+    result[days] = Math.max(0, Number($("pricing_"+days)?.value ?? state.pricing?.[days] ?? DEFAULT_PRICING[days]));
+  });
+  return result;
+}
+
+function renderPricingPreview() {
+  const holder = $("pricingPreview");
+  if (!holder) return;
+  const temp = pricingFromFields();
+  const lines = [];
+  for (let d=1; d<=30; d++) lines.push(`<div class="pricing-preview-line"><span>${d} ${d===1?"giorno":"giorni"}</span><strong>${formatEuro(pricePerBikeForDays(d,temp))}</strong></div>`);
+  holder.innerHTML = lines.join("");
+}
+
+function resetRentalForm() {
+  $("rentalForm").reset();
+  $("rentalId").value = "";
+  $("startDate").value = todayISO();
+  $("endDate").value = todayISO();
+  $("pickupTime").value = "09:00";
+  $("returnTime").value = "19:00";
+  $("rentalStatus").value = "prenotata";
+  priceManuallyEdited = false;
+  $("rentalPrice").value = 0;
+  makeQuantityRows($("bikeFields"), state.inventory, "bike");
+  updateAvailabilityIndicator();
+  updateRentalPrice(true);
+}
+
+function updateAvailabilityIndicator() {
+  const start = $("startDate").value;
+  const end = $("endDate").value;
+  const excludeId = $("rentalId").value || null;
+  if (!start || !end || end < start) {
+    $("availabilityStatus").textContent = "Controlla le date";
+    $("availabilityStatus").className = "availability-badge availability-no";
+    return false;
+  }
+
+  const requestedBikes = collectQuantities("bike", state.inventory);
+  const requestedAcc = collectInlineSeats();
+  let ok = true;
+
+  for (const [key, qty] of Object.entries(requestedBikes)) {
+    const available = Math.max(0, state.inventory[key].total - maxUsedInRange(start, end, key, "bikes", excludeId));
+    const remaining = available - qty;
+    const input = $(`bike_${key}`);
+    const info = input?.closest(".quantity-row")?.querySelector("small");
+    if (info) {
+      info.textContent = `Libere nel periodo: ${available} · Dopo questa prenotazione: ${Math.max(0, remaining)}`;
+      info.classList.toggle("availability-warning-text", remaining < 0);
+    }
+    if (qty > available) ok = false;
+  }
+  for (const [key, qty] of Object.entries(requestedAcc)) {
+    const available = Math.max(0, state.accessories[key].total - maxUsedInRange(start, end, key, "accessories", excludeId));
+    const remaining = available - qty;
+    const input = document.querySelector(`.bike-seat-select option[value="${CSS.escape(key)}"]`)?.closest("select");
+    const info = null;
+    if (info) {
+      info.textContent = `Liberi nel periodo: ${available} · Dopo questa prenotazione: ${Math.max(0, remaining)}`;
+      info.classList.toggle("availability-warning-text", remaining < 0);
+    }
+    if (qty > available) ok = false;
+  }
+
+  const assignments = collectBikeAssignments();
+  Object.entries(assignments).forEach(([bikeKey, rows]) => {
+    const selected = new Set();
+    rows.forEach(raw => {
+      const a = normalizeAssignment(raw);
+      if (!a._unitId) return;
+      if (selected.has(a._unitId) || unitBusyInRange(start, end, bikeKey, a._unitId, excludeId)) ok = false;
+      selected.add(a._unitId);
+    });
+  });
+
+  $("availabilityStatus").textContent = ok ? "Disponibile" : "Quantità non disponibile";
+  $("availabilityStatus").className = `availability-badge ${ok ? "availability-ok" : "availability-no"}`;
+  return ok;
+}
+
+function rentalItemsText(rental) {
+  const lines = [];
+  Object.entries(rental.bikes || {}).forEach(([key, qty]) => {
+    const assignments = rental.bikeAssignments?.[key] || [];
+    for (let i = 0; i < Number(qty || 0); i++) {
+      const assignment = normalizeAssignment(assignments[i]);
+      const unitName = assignment._unitName || "";
+      lines.push(`1 × ${state.inventory[key]?.label || key}${unitName ? ` — ${unitName}` : ""}`);
+      Object.entries(assignment).forEach(([accKey, accQty]) => {
+        if (accKey === "_unitId" || accKey === "_unitName") return;
+        if (Number(accQty || 0) > 0) lines.push(`↳ ${state.accessories[accKey]?.label || accKey} ×${accQty}`);
+      });
+    }
+  });
+  return lines.length ? lines.join("\n") : "Nessun articolo inserito";
+}
+
+function statusLabel(status) {
+  return {
+    prenotata: "Prenotata",
+    ritirata: "Ritirata",
+    restituita: "Restituita",
+    annullata: "Annullata"
+  }[status] || status;
+}
+
+function createRentalCard(rental) {
+  const card = $("rentalCardTemplate").content.firstElementChild.cloneNode(true);
+  card.querySelector(".rental-name").textContent = rental.customerName;
+  card.querySelector(".rental-meta").textContent =
+    `${formatDate(rental.startDate)} ${rental.pickupTime || ""} → ${formatDate(rental.endDate)} ${rental.returnTime || ""}`;
+  card.querySelector(".rental-items").textContent = rentalItemsText(rental);
+  card.querySelector(".rental-price").textContent = Number.isFinite(Number(rental.priceTotal)) ? `Totale: ${formatEuro(rental.priceTotal)}` : "";
+  const visibleNotes = /^(1 seggiolino per ogni bici|seggiolino per ogni bici)$/i.test((rental.notes || "").trim()) ? "" : (rental.notes || "");
+  card.querySelector(".rental-notes").textContent = visibleNotes;
+
+  const pill = card.querySelector(".status-pill");
+  pill.textContent = statusLabel(rental.status);
+  pill.className = `status-pill status-${rental.status}`;
+
+  card.querySelector(".edit-btn").addEventListener("click", () => editRental(rental.id));
+  card.querySelector(".status-btn").addEventListener("click", () => cycleStatus(rental.id));
+  card.querySelector(".delete-btn").addEventListener("click", () => deleteRental(rental.id));
+  return card;
+}
+
+
+
+let reminderFilter = "all";
+
+function reminderEntries() {
+  const today = todayISO();
+  const tomorrow = addDays(today, 1);
+  const nextWeek = addDays(today, 7);
+  const entries = [];
+
+  state.rentals.forEach(rental => {
+    if (rental.status === "annullata" || rental.status === "restituita") return;
+    if (rental.startDate >= today && rental.startDate <= nextWeek && rental.status === "prenotata") {
+      entries.push({ type:"delivery", date:rental.startDate, time:rental.pickupTime || "", rental });
+    }
+    if (rental.endDate >= today && rental.endDate <= nextWeek && rental.status !== "restituita") {
+      entries.push({ type:"return", date:rental.endDate, time:rental.returnTime || "", rental });
+    }
+    if (rental.endDate < today && rental.status === "ritirata") {
+      entries.push({ type:"late", date:rental.endDate, time:rental.returnTime || "", rental });
+    }
+  });
+
+  return entries.sort((a,b) => (a.date+a.time).localeCompare(b.date+b.time));
+}
+
+function reminderCard(entry) {
+  const labels = {
+    delivery: { text:"DA CONSEGNARE", cls:"delivery", icon:"📤" },
+    return: { text:"DA RIENTRARE", cls:"return", icon:"📥" },
+    late: { text:"IN RITARDO", cls:"late", icon:"⏰" }
+  };
+  const meta = labels[entry.type];
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "reminder-card";
+  button.innerHTML = `
+    <div class="reminder-card-top">
+      <h4>${meta.icon} ${entry.rental.customerName}</h4>
+      <span class="reminder-kind ${meta.cls}">${meta.text}</span>
+    </div>
+    <div class="reminder-time">${formatDate(entry.date)}${entry.time ? ` · ${entry.time}` : ""}</div>
+    <div class="reminder-items"></div>
+    <div class="reminder-open">Apri prenotazione ›</div>`;
+  button.querySelector(".reminder-items").textContent = rentalItemsText(entry.rental);
+  button.addEventListener("click", () => editRental(entry.rental.id));
+  return button;
+}
+
+function renderReminderSection(container, title, entries) {
+  const section = document.createElement("section");
+  section.className = "reminder-section";
+  section.innerHTML = `<div class="reminder-section-title"><h3>${title}</h3><span class="reminder-count">${entries.length}</span></div><div class="reminder-list"></div>`;
+  const list = section.querySelector(".reminder-list");
+  if (!entries.length) list.innerHTML = `<div class="reminder-empty">Nessun promemoria.</div>`;
+  else entries.forEach(entry => list.appendChild(reminderCard(entry)));
+  container.appendChild(section);
+}
+
+function renderReminders() {
+  const holder = $("remindersContent");
+  if (!holder) return;
+  document.querySelectorAll("[data-reminder-filter]").forEach(btn => btn.classList.toggle("active", btn.dataset.reminderFilter === reminderFilter));
+  let entries = reminderEntries();
+  if (reminderFilter === "delivery") entries = entries.filter(e => e.type === "delivery");
+  if (reminderFilter === "return") entries = entries.filter(e => e.type === "return" || e.type === "late");
+
+  const today = todayISO();
+  const tomorrow = addDays(today, 1);
+  const late = entries.filter(e => e.type === "late");
+  const todayEntries = entries.filter(e => e.type !== "late" && e.date === today);
+  const tomorrowEntries = entries.filter(e => e.type !== "late" && e.date === tomorrow);
+  const upcoming = entries.filter(e => e.type !== "late" && e.date > tomorrow);
+
+  holder.innerHTML = "";
+  if (late.length) renderReminderSection(holder, "🔴 In ritardo", late);
+  renderReminderSection(holder, "Oggi", todayEntries);
+  renderReminderSection(holder, "Domani", tomorrowEntries);
+  renderReminderSection(holder, "Prossimi 7 giorni", upcoming);
+}
+
+document.querySelectorAll("[data-reminder-filter]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    reminderFilter = btn.dataset.reminderFilter;
+    renderReminders();
+  });
+});
+
+
+function renderHome() {
+  const date = selectedHomeDate || todayISO();
+  const isToday = date === todayISO();
+  const dateObj = new Date(date + "T12:00:00");
+  $("todayLabel").textContent = new Intl.DateTimeFormat("it-IT", {
+    weekday: "long", day: "numeric", month: "long"
+  }).format(dateObj);
+  $("homeDateCaption").textContent = isToday ? "Oggi" : "Giorno selezionato";
+  $("homeTodayBtn").classList.toggle("hidden", isToday);
+
+  const dayRentals = activeRentalsForDate(date);
+  $("statBookings").textContent = dayRentals.length;
+  $("statPickup").textContent = dayRentals.filter(r => r.startDate === date && r.status === "prenotata").length;
+  $("statReturn").textContent = dayRentals.filter(r => r.endDate === date && r.status !== "restituita").length;
+  $("statBikes").textContent = dayRentals.reduce((sum, r) =>
+    sum + Object.values(r.bikes || {}).reduce((a, b) => a + Number(b || 0), 0), 0);
+
+  const list = $("todayRentals");
+  list.innerHTML = "";
+  if (!dayRentals.length) {
+    list.innerHTML = `<div class="empty-state">Nessun noleggio previsto per questa data.</div>`;
+  } else {
+    dayRentals
+      .sort((a, b) => (a.pickupTime || "").localeCompare(b.pickupTime || ""))
+      .forEach(r => list.appendChild(createRentalCard(r)));
+  }
+}
+function renderCalendar() {
+  const date = $("calendarDate").value || todayISO();
+  $("calendarDate").value = date;
+  const rentals = activeRentalsForDate(date);
+
+  const avail = $("dayAvailability");
+  avail.innerHTML = `<h3>Disponibilità ${formatDate(date)}</h3>`;
+  Object.entries(state.inventory).forEach(([key, item]) => {
+    const used = usedQuantity(date, key, "bikes");
+    const free = Math.max(0, item.total - used);
+    avail.innerHTML += `<div class="availability-line"><span>${item.label}</span><strong>${free} libere su ${item.total}</strong></div>`;
+  });
+  Object.entries(state.accessories).forEach(([key, item]) => {
+    const used = usedQuantity(date, key, "accessories");
+    const free = Math.max(0, item.total - used);
+    avail.innerHTML += `<div class="availability-line"><span>${item.label}</span><strong>${free} liberi su ${item.total}</strong></div>`;
+  });
+
+  const list = $("calendarRentals");
+  list.innerHTML = "";
+  if (!rentals.length) list.innerHTML = `<div class="empty-state">Nessun noleggio in questa data.</div>`;
+  rentals.forEach(r => list.appendChild(createRentalCard(r)));
+}
+
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function normalizedUnits(item) {
+  const total = Math.max(0, Number(item?.total || 0));
+  const existing = Array.isArray(item?.units) ? item.units : [];
+  return Array.from({ length: total }, (_, index) => ({
+    id: String(existing[index]?.id || `unit_${index + 1}`),
+    name: String(existing[index]?.name || "")
+  }));
+}
+
+function openUnitsModal(key) {
+  const item = state.inventory[key];
+  if (!item) return;
+  $("unitsCategoryKey").value = key;
+  $("unitsModalTitle").textContent = item.label;
+  const units = normalizedUnits(item);
+  $("unitsList").innerHTML = units.length
+    ? units.map((unit, index) => `<label class="unit-row"><span class="unit-row-number">#${index + 1}</span><input class="unit-name-input" maxlength="80" data-unit-id="${escapeHtml(unit.id)}" value="${escapeHtml(unit.name)}" placeholder="Es. ${escapeHtml(item.label)} #${index + 1}"></label>`).join("")
+    : `<div class="empty-state">Imposta una quantità maggiore di 0 per aggiungere i singoli mezzi.</div>`;
+  $("unitsModal").classList.remove("hidden");
+}
+
+function closeUnitsModal() {
+  $("unitsModal").classList.add("hidden");
+}
+
+function saveUnits() {
+  const key = $("unitsCategoryKey").value;
+  const item = state.inventory[key];
+  if (!item) return closeUnitsModal();
+  const previous = normalizedUnits(item);
+  const inputs = [...$("unitsList").querySelectorAll(".unit-name-input")];
+  item.units = inputs.map((input, index) => ({
+    id: input.dataset.unitId || previous[index]?.id || `unit_${index + 1}`,
+    name: input.value.trim()
+  }));
+  saveState();
+  renderFleet();
+  closeUnitsModal();
+}
+
+function renderFleet() {
+  let startDate = $("fleetDate").value || todayISO();
+  let endDate = $("fleetEndDate").value || startDate;
+  if (endDate < startDate) {
+    endDate = startDate;
+    $("fleetEndDate").value = endDate;
+  }
+  $("fleetDate").value = startDate;
+  $("fleetEndDate").value = endDate;
+
+  const periodLabel = startDate === endDate
+    ? formatDate(startDate)
+    : `${formatDate(startDate)} – ${formatDate(endDate)}`;
+
+  let totalAll = 0;
+  let usedAll = 0;
+
+  const list = $("fleetList");
+  list.innerHTML = "";
+
+  Object.entries(state.inventory).forEach(([key, item]) => {
+    const total = Number(item.total || 0);
+    const used = maxUsedInRange(startDate, endDate, key, "bikes");
+    const free = Math.max(0, total - used);
+    totalAll += total;
+    usedAll += used;
+
+    const card = document.createElement("article");
+    card.className = "fleet-card";
+    card.innerHTML = `
+      <div class="fleet-card-top">
+        <div>
+          <h3>${item.label}</h3>
+          <p class="muted">${periodLabel}</p>
+        </div>
+        <span class="availability-badge ${free > 0 ? "availability-ok" : "availability-no"}">
+          ${free > 0 ? "Disponibile" : "Esaurita"}
+        </span>
+      </div>
+      <div class="fleet-numbers">
+        <div class="fleet-number"><span>Totali</span><strong>${total}</strong></div>
+        <div class="fleet-number"><span>Occupate</span><strong>${used}</strong></div>
+        <div class="fleet-number"><span>Libere</span><strong>${free}</strong></div>
+      </div>
+      <div class="fleet-card-actions fleet-card-actions-three">
+        <button class="secondary-btn manage-units-btn">Gestisci mezzi</button>
+        <button class="secondary-btn edit-bike-type-btn">Modifica</button>
+        <button class="danger-btn delete-bike-type-btn">Elimina</button>
+      </div>`;
+
+    card.querySelector(".manage-units-btn").addEventListener("click", () => openUnitsModal(key));
+    card.querySelector(".edit-bike-type-btn").addEventListener("click", () => openBikeTypeModal(key));
+    card.querySelector(".delete-bike-type-btn").addEventListener("click", () => deleteBikeType(key));
+    list.appendChild(card);
+  });
+
+  $("fleetTotalCount").textContent = totalAll;
+  $("fleetUsedCount").textContent = usedAll;
+  $("fleetFreeCount").textContent = Math.max(0, totalAll - usedAll);
+
+  const accList = $("fleetAccessoriesList");
+  accList.innerHTML = "";
+  Object.entries(state.accessories).forEach(([key, item]) => {
+    const total = Number(item.total || 0);
+    const used = maxUsedInRange(startDate, endDate, key, "accessories");
+    const free = Math.max(0, total - used);
+
+    const card = document.createElement("article");
+    card.className = "fleet-card";
+    card.innerHTML = `
+      <div class="fleet-card-top">
+        <div>
+          <h3>${item.label}</h3>
+          <p class="muted">${periodLabel}</p>
+        </div>
+        <span class="availability-badge ${free > 0 ? "availability-ok" : "availability-no"}">
+          ${free > 0 ? "Disponibile" : "Esaurito"}
+        </span>
+      </div>
+      <div class="fleet-numbers">
+        <div class="fleet-number"><span>Totali</span><strong>${total}</strong></div>
+        <div class="fleet-number"><span>Occupati</span><strong>${used}</strong></div>
+        <div class="fleet-number"><span>Liberi</span><strong>${free}</strong></div>
+      </div>`;
+    accList.appendChild(card);
+  });
+}
+
+function openBikeTypeModal(key = "") {
+  $("bikeTypeModal").classList.remove("hidden");
+  $("bikeTypeKey").value = key;
+
+  if (key && state.inventory[key]) {
+    $("bikeTypeModalTitle").textContent = "Modifica categoria";
+    $("bikeTypeLabel").value = state.inventory[key].label;
+    $("bikeTypeTotal").value = state.inventory[key].total;
+  } else {
+    $("bikeTypeModalTitle").textContent = "Aggiungi categoria";
+    $("bikeTypeLabel").value = "";
+    $("bikeTypeTotal").value = 1;
+  }
+}
+
+function closeBikeTypeModal() {
+  $("bikeTypeModal").classList.add("hidden");
+}
+
+function saveBikeType() {
+  const originalKey = $("bikeTypeKey").value;
+  const label = $("bikeTypeLabel").value.trim();
+  const total = Math.max(0, Number($("bikeTypeTotal").value || 0));
+
+  if (!label) {
+    alert("Inserisci il nome della tipologia.");
+    return;
+  }
+
+  if (originalKey) {
+    const existing = state.inventory[originalKey] || {};
+    state.inventory[originalKey] = { label, total, units: normalizedUnits({ ...existing, total }) };
+  } else {
+    let key = normalizeKey(label);
+    let suffix = 2;
+    while (state.inventory[key]) {
+      key = `${normalizeKey(label)}_${suffix++}`;
+    }
+    state.inventory[key] = { label, total, units: normalizedUnits({ total }) };
+  }
+
+  saveState();
+  resetRentalForm();
+  renderSettings();
+  renderFleet();
+  closeBikeTypeModal();
+}
+
+function deleteBikeType(key) {
+  const item = state.inventory[key];
+  if (!item) return;
+
+  const usedInRentals = state.rentals.some(r => Number((r.bikes || {})[key] || 0) > 0);
+  if (usedInRentals) {
+    alert("Questa tipologia è già presente in uno o più noleggi e non può essere eliminata. Puoi impostare la quantità totale a 0.");
+    return;
+  }
+
+  if (!confirm(`Eliminare la tipologia "${item.label}"?`)) return;
+  delete state.inventory[key];
+  saveState();
+  resetRentalForm();
+  renderSettings();
+  renderFleet();
+}
+
+function customerKey(rental) {
+  return `${(rental.customerName || "").trim()}|${(rental.customerPhone || "").trim()}`.toLowerCase();
+}
+
+function renderCustomers(filter = "") {
+  const map = new Map();
+  (state.customers || []).forEach(c => {
+    const key = c.normalized_key || `${(c.name || "").trim()}|${(c.phone || "").trim()}`.toLowerCase();
+    if (!c.name) return;
+    map.set(key, {
+      key,
+      name: c.name,
+      phone: c.phone || "",
+      document: c.document || "",
+      count: 0,
+      lastDate: ""
+    });
+  });
+  state.rentals.forEach(r => {
+    const key = customerKey(r);
+    if (!map.has(key)) {
+      map.set(key, {
+        key,
+        name: r.customerName,
+        phone: r.customerPhone || "",
+        document: r.customerDocument || "",
+        count: 0,
+        lastDate: r.startDate
+      });
+    }
+    const item = map.get(key);
+    item.count++;
+    if (!item.lastDate || r.startDate > item.lastDate) item.lastDate = r.startDate;
+    if (!item.document && r.customerDocument) item.document = r.customerDocument;
+  });
+
+  const list = $("customersList");
+  list.innerHTML = "";
+  const customers = [...map.values()]
+    .filter(c => `${c.name} ${c.phone}`.toLowerCase().includes(filter.toLowerCase()))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  if (!customers.length) {
+    list.innerHTML = `<div class="empty-state">Nessun cliente trovato.</div>`;
+    return;
+  }
+
+  customers.forEach(c => {
+    const card = document.createElement("article");
+    card.className = "customer-card";
+    card.setAttribute("role", "button");
+    card.tabIndex = 0;
+    card.innerHTML = `
+      <h3>${c.name}</h3>
+      <p>${c.phone || "Telefono non inserito"}</p>
+      <p>${c.document || "Documento non inserito"}</p>
+      <p>${c.count ? `${c.count} noleggi · ultimo ${formatDate(c.lastDate)}` : "Cliente salvato nel cloud"}</p>
+      <p class="customer-card-hint">Tocca per vedere le prenotazioni ›</p>`;
+    const open = () => openCustomerDetail(c.key);
+    card.addEventListener("click", open);
+    card.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") open(); });
+    list.appendChild(card);
+  });
+}
+
+function openCustomerDetail(key) {
+  const rentals = state.rentals.filter(r => customerKey(r) === key)
+    .sort((a,b) => b.startDate.localeCompare(a.startDate));
+  const cloudCustomer = (state.customers || []).find(c => (c.normalized_key || `${(c.name || "").trim()}|${(c.phone || "").trim()}`.toLowerCase()) === key);
+  const first = rentals[0];
+  const name = first?.customerName || cloudCustomer?.name || "Cliente";
+  const phone = first?.customerPhone || cloudCustomer?.phone || "";
+  const documentValue = first?.customerDocument || cloudCustomer?.document || "";
+  $("customerDetailTitle").textContent = name;
+  $("customerDetailInfo").innerHTML = `<p>${phone || "Telefono non inserito"}</p><p>${documentValue || "Documento non inserito"}</p>`;
+  const holder = $("customerDetailRentals");
+  holder.innerHTML = "";
+  if (!rentals.length) holder.innerHTML = `<div class="empty-state">Le prenotazioni di questo cliente saranno sincronizzate nella prossima fase.</div>`;
+  rentals.forEach(r => {
+    const card = document.createElement("article");
+    card.className = "customer-detail-card";
+    card.innerHTML = `<h4>${formatDate(r.startDate)} → ${formatDate(r.endDate)}</h4>
+      <p>${rentalItemsText(r)}</p>
+      ${Number.isFinite(Number(r.priceTotal)) ? `<p class="rental-price">Totale: ${formatEuro(r.priceTotal)}</p>` : ""}
+      ${r.notes ? `<p>${r.notes}</p>` : ""}
+      <span class="status-pill status-${r.status}">${statusLabel(r.status)}</span>
+      <button type="button" class="secondary-btn full customer-open-rental" style="margin-top:10px">Apri prenotazione</button>`;
+    card.querySelector(".customer-open-rental").addEventListener("click", () => {
+      closeCustomerDetail();
+      editRental(r.id);
+    });
+    holder.appendChild(card);
+  });
+  $("customerDetailModal").classList.remove("hidden");
+}
+
+function closeCustomerDetail() {
+  $("customerDetailModal").classList.add("hidden");
+}
+
+function renderSettings() {
+  makeQuantityRows($("inventorySettings"), state.inventory, "settingBike", true);
+  makeQuantityRows($("accessorySettings"), state.accessories, "settingAcc", true);
+
+  const setupStore = window.rentixSetupStore;
+  const setupKeys = setupStore?.keys || {};
+  const activity = setupStore?.get?.(setupKeys.activity) || "";
+  const activitySelect = $("settingsActivityType");
+  const customWrap = $("settingsActivityCustomWrap");
+  const customInput = $("settingsActivityCustom");
+  const matching = Array.from(activitySelect.options).some(option => option.value === activity);
+  if (activity && matching) {
+    activitySelect.value = activity;
+    customWrap.hidden = true;
+    customInput.value = "";
+  } else if (activity) {
+    activitySelect.value = "Altro";
+    customWrap.hidden = false;
+    customInput.value = activity;
+  } else {
+    activitySelect.value = "";
+    customWrap.hidden = true;
+    customInput.value = "";
+  }
+  $("settingsBusinessName").value = setupStore?.get?.(setupKeys.businessName) || "";
+  const savedCurrency = setupStore?.get?.(setupKeys.currency) || "EUR";
+  $("settingsCurrency").value = Array.from($("settingsCurrency").options).some(option => option.value === savedCurrency) ? savedCurrency : "EUR";
+}
+
+function editRental(id) {
+  const rental = state.rentals.find(r => r.id === id);
+  if (!rental) return;
+
+  showPage("newRentalPage");
+  $("rentalId").value = rental.id;
+  $("customerName").value = rental.customerName;
+  $("customerPhone").value = rental.customerPhone || "";
+  $("customerDocument").value = rental.customerDocument || "";
+  $("startDate").value = rental.startDate;
+  $("endDate").value = rental.endDate;
+  $("pickupTime").value = rental.pickupTime || "09:00";
+  $("returnTime").value = rental.returnTime || "19:00";
+  $("rentalStatus").value = rental.status;
+  $("rentalNotes").value = rental.notes || "";
+  priceManuallyEdited = Boolean(rental.priceManual);
+  $("rentalPrice").value = Number.isFinite(Number(rental.priceTotal)) ? Number(rental.priceTotal) : 0;
+
+  Object.entries(rental.bikes || {}).forEach(([key, qty]) => {
+    if ($(`bike_${key}`)) $(`bike_${key}`).value = qty;
+  });
+  loadBikeAssignments(rental);
+  updateAvailabilityIndicator();
+  updateRentalPrice(!Number.isFinite(Number(rental.priceTotal)));
+}
+
+function cycleStatus(id) {
+  const order = ["prenotata", "ritirata", "restituita"];
+  const rental = state.rentals.find(r => r.id === id);
+  if (!rental) return;
+  const current = order.indexOf(rental.status);
+  rental.status = order[(current + 1) % order.length];
+  rental.updatedAt = new Date().toISOString();
+  saveState();
+  window.rentixCloudRentals?.upsertRental?.(rental).then(ok => {
+    if (ok === false) console.warn("Stato aggiornato sul telefono, ma non sincronizzato nel cloud.");
+  });
+  renderHome();
+  renderCalendar();
+}
+
+async function deleteRental(id) {
+  if (!confirm("Eliminare definitivamente questo noleggio?")) return;
+
+  const rental = state.rentals.find(r => r.id === id);
+  if (!rental) return;
+
+  const cloudDelete = window.rentixCloudRentals?.deleteRental;
+  if (typeof cloudDelete === "function") {
+    const ok = await cloudDelete(id);
+    if (!ok) {
+      alert("Non è stato possibile eliminare la prenotazione dal cloud. La prenotazione è stata mantenuta: controlla la connessione e riprova.");
+      return;
+    }
+  }
+
+  state.rentals = state.rentals.filter(r => r.id !== id);
+  saveState();
+  renderHome();
+  renderCalendar();
+  renderCustomers();
+}
+
+$("rentalForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  if (!$("customerName").value.trim()) {
+    alert("Inserisci il nome del cliente.");
+    return;
+  }
+  if ($("endDate").value < $("startDate").value) {
+    alert("La data di restituzione non può essere precedente al ritiro.");
+    return;
+  }
+  if (!updateAvailabilityIndicator()) {
+    alert("Una o più quantità non sono disponibili nelle date scelte.");
+    return;
+  }
+
+  const rental = {
+    id: $("rentalId").value || crypto.randomUUID(),
+    customerName: $("customerName").value.trim(),
+    customerPhone: $("customerPhone").value.trim(),
+    customerDocument: $("customerDocument").value.trim(),
+    startDate: $("startDate").value,
+    endDate: $("endDate").value,
+    pickupTime: $("pickupTime").value,
+    returnTime: $("returnTime").value,
+    bikes: collectQuantities("bike", state.inventory),
+    bikeAssignments: collectBikeAssignments(),
+    accessories: collectInlineSeats(),
+    status: $("rentalStatus").value,
+    notes: $("rentalNotes").value.trim(),
+    priceTotal: Math.max(0, Number($("rentalPrice").value || 0)),
+    priceManual: priceManuallyEdited,
+    pricingDays: inclusiveDays($("startDate").value, $("endDate").value),
+    updatedAt: new Date().toISOString()
+  };
+
+  const index = state.rentals.findIndex(r => r.id === rental.id);
+  if (index >= 0) state.rentals[index] = rental;
+  else state.rentals.push(rental);
+
+  saveState();
+  window.rentixCloudRentals?.upsertRental?.(rental).then(ok => {
+    if (ok === false) console.warn("Prenotazione salvata sul telefono, ma non sincronizzata nel cloud.");
+  });
+  window.rentixCloudCustomers?.upsertCustomer?.(rental).then(ok => {
+    if (ok === false) console.warn("Prenotazione salvata localmente, ma cliente non sincronizzato nel cloud.");
+  });
+  resetRentalForm();
+  showPage("homePage");
+});
+
+document.addEventListener("click", (e) => {
+  const pageBtn = e.target.closest("[data-page]");
+  if (pageBtn) showPage(pageBtn.dataset.page);
+});
+
+$("quickAddBtn").addEventListener("click", () => {
+  resetRentalForm();
+  $("startDate").value = selectedHomeDate || todayISO();
+  $("endDate").value = selectedHomeDate || todayISO();
+  updateAvailabilityIndicator();
+  showPage("newRentalPage");
+});
+$("homePrevDayBtn").addEventListener("click", () => {
+  selectedHomeDate = addDays(selectedHomeDate || todayISO(), -1);
+  renderHome();
+});
+$("homeNextDayBtn").addEventListener("click", () => {
+  selectedHomeDate = addDays(selectedHomeDate || todayISO(), 1);
+  renderHome();
+});
+$("homeTodayBtn").addEventListener("click", () => {
+  selectedHomeDate = todayISO();
+  renderHome();
+});
+$("clearFormBtn").addEventListener("click", resetRentalForm);
+const menuToggleBtn = $("menuToggleBtn");
+const mainDropdownMenu = $("mainDropdownMenu");
+
+function closeMainMenu() {
+  if (!mainDropdownMenu || !menuToggleBtn) return;
+  mainDropdownMenu.hidden = true;
+  menuToggleBtn.setAttribute("aria-expanded", "false");
+  menuToggleBtn.setAttribute("aria-label", "Apri menu");
+}
+
+function toggleMainMenu() {
+  if (!mainDropdownMenu || !menuToggleBtn) return;
+  const willOpen = mainDropdownMenu.hidden;
+  mainDropdownMenu.hidden = !willOpen;
+  menuToggleBtn.setAttribute("aria-expanded", String(willOpen));
+  menuToggleBtn.setAttribute("aria-label", willOpen ? "Chiudi menu" : "Apri menu");
+}
+
+menuToggleBtn?.addEventListener("click", (event) => {
+  event.stopPropagation();
+  toggleMainMenu();
+});
+mainDropdownMenu?.addEventListener("click", event => {
+  event.stopPropagation();
+  const menuItem = event.target.closest(".menu-item[data-page]");
+  if (!menuItem) return;
+  const pageId = menuItem.dataset.page;
+  if (pageId && document.getElementById(pageId)) showPage(pageId);
+});
+document.addEventListener("click", closeMainMenu);
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") closeMainMenu();
+});
+
+$("prevDayBtn").addEventListener("click", () => {
+  $("calendarDate").value = addDays($("calendarDate").value || todayISO(), -1);
+  renderCalendar();
+});
+$("nextDayBtn").addEventListener("click", () => {
+  $("calendarDate").value = addDays($("calendarDate").value || todayISO(), 1);
+  renderCalendar();
+});
+$("calendarDate").addEventListener("change", renderCalendar);
+$("customerSearch").addEventListener("input", e => renderCustomers(e.target.value));
+
+["startDate", "endDate"].forEach(id => $(id).addEventListener("change", () => { updateAvailabilityIndicator(); updateRentalPrice(); }));
+$("bikeFields").addEventListener("input", () => { updateAvailabilityIndicator(); updateRentalPrice(); });
+$("accessoryFields")?.addEventListener("input", updateAvailabilityIndicator);
+
+$("rentalPrice").addEventListener("input", () => {
+  priceManuallyEdited = true;
+  updateRentalPrice();
+});
+$("restoreAutoPriceBtn").addEventListener("click", () => {
+  priceManuallyEdited = false;
+  updateRentalPrice(true);
+});
+$("openPricingFromRentalBtn").addEventListener("click", () => showPage("pricingPage"));
+$("openPricingSettingsCard").addEventListener("click", () => showPage("pricingPage"));
+$("savePricingBtn").addEventListener("click", () => {
+  state.pricing = pricingFromFields();
+  saveState();
+  priceManuallyEdited = false;
+  updateRentalPrice(true);
+  alert("Listino salvato.");
+});
+
+$("settingsActivityType").addEventListener("change", () => {
+  const isOther = $("settingsActivityType").value === "Altro";
+  $("settingsActivityCustomWrap").hidden = !isOther;
+  if (isOther) $("settingsActivityCustom").focus();
+});
+
+$("saveBusinessSettingsBtn").addEventListener("click", async () => {
+  let activity = $("settingsActivityType").value.trim();
+  const businessName = $("settingsBusinessName").value.trim();
+  const currency = $("settingsCurrency").value || "EUR";
+
+  if (!activity) {
+    alert("Seleziona il tipo di attività.");
+    $("settingsActivityType").focus();
+    return;
+  }
+  if (activity === "Altro") {
+    activity = $("settingsActivityCustom").value.trim();
+    if (!activity) {
+      alert("Specifica il tipo di attività.");
+      $("settingsActivityCustom").focus();
+      return;
+    }
+  }
+  if (!businessName) {
+    alert("Inserisci il nome dell'attività.");
+    $("settingsBusinessName").focus();
+    return;
+  }
+
+  const setupStore = window.rentixSetupStore;
+  const setupKeys = setupStore?.keys || {};
+  setupStore?.set?.(setupKeys.activity, activity);
+  setupStore?.set?.(setupKeys.businessName, businessName);
+  setupStore?.set?.(setupKeys.currency, currency);
+  const cloudSaved = await window.rentixCloudPhase1?.saveNow?.();
+  const businessNameHeader = $("businessNameHeader");
+  if (businessNameHeader) {
+    businessNameHeader.textContent = businessName;
+    businessNameHeader.title = businessName;
+    businessNameHeader.hidden = false;
+  }
+  if (cloudSaved === false) {
+    alert("Dati salvati sul telefono, ma non nel cloud. Controlla Internet e riprova.");
+  } else {
+    alert("Dati attività salvati e sincronizzati.");
+  }
+});
+
+$("saveSettingsBtn").addEventListener("click", async () => {
+  Object.keys(state.inventory).forEach(key => {
+    state.inventory[key].total = Math.max(0, Number($(`settingBike_${key}`).value || 0));
+  });
+  Object.keys(state.accessories).forEach(key => {
+    state.accessories[key].total = Math.max(0, Number($(`settingAcc_${key}`).value || 0));
+  });
+  saveState();
+  resetRentalForm();
+  const cloudSaved = await window.rentixCloudPhase1?.saveNow?.();
+  if (cloudSaved === false) {
+    alert("Disponibilità salvate sul telefono, ma non nel cloud. Controlla Internet e riprova.");
+  } else {
+    alert("Disponibilità salvate e sincronizzate.");
+  }
+});
+
+$("exportBtn").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `backup-noleggi-${todayISO()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+$("importInput").addEventListener("change", async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  try {
+    const imported = JSON.parse(await file.text());
+    if (!Array.isArray(imported.rentals)) throw new Error("Formato non valido");
+    state = {
+      rentals: imported.rentals,
+      inventory: { ...DEFAULT_INVENTORY, ...(imported.inventory || {}) },
+      accessories: { ...DEFAULT_ACCESSORIES, ...(imported.accessories || {}) },
+      pricing: { ...DEFAULT_PRICING, ...(imported.pricing || {}) }
+    };
+    saveState();
+    resetRentalForm();
+    renderHome();
+    alert("Backup importato correttamente.");
+  } catch {
+    alert("Il file selezionato non è un backup valido.");
+  } finally {
+    e.target.value = "";
+  }
+});
+
+$("resetBtn").addEventListener("click", () => {
+  if (!confirm("Questa operazione cancella tutti i noleggi. Continuare?")) return;
+  state = {
+    rentals: [],
+    inventory: structuredClone(DEFAULT_INVENTORY),
+    accessories: structuredClone(DEFAULT_ACCESSORIES),
+    pricing: structuredClone(DEFAULT_PRICING)
+  };
+  saveState();
+  resetRentalForm();
+  renderHome();
+  renderSettings();
+});
+
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  navigator.serviceWorker.register("service-worker.js").catch(() => {});
+}
+
+
+$("addBikeTypeBtn").addEventListener("click", () => openBikeTypeModal());
+$("closeBikeTypeModalBtn").addEventListener("click", closeBikeTypeModal);
+$("saveBikeTypeBtn").addEventListener("click", saveBikeType);
+$("closeUnitsModalBtn").addEventListener("click", closeUnitsModal);
+$("saveUnitsBtn").addEventListener("click", saveUnits);
+$("unitsModal").addEventListener("click", event => { if (event.target === $("unitsModal")) closeUnitsModal(); });
+$("bikeTypeModal").addEventListener("click", (e) => {
+  if (e.target === $("bikeTypeModal")) closeBikeTypeModal();
+});
+
+$("closeCustomerDetailBtn").addEventListener("click", closeCustomerDetail);
+$("customerDetailModal").addEventListener("click", (e) => {
+  if (e.target === $("customerDetailModal")) closeCustomerDetail();
+});
+
+$("fleetPrevDayBtn").addEventListener("click", () => {
+  $("fleetDate").value = addDays($("fleetDate").value || todayISO(), -1);
+  $("fleetEndDate").value = addDays($("fleetEndDate").value || $("fleetDate").value, -1);
+  renderFleet();
+});
+$("fleetNextDayBtn").addEventListener("click", () => {
+  $("fleetDate").value = addDays($("fleetDate").value || todayISO(), 1);
+  $("fleetEndDate").value = addDays($("fleetEndDate").value || $("fleetDate").value, 1);
+  renderFleet();
+});
+$("fleetDate").addEventListener("change", () => {
+  if (!$("fleetEndDate").value || $("fleetEndDate").value < $("fleetDate").value) {
+    $("fleetEndDate").value = $("fleetDate").value;
+  }
+});
+$("fleetEndDate").addEventListener("change", () => {
+  if ($("fleetEndDate").value < $("fleetDate").value) {
+    $("fleetEndDate").value = $("fleetDate").value;
+  }
+});
+$("fleetSearchBtn").addEventListener("click", renderFleet);
+
+$("calendarDate").value = todayISO();
+$("fleetDate").value = todayISO();
+$("fleetEndDate").value = todayISO();
+resetRentalForm();
+renderHome();
+
+
 </script>
+
+<script>
+(function () {
+  let homeFilter = "all";
+  let visibleMonth = new Date((document.getElementById("calendarDate").value || todayISO()) + "T12:00:00");
+  visibleMonth.setDate(1);
+
+  function homeFilteredRentals() {
+    const date = selectedHomeDate || todayISO();
+    const all = activeRentalsForDate(date);
+    if (homeFilter === "pickup") return all.filter(r => r.startDate === date && r.status === "prenotata");
+    if (homeFilter === "return") return all.filter(r => r.endDate === date && r.status !== "restituita" && r.status !== "annullata");
+    return all;
+  }
+
+  const originalRenderHome = renderHome;
+  renderHome = function () {
+    originalRenderHome();
+    const labels = {
+      all: "Prenotazioni del giorno",
+      pickup: "Da ritirare nel giorno",
+      return: "Da restituire nel giorno",
+      bikes: "Prenotazioni con articoli impegnati"
+    };
+    document.getElementById("todayListTitle").textContent = labels[homeFilter];
+    document.querySelectorAll("[data-home-filter]").forEach(b =>
+      b.classList.toggle("selected", b.dataset.homeFilter === homeFilter)
+    );
+    const list = document.getElementById("todayRentals");
+    const rentals = homeFilteredRentals();
+    list.innerHTML = "";
+    if (!rentals.length) {
+      list.innerHTML = '<div class="empty-state">Nessuna prenotazione in questa categoria.</div>';
+      return;
+    }
+    rentals.sort((a,b)=>(a.pickupTime||"").localeCompare(b.pickupTime||""))
+      .forEach(r => list.appendChild(createRentalCard(r)));
+
+  };
+
+  document.querySelectorAll("[data-home-filter]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      homeFilter = btn.dataset.homeFilter;
+      renderHome();
+    });
+  });
+
+  function isoFromParts(y, m, d) {
+    const dt = new Date(y, m, d, 12, 0, 0);
+    const mm = String(dt.getMonth()+1).padStart(2,"0");
+    const dd = String(dt.getDate()).padStart(2,"0");
+    return `${dt.getFullYear()}-${mm}-${dd}`;
+  }
+
+  function monthBookingCount(date) {
+    return activeRentalsForDate(date).length;
+  }
+
+  function renderMonthGrid() {
+    const selected = document.getElementById("calendarDate").value || todayISO();
+    document.getElementById("calendarMonthLabel").textContent =
+      new Intl.DateTimeFormat("it-IT", {month:"long", year:"numeric"}).format(visibleMonth);
+
+    const grid = document.getElementById("calendarGrid");
+    grid.innerHTML = "";
+    const y = visibleMonth.getFullYear();
+    const m = visibleMonth.getMonth();
+    const first = new Date(y, m, 1, 12);
+    const mondayIndex = (first.getDay() + 6) % 7;
+    const start = new Date(y, m, 1 - mondayIndex, 12);
+
+    for (let i=0; i<42; i++) {
+      const d = new Date(start);
+      d.setDate(start.getDate()+i);
+      const iso = isoFromParts(d.getFullYear(), d.getMonth(), d.getDate());
+      const count = monthBookingCount(iso);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "calendar-day";
+      if (d.getMonth() !== m) btn.classList.add("other-month");
+      if (iso === todayISO()) btn.classList.add("today");
+      if (iso === selected) btn.classList.add("selected");
+      btn.innerHTML = `<span class="day-number">${d.getDate()}</span>${count ? `<span class="booking-count">${count}</span>` : ""}`;
+      btn.setAttribute("aria-label", `${formatDate(iso)}: ${count} prenotazioni`);
+      btn.addEventListener("click", () => {
+        document.getElementById("calendarDate").value = iso;
+        visibleMonth = new Date(d);
+        visibleMonth.setDate(1);
+        renderCalendar();
+      });
+      grid.appendChild(btn);
+    }
+  }
+
+  const originalRenderCalendar = renderCalendar;
+  renderCalendar = function () {
+    originalRenderCalendar();
+    const date = document.getElementById("calendarDate").value || todayISO();
+    document.getElementById("selectedDateTitle").textContent =
+      new Intl.DateTimeFormat("it-IT", {weekday:"long", day:"numeric", month:"long", year:"numeric"})
+        .format(new Date(date+"T12:00:00"));
+    renderMonthGrid();
+  };
+
+  document.getElementById("prevMonthBtn").addEventListener("click", () => {
+    visibleMonth.setMonth(visibleMonth.getMonth()-1);
+    const iso = isoFromParts(visibleMonth.getFullYear(), visibleMonth.getMonth(), 1);
+    document.getElementById("calendarDate").value = iso;
+    renderCalendar();
+  });
+  document.getElementById("nextMonthBtn").addEventListener("click", () => {
+    visibleMonth.setMonth(visibleMonth.getMonth()+1);
+    const iso = isoFromParts(visibleMonth.getFullYear(), visibleMonth.getMonth(), 1);
+    document.getElementById("calendarDate").value = iso;
+    renderCalendar();
+  });
+  document.getElementById("calendarTodayBtn").addEventListener("click", () => {
+    document.getElementById("calendarDate").value = todayISO();
+    visibleMonth = new Date(todayISO()+"T12:00:00");
+    visibleMonth.setDate(1);
+    renderCalendar();
+  });
+  document.getElementById("newForSelectedDateBtn").addEventListener("click", () => {
+    const chosen = document.getElementById("calendarDate").value || todayISO();
+    resetRentalForm();
+    document.getElementById("startDate").value = chosen;
+    document.getElementById("endDate").value = chosen;
+    updateAvailabilityIndicator();
+    showPage("newRentalPage");
+  });
+
+  // The old daily arrow buttons no longer exist; guard the listeners produced by older versions.
+  document.getElementById("calendarDate").value = todayISO();
+  visibleMonth = new Date(todayISO()+"T12:00:00");
+  visibleMonth.setDate(1);
+  renderHome();
+  renderCalendar();
+})();
+
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function initAuth() {
+  const SUPABASE_URL = "https://xwscnrljuijhllehrqyt.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_MNGsdnytF-pwVMXwS-It3w_QWQcWxZ-";
+  const screen=document.getElementById("registrationScreen"), form=document.getElementById("registrationForm"), email=document.getElementById("registrationEmail"), password=document.getElementById("registrationPassword"), confirmPassword=document.getElementById("registrationPasswordConfirm"), consent=document.getElementById("registrationConsent"), errorBox=document.getElementById("registrationError"), successBox=document.getElementById("registrationSuccess"), submitBtn=document.getElementById("registrationSubmitBtn"), switchBtn=document.getElementById("registrationLoginBtn"), switchText=document.getElementById("authSwitchText"), title=document.getElementById("registrationTitle"), logoutBtn=document.getElementById("logoutBtn"), deleteAccountBtn=document.getElementById("deleteAccountBtn"), forgotBtn=document.getElementById("forgotPasswordBtn"), passwordLabel=document.getElementById("registrationPasswordLabel"), confirmLabel=document.getElementById("confirmPasswordLabel");
+  if(!screen||!form)return; let mode="register";
+  const open=()=>{screen.hidden=false;document.body.classList.add("auth-open")};
+  const close=()=>{screen.hidden=true;document.body.classList.remove("auth-open")};
+  const activateAccount=async session=>{
+    const uid=session?.user?.id;
+    if(!uid)return;
+    window.rentixAccountId=uid;
+    window.rentixAccountEmail=session?.user?.email || "";
+    const previous=sessionStorage.getItem("rentixActiveAccountId");
+    sessionStorage.setItem("rentixActiveAccountId",uid);
+    sessionStorage.setItem("rentixActiveAccountEmail",window.rentixAccountEmail);
+    if(previous && previous!==uid){ location.reload(); return; }
+    window.rentixReloadLocalState?.();
+    await window.rentixCloudPhase1?.load?.();
+    await window.rentixCloudRentals?.load?.();
+    await window.rentixCloudCustomers?.load?.();
+    window.rentixApplyAccountSetup?.();
+  };
+  const message=(text,ok=false)=>{errorBox.textContent=ok?"":text;successBox.hidden=!ok;successBox.textContent=ok?text:""};
+  const resetFields=()=>{password.value="";confirmPassword.value="";consent.checked=false;};
+  const setMode=next=>{
+    mode=next;
+    screen.classList.toggle("login-mode",mode==="login");
+    screen.classList.toggle("recovery-mode",mode==="recovery");
+    screen.classList.toggle("new-password-mode",mode==="new-password");
+    if(mode==="login"){
+      title.innerHTML='Accedi a <span>Rentix Lab</span>'; submitBtn.textContent="Accedi"; switchText.textContent="Non hai un account?"; switchBtn.textContent="Registrati"; password.autocomplete="current-password"; passwordLabel.firstChild.textContent="Password";
+    } else if(mode==="register"){
+      title.innerHTML='Benvenuto in <span>Rentix Lab</span>'; submitBtn.textContent="Crea account"; switchText.textContent="Hai già un account?"; switchBtn.textContent="Accedi"; password.autocomplete="new-password"; passwordLabel.firstChild.textContent="Password";
+    } else if(mode==="recovery"){
+      title.innerHTML='Recupera la <span>password</span>'; submitBtn.textContent="Invia email di recupero";
+    } else {
+      title.innerHTML='Scegli una nuova <span>password</span>'; submitBtn.textContent="Salva nuova password"; passwordLabel.firstChild.textContent="Nuova password"; confirmLabel.firstChild.textContent="Conferma nuova password";
+    }
+    message(""); resetFields();
+  };
+  document.querySelectorAll("[data-password-target]").forEach(btn=>btn.addEventListener("click",()=>{const input=document.getElementById(btn.dataset.passwordTarget);const show=input.type==="password";input.type=show?"text":"password";btn.textContent=show?"🙈":"👁";}));
+  if(!window.supabase?.createClient){open();message("Connessione al servizio non disponibile. Controlla Internet e riprova.");submitBtn.disabled=true;return;}
+  const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY); window.rentixSupabase=client;
+  const currentRedirect=()=>location.protocol.startsWith("http")?location.origin+location.pathname:undefined;
+  client.auth.getSession().then(async ({data})=>{if(data?.session){await activateAccount(data.session);close();}else{setMode("login");open();}}).catch(()=>open());
+  client.auth.onAuthStateChange(async (event,session)=>{
+    if(event==="PASSWORD_RECOVERY"){setMode("new-password");open();return;}
+    if(session){await activateAccount(session);close();}else open();
+  });
+  switchBtn.addEventListener("click",()=>setMode(mode==="login"?"register":"login"));
+  forgotBtn?.addEventListener("click",()=>setMode("recovery"));
+  form.addEventListener("submit",async e=>{
+    e.preventDefault(); message(""); const mail=email.value.trim(),pw=password.value;
+    if(mode!=="new-password"&&(!mail||!email.validity.valid))return message("Inserisci un indirizzo email valido.");
+    if((mode==="login"||mode==="register"||mode==="new-password")&&pw.length<8)return message("La password deve contenere almeno 8 caratteri.");
+    if((mode==="register"||mode==="new-password")&&pw!==confirmPassword.value)return message("Le due password non coincidono.");
+    if(mode==="register"&&!consent.checked)return message("Devi accettare Privacy Policy e Termini per registrarti.");
+    submitBtn.disabled=true;
+    try{
+      if(mode==="login"){
+        submitBtn.textContent="Accesso..."; const {data,error}=await client.auth.signInWithPassword({email:mail,password:pw}); if(error)throw error; await activateAccount(data.session); close();
+      }else if(mode==="register"){
+        submitBtn.textContent="Creazione..."; const {data,error}=await client.auth.signUp({email:mail,password:pw}); if(error)throw error; if(data?.session){activateAccount(data.session);close();}else{setMode("login");message("Account creato. Conferma l’email, poi accedi.",true);}
+      }else if(mode==="recovery"){
+        submitBtn.textContent="Invio..."; const options={}; const redirectTo=currentRedirect(); if(redirectTo)options.redirectTo=redirectTo; const {error}=await client.auth.resetPasswordForEmail(mail,{redirectTo}); if(error)throw error; setMode("login");message("Email di recupero inviata. Controlla anche Spam e Promozioni.",true);
+      }else{
+        submitBtn.textContent="Salvataggio..."; const {error}=await client.auth.updateUser({password:pw}); if(error)throw error; await client.auth.signOut(); setMode("login");message("Password aggiornata. Ora puoi accedere.",true);
+      }
+    }catch(err){
+      const m=String(err?.message||"").toLowerCase();
+      if(m.includes("invalid login"))message("Email o password non corretti, oppure email non ancora confermata.");
+      else if(m.includes("already registered")||m.includes("already been registered"))message("Questa email è già registrata: premi Accedi.");
+      else if(m.includes("rate limit"))message("Hai fatto troppi tentativi. Attendi qualche minuto e riprova.");
+      else message("Operazione non riuscita. Controlla i dati e riprova.");
+    }finally{
+      submitBtn.disabled=false;
+      if(mode==="login")submitBtn.textContent="Accedi"; else if(mode==="register")submitBtn.textContent="Crea account"; else if(mode==="recovery")submitBtn.textContent="Invia email di recupero"; else submitBtn.textContent="Salva nuova password";
+    }
+  });
+  const clearLocalAccountData=uid=>{
+    try{
+      Object.keys(localStorage).forEach(key=>{
+        if(key.endsWith(`__${uid}`)||key.includes(`__${uid}__`))localStorage.removeItem(key);
+      });
+    }catch(_){}
+    sessionStorage.removeItem("rentixActiveAccountId");
+    sessionStorage.removeItem("rentixActiveAccountEmail");
+    window.rentixAccountId=""; window.rentixAccountEmail="";
+  };
+  deleteAccountBtn?.addEventListener("click",async()=>{
+    const first=confirm("Vuoi eliminare definitivamente il tuo account Rentix Lab? Tutti i dati associati verranno cancellati e non potranno essere recuperati.");
+    if(!first)return;
+    const typed=prompt('Per confermare, scrivi ELIMINA');
+    if(typed!=="ELIMINA"){ if(typed!==null)alert("Conferma non valida. Account non eliminato."); return; }
+    const uid=window.rentixAccountId||sessionStorage.getItem("rentixActiveAccountId");
+    deleteAccountBtn.disabled=true; deleteAccountBtn.textContent="Eliminazione...";
+    try{
+      const {error}=await client.rpc("delete_own_account");
+      if(error)throw error;
+      clearLocalAccountData(uid);
+      try{await client.auth.signOut({scope:"local"});}catch(_){}
+      document.getElementById("accountFlowScreen").hidden=true;
+      setMode("register"); open();
+      message("Account eliminato. Ora puoi registrarti di nuovo.",true);
+    }catch(err){
+      console.error("Eliminazione account non riuscita",err);
+      alert("Non è stato possibile eliminare l’account. Verifica che la funzione Supabase delete_own_account sia stata configurata.");
+    }finally{
+      deleteAccountBtn.disabled=false; deleteAccountBtn.textContent="🗑️ Elimina account";
+    }
+  });
+  logoutBtn?.addEventListener("click",async()=>{try{await client.auth.signOut();}finally{sessionStorage.removeItem("rentixActiveAccountId");sessionStorage.removeItem("rentixActiveAccountEmail");window.rentixAccountId="";window.rentixAccountEmail="";setMode("login");open();document.getElementById("mainDropdownMenu")?.setAttribute("hidden","");}});
+})();
+</script>
+
+
+<script>
+/* ── Back-navigation history ─────────────────────────────────────────────────
+   Wraps the global showPage() to keep a navStack of page IDs.
+   The back button and the Android / browser Back key both call goBack().
+   No existing functionality is changed: only forward navigation gains
+   history tracking, and every call to showPage() still works exactly as before.
+   ──────────────────────────────────────────────────────────────────────────── */
+(function initNavHistory() {
+  'use strict';
+
+  // Stack of page IDs we can return to.
+  var navStack = [];
+  // Prevent re-entrant pushes while we are navigating backwards.
+  var _skipPush = false;
+
+  // Capture the original showPage before we overwrite it.
+  var _origShowPage = showPage; // showPage is a global function declaration
+
+  /* Update back-button visibility. */
+  function _refreshBackBtn() {
+    var btn = document.getElementById('backBtn');
+    if (btn) btn.hidden = (navStack.length === 0);
+  }
+
+  /* Navigate back one step without pushing a new entry. */
+  function _goBack() {
+    if (!navStack.length) return;
+    var prevPage = navStack.pop();
+    _skipPush = true;
+    try { _origShowPage(prevPage); } finally { _skipPush = false; }
+    _refreshBackBtn();
+  }
+
+  /* Replace the global showPage with a wrapper that records history. */
+  window.showPage = function showPage(pageId) {
+    if (!_skipPush) {
+      var current = (document.querySelector('.page.active') || {}).id;
+      if (current && current !== pageId) {
+        navStack.push(current);
+        try { history.pushState({ rentixPage: pageId }, ''); } catch (_) {}
+      }
+    }
+    _origShowPage(pageId);
+    _refreshBackBtn();
+  };
+
+  /* Back button in the topbar. */
+  var backBtn = document.getElementById('backBtn');
+  if (backBtn) {
+    backBtn.addEventListener('click', function () {
+      if (!navStack.length) return;
+      // history.back() fires popstate asynchronously → _goBack() is called there.
+      try { history.back(); } catch (_) { _goBack(); }
+    });
+  }
+
+  /* Android hardware back key / browser Back button → popstate. */
+  window.addEventListener('popstate', function () {
+    if (navStack.length) _goBack();
+    // If navStack is empty the browser navigates away naturally — let it.
+  });
+
+  /* Replace the initial history entry so popstate fires correctly on first back. */
+  try { history.replaceState({ rentixPage: 'homePage' }, ''); } catch (_) {}
+
+  _refreshBackBtn();
+})();
+</script>
+
 </body>
 </html>
