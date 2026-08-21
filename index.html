@@ -5105,8 +5105,9 @@ renderHome();
   function getLink() {
     var uid = currentUserId();
     if (!uid) return '';
-    var base = window.RENTIX_BASE_URL || window.location.origin;
-    return base + '/request.html?operator=' + encodeURIComponent(uid);
+    var requestUrl = new URL('request.html', window.location.href);
+    requestUrl.searchParams.set('operator', uid);
+    return requestUrl.href;
   }
   function refreshLinkInput() {
     var inp = el('reqLinkInput');
