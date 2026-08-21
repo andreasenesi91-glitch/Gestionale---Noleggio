@@ -775,6 +775,67 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 0 0 1.5px rgba(255, 212, 0, 0.40), 0 0 12px rgba(255, 212, 0, 0.14);
 }
 .back-btn[hidden] { display: none !important; }
+
+/* ── Risorse PRO ──────────────────────────────────────────────────────────── */
+.pro-badge {
+  display: inline-flex;
+  align-items: center;
+  background: #ffd400;
+  color: #111;
+  font-size: .6rem;
+  font-weight: 900;
+  letter-spacing: .05em;
+  padding: 2px 6px;
+  border-radius: 5px;
+  margin-left: 6px;
+  vertical-align: middle;
+  line-height: 1.4;
+  pointer-events: none;
+}
+.rs-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: border-color .14s ease, transform .11s ease;
+}
+.rs-card:active { transform: scale(.99); border-color: rgba(255,212,0,.3); }
+.rs-card-info { flex: 1; min-width: 0; }
+.rs-card-info h3 { margin-bottom: 3px; font-size: 1rem; }
+.rs-card-info p  { color: var(--muted); font-size: .88rem; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rs-card-chevron { color: var(--muted); font-size: 1.3rem; flex-shrink: 0; }
+.rs-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: .7rem;
+  font-weight: 900;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.rs-disponibile     { background: rgba(61,220,132,.13);  color: #3ddc84; }
+.rs-prenotato       { background: rgba(255,212,0,.13);   color: #ffd400; }
+.rs-in_noleggio     { background: rgba(91,156,246,.13);  color: #5b9cf6; }
+.rs-in_manutenzione { background: rgba(255,149,64,.13);  color: #ff9540; }
+.rs-fuori_servizio  { background: rgba(255,92,92,.13);   color: #ff5c5c; }
+.rs-empty { text-align: center; color: var(--muted); padding: 28px 12px; font-size: .9rem; line-height: 1.6; }
+.rs-category-tag { color: var(--muted); font-size: .78rem; margin-top: 3px !important; }
+/* PRO badge in sidebar menu — slightly smaller, never clipped */
+.menu-item .pro-badge { font-size: .55rem; padding: 2px 5px; border-radius: 4px; margin-left: 5px; vertical-align: middle; }
+/* Resource assignment section inside booking form */
+.rs-booking-group { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-top: 12px; }
+.rs-booking-group-title { font-size: .85rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 12px; }
+.rs-booking-section { margin-bottom: 14px; }
+.rs-booking-section:last-child { margin-bottom: 0; }
+.rs-booking-head { font-size: .9rem; font-weight: 700; margin: 0 0 8px; }
+.rs-slot-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.rs-slot-label { font-size: .8rem; color: var(--muted); white-space: nowrap; flex-shrink: 0; min-width: 72px; }
+.rs-slot-select { flex: 1; min-height: 40px; font-size: .9rem; }
 </style>
   <title>Rentix Lab Lite</title>
 
@@ -1369,6 +1430,8 @@ body.setup-open { overflow: hidden; }
             <button type="button" class="menu-item" data-page="fleetPage"><span>📦</span>Inventario</button>
             <button type="button" class="menu-item" data-page="customersPage"><span>👥</span>Clienti</button>
             <button type="button" class="menu-item" data-page="remindersPage"><span>🔔</span>Promemoria</button>
+            <button type="button" class="menu-item" data-page="risorsePage"><span>🗂️</span>Risorse<span class="pro-badge">PRO</span></button>
+            <button type="button" class="menu-item" data-page="requestsPage"><span>📋</span>Richieste<span class="req-badge" id="requestsBadge" style="display:none">0</span></button>
             <div class="menu-divider"></div>
             <button type="button" class="menu-item" data-page="pricingPage"><span>💰</span>Listino</button>
             <button type="button" class="menu-item" data-page="settingsPage"><span>⚙️</span>Impostazioni</button>
@@ -1593,12 +1656,13 @@ body.setup-open { overflow: hidden; }
 
         <div id="fleetList" class="card-list"></div>
 
-        <div class="section-head">
+        <div class="section-head" style="margin-top:24px">
           <div>
             <p class="eyebrow">ACCESSORI</p>
             <h3>Accessori</h3>
           </div>
         </div>
+        <!-- unified accessory cards: availability + edit/delete rendered by renderFleet() -->
         <div id="fleetAccessoriesList" class="card-list"></div>
       </section>
 
@@ -1709,13 +1773,9 @@ body.setup-open { overflow: hidden; }
         </div>
 
         <div class="form-card">
-          <h3>Inventario</h3>
+          <h3>Inventario mezzi</h3>
           <div id="inventorySettings" class="quantity-list"></div>
-
-          <h3>Accessori</h3>
-          <div id="accessorySettings" class="quantity-list"></div>
-
-          <button class="primary-btn full" id="saveSettingsBtn">Salva disponibilità</button>
+          <button class="primary-btn full" id="saveSettingsBtn" style="margin-top:14px">Salva disponibilità mezzi</button>
         </div>
 
         <div class="form-card settings-link-card" id="openPricingSettingsCard">
@@ -1739,9 +1799,94 @@ body.setup-open { overflow: hidden; }
           <button class="danger-btn full" id="resetBtn">Cancella tutti i dati</button>
         </div>
       </section>
+
+      <!-- ── Risorse PRO ── -->
+      <section class="page" id="risorsePage">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">PRO · GESTIONE RISORSE</p>
+            <h2>Risorse <span class="pro-badge" style="font-size:.65rem;padding:3px 8px;border-radius:6px">PRO</span></h2>
+          </div>
+        </div>
+        <div id="risorseList" class="card-list"></div>
+        <div style="height:48px"></div>
+      </section>
+
+      <section class="page" id="risorsaDetailPage">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">PRO · DETTAGLIO RISORSA</p>
+            <h2 id="rsDetailTitle">Dettaglio risorsa</h2>
+          </div>
+        </div>
+        <div class="card" id="rsDetailInfo" style="padding:4px 16px;margin-bottom:0"></div>
+        <div style="margin-top:24px">
+          <p style="font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:0 0 12px">Storico noleggi</p>
+          <div id="rsDetailHistory"></div>
+        </div>
+        <div style="height:48px"></div>
+      </section>
+
+      <!-- ══ RICHIESTE ══════════════════════════════════════════════════════ -->
+      <section class="page" id="requestsPage">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">RICHIESTE DI NOLEGGIO</p>
+            <h2>Richieste 📋</h2>
+          </div>
+        </div>
+
+        <!-- SQL setup card -->
+        <div class="req-setup-card">
+          <p class="eyebrow" style="color:var(--warning);margin-bottom:6px">⚙️ CONFIGURAZIONE INIZIALE</p>
+          <p style="font-size:.85rem;margin:0 0 10px;color:var(--text)">Esegui questo SQL nel pannello SQL del tuo Supabase (una sola volta) per abilitare le richieste.</p>
+          <button class="secondary-btn compact" id="reqShowSqlBtn" style="width:100%;margin-bottom:8px">Mostra SQL da eseguire →</button>
+          <div id="reqSqlBlock" style="display:none">
+            <pre class="req-sql-pre" id="reqSqlText"></pre>
+            <button class="secondary-btn compact" id="reqCopySqlBtn" style="width:100%;margin-top:6px">📋 Copia SQL negli appunti</button>
+          </div>
+        </div>
+
+        <!-- Personal link -->
+        <div class="form-card" style="margin-bottom:14px">
+          <p class="eyebrow" style="margin-bottom:6px">IL TUO LINK PERSONALE</p>
+          <p style="font-size:.85rem;color:var(--muted);margin:0 0 12px">Condividi questo link con i clienti via WhatsApp. Possono compilare la richiesta senza registrarsi.</p>
+          <div class="req-link-row">
+            <input type="text" id="reqLinkInput" readonly style="flex:1;min-width:0;font-size:.78rem;padding:10px 12px;background:#101010" />
+            <button class="primary-btn compact" id="reqCopyLinkBtn" style="flex-shrink:0;white-space:nowrap">Copia link</button>
+          </div>
+        </div>
+
+        <!-- List -->
+        <div class="section-head" style="margin-top:4px;margin-bottom:10px">
+          <h3 style="margin:0">Richieste ricevute</h3>
+          <button class="secondary-btn compact" id="reqRefreshBtn" style="min-height:36px;padding:7px 12px;font-size:.82rem">🔄 Aggiorna</button>
+        </div>
+        <div id="requestsList" class="card-list"></div>
+        <div style="height:48px"></div>
+      </section>
+
+      <!-- ══ DETTAGLIO RICHIESTA ══════════════════════════════════════════ -->
+      <section class="page" id="requestDetailPage">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">DETTAGLIO RICHIESTA</p>
+            <h2 id="reqDetailTitle">Richiesta</h2>
+          </div>
+          <span class="req-status-pill" id="reqDetailStatusPill"></span>
+        </div>
+        <div class="form-card" id="reqDetailInfo" style="padding:4px 16px 8px;margin-bottom:14px"></div>
+        <div class="req-action-row">
+          <button class="primary-btn req-action-btn" id="reqAcceptBtn">✅ Accetta</button>
+          <button class="danger-btn req-action-btn" id="reqRejectBtn">❌ Rifiuta</button>
+          <button class="secondary-btn req-action-btn" id="reqWhatsappBtn">💬 WhatsApp</button>
+        </div>
+        <div style="height:48px"></div>
+      </section>
     
 </main>
   </div>
+
 
 
   <div class="modal-backdrop hidden" id="bikeTypeModal">
@@ -2022,9 +2167,10 @@ body.setup-open { overflow: hidden; }
   function addSetupAccessory(preset = {}) {
     const card = document.createElement("div");
     card.className = "setup-category-card";
-    card.innerHTML = `<div class="setup-category-grid">
-      <label>Accessorio<input class="setup-accessory-name" maxlength="80" placeholder="Es. Tendalino" value="${escapeSetupValue(preset.label)}"></label>
-      <label>Quantità<input class="setup-accessory-qty" type="number" min="0" step="1" value="${Math.max(0, Number(preset.total ?? 1))}"></label>
+    card.innerHTML = `<div class="setup-category-grid" style="grid-template-columns:1fr 72px 90px auto">
+      <label>Accessorio<input class="setup-accessory-name" maxlength="80" placeholder="Es. Casco" value="${escapeSetupValue(preset.label)}"></label>
+      <label>Qtà<input class="setup-accessory-qty" type="number" min="0" step="1" value="${Math.max(0, Number(preset.total ?? 1))}"></label>
+      <label>Prezzo €<input class="setup-accessory-price" type="number" min="0" step="0.5" placeholder="0.00" value="${Number(preset.price ?? 0).toFixed(2)}"></label>
       <button type="button" class="setup-mini-btn setup-remove-btn" aria-label="Rimuovi accessorio">×</button>
     </div>`;
     card.querySelector(".setup-remove-btn").addEventListener("click", () => card.remove());
@@ -2056,7 +2202,9 @@ body.setup-open { overflow: hidden; }
       if (!label) return;
       let key = slug(label), n = 2;
       while (accessories[key]) key = `${slug(label)}_${n++}`;
-      accessories[key] = { label, total: Math.max(0, Number(card.querySelector(".setup-accessory-qty").value || 0)) };
+      const total = Math.max(0, Number(card.querySelector(".setup-accessory-qty").value || 0));
+      const price = Math.max(0, Number(card.querySelector(".setup-accessory-price")?.value || 0));
+      accessories[key] = { label, total, price };
     });
     if (!categoryCount) {
       inventorySetupError.textContent = "Aggiungi almeno una categoria per continuare.";
@@ -2147,6 +2295,7 @@ window.rentixCloudPhase1 = (() => {
       currency: store?.get?.(keys.currency) || "EUR",
       inventory: state.inventory || {},
       accessories: state.accessories || {},
+      pricing: state.pricing || {},
       setup_completed: store?.get?.(keys.setup) === "1",
       updated_at: new Date().toISOString()
     };
@@ -2571,6 +2720,10 @@ renderFleet();
   if (pageId === "remindersPage") renderReminders();
   if (pageId === "settingsPage") renderSettings();
   if (pageId === "pricingPage") renderPricing();
+  if (pageId === "risorsePage") { if (window._rsRenderList) window._rsRenderList(); }
+  if (pageId === "risorsaDetailPage") { if (window._rsRenderDetail) window._rsRenderDetail(); }
+  if (pageId === "requestsPage") { if (window._reqRenderList) window._reqRenderList(); }
+  if (pageId === "requestDetailPage") { if (window._reqRenderDetail) window._reqRenderDetail(); }
 }
 
 function makeQuantityRows(container, source, prefix, settings = false) {
@@ -2702,8 +2855,16 @@ function renderAllBikeAssignments(forcedPresets = null) {
       const unitHtml = units.length ? `<label class="unit-assignment-field"><span>Scegli il mezzo</span><select class="unit-assignment-select"><option value="">Non assegnato</option>${options}</select></label>` : `<small class="muted">Nessun mezzo disponibile in questa categoria</small>`;
 
       const allowedAccessories = Object.entries(state.accessories || {});
-      const accessoriesHtml = allowedAccessories.length
-        ? allowedAccessories.map(([accKey, acc]) => `<div class="accessory-quantity-row"><strong>${escapeHtml(acc.label || accKey)}</strong><div class="quantity-control"><button type="button" class="qty-btn" data-action="minus">−</button><input class="qty-input inline-accessory-qty" data-accessory="${escapeHtml(accKey)}" type="number" min="0" step="1" value="${values[accKey] || 0}"><button type="button" class="qty-btn" data-action="plus">+</button></div></div>`).join("")
+      /* deduplicate accessories that share the same label (rendering-only guard) */
+      const _accSeenLabels = new Set();
+      const uniqueAccessories = allowedAccessories.filter(([, acc]) => {
+        const lbl = (acc.label || '').trim().toLowerCase();
+        if (_accSeenLabels.has(lbl)) return false;
+        _accSeenLabels.add(lbl);
+        return true;
+      });
+      const accessoriesHtml = uniqueAccessories.length
+        ? uniqueAccessories.map(([accKey, acc]) => `<div class="accessory-quantity-row"><strong>${escapeHtml(acc.label || accKey)}</strong><div class="quantity-control"><button type="button" class="qty-btn" data-action="minus">−</button><input class="qty-input inline-accessory-qty" data-accessory="${escapeHtml(accKey)}" type="number" min="0" step="1" value="${values[accKey] || 0}"><button type="button" class="qty-btn" data-action="plus">+</button></div></div>`).join("")
         : `<small class="muted">Nessun oggetto configurato nell'inventario</small>`;
 
       const row = document.createElement("div");
@@ -2715,7 +2876,7 @@ function renderAllBikeAssignments(forcedPresets = null) {
         input.value = Math.max(0, Number(input.value || 0) + (btn.dataset.action === "plus" ? 1 : -1));
         input.dispatchEvent(new Event("input", { bubbles:true }));
       }));
-      row.querySelectorAll(".inline-accessory-qty").forEach(input => input.addEventListener("input", updateAvailabilityIndicator));
+      row.querySelectorAll(".inline-accessory-qty").forEach(input => input.addEventListener("input", () => { updateAvailabilityIndicator(); updateRentalPrice(); }));
       row.querySelector(".unit-assignment-select")?.addEventListener("change", () => {
         renderAllBikeAssignments(currentAssignmentPresets());
         updateAvailabilityIndicator();
@@ -2823,12 +2984,26 @@ function updateRentalPrice(force = false) {
   const days = inclusiveDays($("startDate").value, $("endDate").value);
   const bikes = bikeCountFromForm();
   const perBike = pricePerBikeForDays(days);
-  const automaticTotal = perBike * bikes;
-  $("priceDaysLabel").textContent = `${days || 0} ${days === 1 ? "giorno" : "giorni"} · ${bikes} ${bikes === 1 ? "articolo" : "articoli"} · ${formatEuro(perBike)} per articolo`;
+  const vehicleTotal = perBike * bikes;
+
+  /* sum accessory extra costs from inline qty inputs */
+  let accExtra = 0;
+  document.querySelectorAll(".inline-accessory-qty").forEach(input => {
+    const qty = Math.max(0, Number(input.value || 0));
+    if (!qty) return;
+    const accPrice = Number(state.accessories[input.dataset.accessory]?.price || 0);
+    accExtra += qty * accPrice;
+  });
+
+  const automaticTotal = vehicleTotal + accExtra;
+  const accNote = accExtra > 0 ? ` + ${formatEuro(accExtra)} accessori` : "";
+  $("priceDaysLabel").textContent = `${days || 0} ${days === 1 ? "giorno" : "giorni"} · ${bikes} ${bikes === 1 ? "articolo" : "articoli"} · ${formatEuro(perBike)} per articolo${accNote}`;
   if (force || !priceManuallyEdited) $("rentalPrice").value = automaticTotal;
   $("priceAutoNote").textContent = priceManuallyEdited
-    ? `Prezzo modificato manualmente. Automatico: ${formatEuro(automaticTotal)}. Accessori inclusi.`
-    : "Calcolato automaticamente dal listino. Accessori inclusi.";
+    ? `Prezzo modificato manualmente. Automatico: ${formatEuro(automaticTotal)}.`
+    : accExtra > 0
+      ? `Calcolato automaticamente: mezzi ${formatEuro(vehicleTotal)} + accessori ${formatEuro(accExtra)}.`
+      : "Calcolato automaticamente dal listino.";
 }
 
 function formatEuro(value) {
@@ -2945,7 +3120,12 @@ function rentalItemsText(rental) {
       lines.push(`1 × ${state.inventory[key]?.label || key}${unitName ? ` — ${unitName}` : ""}`);
       Object.entries(assignment).forEach(([accKey, accQty]) => {
         if (accKey === "_unitId" || accKey === "_unitName") return;
-        if (Number(accQty || 0) > 0) lines.push(`↳ ${state.accessories[accKey]?.label || accKey} ×${accQty}`);
+        if (Number(accQty || 0) > 0) {
+          const accUnitPrice = Number(state.accessories[accKey]?.price || 0);
+          const accLineTotal = accUnitPrice * Number(accQty);
+          const accPriceStr = accUnitPrice > 0 ? ` (+${formatEuro(accLineTotal)})` : "";
+          lines.push(`↳ ${state.accessories[accKey]?.label || accKey} ×${accQty}${accPriceStr}`);
+        }
       });
     }
   });
@@ -3233,17 +3413,21 @@ function renderFleet() {
 
   const accList = $("fleetAccessoriesList");
   accList.innerHTML = "";
-  Object.entries(state.accessories).forEach(([key, item]) => {
-    const total = Number(item.total || 0);
-    const used = maxUsedInRange(startDate, endDate, key, "accessories");
-    const free = Math.max(0, total - used);
+
+  /* ── view card ─────────────────────────────────────────────────── */
+  function renderAccViewCard(key, item) {
+    const total = Number(item.total || item.quantity || 0);
+    const used  = maxUsedInRange(startDate, endDate, key, "accessories");
+    const free  = Math.max(0, total - used);
+    const label = item.label || item.name || key;
+    const price = Number(item.price || 0);
 
     const card = document.createElement("article");
     card.className = "fleet-card";
     card.innerHTML = `
       <div class="fleet-card-top">
         <div>
-          <h3>${item.label}</h3>
+          <h3>${escapeHtml(label)}${price > 0 ? `<span style="font-size:.8rem;font-weight:400;color:var(--muted);margin-left:6px">+${formatEuro(price)}</span>` : ""}</h3>
           <p class="muted">${periodLabel}</p>
         </div>
         <span class="availability-badge ${free > 0 ? "availability-ok" : "availability-no"}">
@@ -3254,9 +3438,126 @@ function renderFleet() {
         <div class="fleet-number"><span>Totali</span><strong>${total}</strong></div>
         <div class="fleet-number"><span>Occupati</span><strong>${used}</strong></div>
         <div class="fleet-number"><span>Liberi</span><strong>${free}</strong></div>
+      </div>
+      <div class="fleet-card-actions">
+        <button class="secondary-btn acc-edit-btn">Modifica</button>
+        <button class="danger-btn acc-delete-btn">Elimina</button>
       </div>`;
-    accList.appendChild(card);
+
+    card.querySelector(".acc-edit-btn").addEventListener("click", () => {
+      card.replaceWith(renderAccEditCard(key, item));
+    });
+    card.querySelector(".acc-delete-btn").addEventListener("click", async () => {
+      const name = item.label || item.name || key;
+      if (!confirm(`Eliminare l'accessorio "${name}"?`)) return;
+      delete state.accessories[key];
+      saveState();
+      resetRentalForm();
+      renderFleet();
+      await window.rentixCloudPhase1?.saveNow?.();
+    });
+    return card;
+  }
+
+  /* ── edit card ─────────────────────────────────────────────────── */
+  function renderAccEditCard(key, item) {
+    const label  = item.label || item.name  || "";
+    const total  = Number(item.total || item.quantity || 0);
+    const price  = Number(item.price || 0);
+    const isNew  = !state.accessories[key];
+
+    const card = document.createElement("article");
+    card.className = "fleet-card";
+    card.dataset.accKey = key; /* used by draft system */
+    card.innerHTML = `
+      <p class="eyebrow" style="margin:0 0 10px">${isNew ? "NUOVO ACCESSORIO" : "MODIFICA ACCESSORIO"}</p>
+      <div style="display:grid;gap:10px;margin-bottom:12px">
+        <label style="font-size:.82rem;color:var(--muted);margin:0">Nome
+          <input class="acc-edit-name" style="margin-top:4px" maxlength="80"
+            placeholder="es. Casco, Lucchetto…" value="${escapeHtml(label)}">
+        </label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <label style="font-size:.82rem;color:var(--muted);margin:0">Quantità totale
+            <input class="acc-edit-qty" type="number" min="0" step="1"
+              style="margin-top:4px" value="${Math.max(0, total)}">
+          </label>
+          <label style="font-size:.82rem;color:var(--muted);margin:0">Prezzo extra €
+            <input class="acc-edit-price" type="number" min="0" step="0.5"
+              style="margin-top:4px" value="${price.toFixed(2)}">
+          </label>
+        </div>
+      </div>
+      <div class="fleet-card-actions">
+        <button class="secondary-btn acc-cancel-btn">Annulla</button>
+        <button class="primary-btn acc-save-btn">Salva</button>
+      </div>`;
+
+    /* ── draft: restore saved values (if any) ── */
+    const _dr = window._rentixDraft;
+    if (_dr) {
+      const saved = _dr.accGet(key);
+      if (saved) {
+        if (saved.name  !== undefined) card.querySelector(".acc-edit-name").value  = saved.name;
+        if (saved.qty   !== undefined) card.querySelector(".acc-edit-qty").value   = saved.qty;
+        if (saved.price !== undefined) card.querySelector(".acc-edit-price").value = saved.price;
+        _dr.toast("Bozza ripristinata");
+      }
+      /* auto-save on input */
+      let _accTimer = null;
+      card.addEventListener("input", () => {
+        clearTimeout(_accTimer);
+        _accTimer = setTimeout(() => {
+          const n = card.querySelector(".acc-edit-name")?.value.trim() || "";
+          if (n) _dr.accSet(key, {
+            name:  n,
+            qty:   card.querySelector(".acc-edit-qty")?.value  || "1",
+            price: card.querySelector(".acc-edit-price")?.value || "0"
+          });
+        }, 600);
+      });
+    }
+
+    card.querySelector(".acc-cancel-btn").addEventListener("click", () => {
+      window._rentixDraft?.accClear(key);
+      if (isNew) { card.remove(); } else { card.replaceWith(renderAccViewCard(key, item)); }
+    });
+
+    card.querySelector(".acc-save-btn").addEventListener("click", async () => {
+      const newLabel = card.querySelector(".acc-edit-name").value.trim();
+      if (!newLabel) { alert("Inserisci un nome per l'accessorio."); return; }
+      const newTotal = Math.max(0, Number(card.querySelector(".acc-edit-qty").value  || 0));
+      const newPrice = Math.max(0, Number(card.querySelector(".acc-edit-price").value || 0));
+      const updated  = { ...(state.accessories[key] || {}), label: newLabel, total: newTotal, price: newPrice };
+      state.accessories[key] = updated;
+      window._rentixDraft?.accClear(key); /* clear draft before re-render */
+      saveState();
+      resetRentalForm();
+      card.replaceWith(renderAccViewCard(key, updated));
+      const cloudSaved = await window.rentixCloudPhase1?.saveNow?.();
+      if (cloudSaved === false) alert("Salvato in locale, ma non nel cloud. Controlla Internet e riprova.");
+    });
+
+    return card;
+  }
+
+  /* render existing accessories */
+  Object.entries(state.accessories || {}).forEach(([key, item]) => {
+    accList.appendChild(renderAccViewCard(key, item));
   });
+
+  /* "+ Aggiungi accessorio" button at the bottom */
+  const addAccBtn = document.createElement("button");
+  addAccBtn.type = "button";
+  addAccBtn.className = "secondary-btn";
+  addAccBtn.style.cssText = "width:100%;margin-top:4px";
+  addAccBtn.textContent = "+ Aggiungi accessorio";
+  addAccBtn.addEventListener("click", () => {
+    const newKey  = "acc_" + Date.now().toString(36);
+    const editCard = renderAccEditCard(newKey, { label: "", total: 1, price: 0 });
+    accList.insertBefore(editCard, addAccBtn);
+    editCard.querySelector(".acc-edit-name")?.focus();
+  });
+  accList.appendChild(addAccBtn);
 }
 
 function openBikeTypeModal(key = "") {
@@ -3278,7 +3579,19 @@ function closeBikeTypeModal() {
   $("bikeTypeModal").classList.add("hidden");
 }
 
-function saveBikeType() {
+function normalizeKey(str) {
+  return (str || "").trim().toLowerCase()
+    .replace(/[àáâãäå]/g, "a").replace(/[èéêë]/g, "e")
+    .replace(/[ìíîï]/g, "i").replace(/[òóôõö]/g, "o")
+    .replace(/[ùúûü]/g, "u")
+    .replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "")
+    || "item";
+}
+
+async function saveBikeType() {
+  const btn = $("saveBikeTypeBtn");
+  if (btn.disabled) return;
+
   const originalKey = $("bikeTypeKey").value;
   const label = $("bikeTypeLabel").value.trim();
   const total = Math.max(0, Number($("bikeTypeTotal").value || 0));
@@ -3288,23 +3601,39 @@ function saveBikeType() {
     return;
   }
 
-  if (originalKey) {
-    const existing = state.inventory[originalKey] || {};
-    state.inventory[originalKey] = { label, total, units: normalizedUnits({ ...existing, total }) };
-  } else {
-    let key = normalizeKey(label);
-    let suffix = 2;
-    while (state.inventory[key]) {
-      key = `${normalizeKey(label)}_${suffix++}`;
-    }
-    state.inventory[key] = { label, total, units: normalizedUnits({ total }) };
-  }
+  btn.disabled = true;
+  btn.textContent = "Salvataggio…";
 
-  saveState();
-  resetRentalForm();
-  renderSettings();
-  renderFleet();
-  closeBikeTypeModal();
+  try {
+    if (originalKey) {
+      const existing = state.inventory[originalKey] || {};
+      state.inventory[originalKey] = { label, total, units: normalizedUnits({ ...existing, total }) };
+    } else {
+      let key = normalizeKey(label);
+      let suffix = 2;
+      while (state.inventory[key]) {
+        key = `${normalizeKey(label)}_${suffix++}`;
+      }
+      state.inventory[key] = { label, total, units: normalizedUnits({ total }) };
+    }
+
+    saveState();
+    resetRentalForm();
+    renderSettings();
+    renderFleet();
+    closeBikeTypeModal();
+
+    const cloudSaved = await window.rentixCloudPhase1?.saveNow?.();
+    if (cloudSaved === false) {
+      alert("Tipologia salvata sul telefono, ma non nel cloud. Controlla Internet e riprova.");
+    }
+  } catch (err) {
+    console.error("saveBikeType error:", err);
+    alert("Errore durante il salvataggio. Riprova.");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Salva tipologia";
+  }
 }
 
 function deleteBikeType(key) {
@@ -3425,9 +3754,9 @@ function closeCustomerDetail() {
   $("customerDetailModal").classList.add("hidden");
 }
 
+
 function renderSettings() {
   makeQuantityRows($("inventorySettings"), state.inventory, "settingBike", true);
-  makeQuantityRows($("accessorySettings"), state.accessories, "settingAcc", true);
 
   const setupStore = window.rentixSetupStore;
   const setupKeys = setupStore?.keys || {};
@@ -3639,6 +3968,24 @@ $("calendarDate").addEventListener("change", renderCalendar);
 $("customerSearch").addEventListener("input", e => renderCustomers(e.target.value));
 
 ["startDate", "endDate"].forEach(id => $(id).addEventListener("change", () => { updateAvailabilityIndicator(); updateRentalPrice(); }));
+
+/* ── Date picker: sync end date to start date month ─────────────────────
+   When the operator picks a start date the end-date field is pre-filled
+   with that same date (if empty or now invalid).  This makes Android's
+   native date picker open at the correct month instead of reverting to
+   the current month.  The `min` attribute is also kept in sync so the
+   picker disallows dates earlier than the start date. */
+$("startDate").addEventListener("change", () => {
+  const s = $("startDate").value;
+  if (!s) return;
+  const endEl = $("endDate");
+  endEl.min = s;
+  if (!endEl.value || endEl.value < s) {
+    endEl.value = s;
+    updateAvailabilityIndicator();
+    updateRentalPrice();
+  }
+});
 $("bikeFields").addEventListener("input", () => { updateAvailabilityIndicator(); updateRentalPrice(); });
 $("accessoryFields")?.addEventListener("input", updateAvailabilityIndicator);
 
@@ -3713,18 +4060,17 @@ $("saveSettingsBtn").addEventListener("click", async () => {
   Object.keys(state.inventory).forEach(key => {
     state.inventory[key].total = Math.max(0, Number($(`settingBike_${key}`).value || 0));
   });
-  Object.keys(state.accessories).forEach(key => {
-    state.accessories[key].total = Math.max(0, Number($(`settingAcc_${key}`).value || 0));
-  });
   saveState();
   resetRentalForm();
+  renderFleet();
   const cloudSaved = await window.rentixCloudPhase1?.saveNow?.();
   if (cloudSaved === false) {
     alert("Disponibilità salvate sul telefono, ma non nel cloud. Controlla Internet e riprova.");
   } else {
-    alert("Disponibilità salvate e sincronizzate.");
+    alert("Disponibilità mezzi salvate e sincronizzate.");
   }
 });
+
 
 $("exportBtn").addEventListener("click", () => {
   const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
@@ -3793,12 +4139,12 @@ $("customerDetailModal").addEventListener("click", (e) => {
   if (e.target === $("customerDetailModal")) closeCustomerDetail();
 });
 
-$("fleetPrevDayBtn").addEventListener("click", () => {
+$("fleetPrevDayBtn")?.addEventListener("click", () => {
   $("fleetDate").value = addDays($("fleetDate").value || todayISO(), -1);
   $("fleetEndDate").value = addDays($("fleetEndDate").value || $("fleetDate").value, -1);
   renderFleet();
 });
-$("fleetNextDayBtn").addEventListener("click", () => {
+$("fleetNextDayBtn")?.addEventListener("click", () => {
   $("fleetDate").value = addDays($("fleetDate").value || todayISO(), 1);
   $("fleetEndDate").value = addDays($("fleetEndDate").value || $("fleetDate").value, 1);
   renderFleet();
@@ -4083,6 +4429,275 @@ renderHome();
 </script>
 
 
+<style>
+/* ── Risorse: detail page ───────────────────────────────────────────────── */
+.rs-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+.rs-detail-row:last-child { border-bottom: 0; }
+.rs-detail-label { color: var(--muted); font-size: .88rem; flex-shrink: 0; }
+
+.rs-history-item {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.rs-history-item:active { opacity: .75; }
+.rs-history-main { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+.rs-history-dates { font-size: .83rem; color: var(--muted); }
+.rs-history-meta { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.rs-history-status {
+  font-size: .78rem;
+  background: var(--surface, #1c1c1e);
+  border-radius: 6px;
+  padding: 3px 8px;
+  color: var(--muted);
+}
+.rs-history-price { font-size: .9rem; font-weight: 700; }
+</style>
+
+<script>
+/* ── Risorse PRO ──────────────────────────────────────────────────────────────
+   Live read-only view of state.inventory[bikeKey].units.
+   No separate localStorage. Data ownership stays with Inventory / Fleet.
+   The obsolete rentixResources_v1__ key is left untouched and inert.
+   ──────────────────────────────────────────────────────────────────────────── */
+(function initRisorse() {
+  'use strict';
+
+  /* ══════════════════════════════════════════════════════════════
+     UTILITIES
+  ══════════════════════════════════════════════════════════════ */
+  function esc(v) {
+    var d = document.createElement('div');
+    d.textContent = (v == null ? '' : String(v));
+    return d.innerHTML;
+  }
+  function el(id) { return document.getElementById(id); }
+
+  function getInventory() { return ((typeof state !== 'undefined') ? state.inventory : null) || {}; }
+  function getRentals()   { return ((typeof state !== 'undefined') ? state.rentals   : null) || []; }
+
+  function categoryLabel(key) {
+    if (!key) return '—';
+    var inv = getInventory();
+    return (inv[key] && inv[key].label) ? inv[key].label : key;
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     DATA SOURCE — synthesised from state.inventory[bikeKey].units
+     Each returned object: { id, name, categoryKey }
+  ══════════════════════════════════════════════════════════════ */
+  function loadRisorse() {
+    var inv = getInventory();
+    var out = [];
+    Object.entries(inv).forEach(function(entry) {
+      var bikeKey = entry[0], item = entry[1];
+      var units = (typeof normalizedUnits === 'function')
+                  ? normalizedUnits(item)
+                  : (Array.isArray(item.units) ? item.units : []);
+      units.forEach(function(unit, idx) {
+        out.push({
+          id:          unit.id,
+          name:        unit.name || (item.label + ' #' + (idx + 1)),
+          categoryKey: bikeKey
+        });
+      });
+    });
+    return out;
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     STATUS CONFIG
+  ══════════════════════════════════════════════════════════════ */
+  var STATUS = {
+    disponibile: { label: 'Disponibile', css: 'rs-disponibile' },
+    prenotato:   { label: 'Prenotato',   css: 'rs-prenotato'   },
+    in_noleggio: { label: 'In noleggio', css: 'rs-in_noleggio' }
+  };
+  function rsLabel(s) { return (STATUS[s] || {}).label || s; }
+  function rsCss(s)   { return (STATUS[s] || {}).css   || ''; }
+
+  /* ══════════════════════════════════════════════════════════════
+     COMPUTED STATUS — uses bikeAssignments._unitId (existing system)
+     "In noleggio"  → unit in an active rental covering today
+     "Prenotato"    → unit in a future rental
+     "Disponibile"  → otherwise
+  ══════════════════════════════════════════════════════════════ */
+  function computeUnitStatus(unitId, categoryKey) {
+    var today = (typeof todayISO === 'function')
+                ? todayISO()
+                : new Date().toISOString().slice(0, 10);
+    var hasToday = false, hasFuture = false;
+    getRentals().forEach(function(rental) {
+      if (rental.status === 'annullata' || rental.status === 'restituita') return;
+      var rows = (rental.bikeAssignments && rental.bikeAssignments[categoryKey]) || [];
+      var assigned = rows.some(function(a) {
+        var norm = (typeof normalizeAssignment === 'function') ? normalizeAssignment(a) : a;
+        return norm._unitId === unitId;
+      });
+      if (!assigned) return;
+      if (rental.startDate <= today && rental.endDate >= today) hasToday = true;
+      else if (rental.startDate > today) hasFuture = true;
+    });
+    if (hasToday) return 'in_noleggio';
+    if (hasFuture) return 'prenotato';
+    return 'disponibile';
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     LIST PAGE
+  ══════════════════════════════════════════════════════════════ */
+  function renderRisorse() {
+    var container = el('risorseList');
+    if (!container) return;
+    var list = loadRisorse();
+    if (!list.length) {
+      container.innerHTML =
+        '<div class="rs-empty">Nessun mezzo trovato.<br>' +
+        'Aggiungi e nomina i mezzi in <strong>Flotta → Gestisci mezzi</strong>.</div>';
+      return;
+    }
+    container.innerHTML = '';
+    list.forEach(function(r) {
+      var cs  = computeUnitStatus(r.id, r.categoryKey);
+      var art = document.createElement('article');
+      art.className = 'rs-card';
+      art.innerHTML =
+        '<div class="rs-card-info">' +
+          '<h3>' + esc(r.name) + '</h3>' +
+          '<p class="rs-category-tag">' + esc(categoryLabel(r.categoryKey)) + '</p>' +
+        '</div>' +
+        '<span class="rs-pill ' + rsCss(cs) + '">' + esc(rsLabel(cs)) + '</span>' +
+        '<button class="secondary-btn rs-detail-btn" style="min-width:72px;min-height:40px;flex-shrink:0">Dettagli</button>';
+      art.querySelector('.rs-detail-btn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        showRisorsaDetail(r.id, r.categoryKey);
+      });
+      container.appendChild(art);
+    });
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     RESOURCE DETAIL PAGE
+  ══════════════════════════════════════════════════════════════ */
+  var _currentDetail = null; // { id, categoryKey }
+
+  var RENTAL_STATUS_IT = {
+    prenotata:  'Prenotata',
+    ritirata:   'Ritirata',
+    restituita: 'Restituita',
+    annullata:  'Annullata'
+  };
+
+  function fmtShortDate(d) {
+    if (!d) return '—';
+    try {
+      return new Intl.DateTimeFormat('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' })
+               .format(new Date(d + 'T12:00:00'));
+    } catch (_) { return d; }
+  }
+
+  function showRisorsaDetail(unitId, categoryKey) {
+    _currentDetail = { id: unitId, categoryKey: categoryKey };
+    renderRisorsaDetail();
+    showPage('risorsaDetailPage');
+  }
+
+  function renderRisorsaDetail() {
+    if (!_currentDetail) return;
+    var id          = _currentDetail.id;
+    var categoryKey = _currentDetail.categoryKey;
+
+    /* resolve unit from inventory */
+    var inv  = getInventory();
+    var item = inv[categoryKey];
+    if (!item) return;
+    var units = (typeof normalizedUnits === 'function')
+                ? normalizedUnits(item)
+                : (Array.isArray(item.units) ? item.units : []);
+    var unit = units.find(function(u) { return u.id === id; });
+    if (!unit) return;
+
+    var name = unit.name || (item.label + ' (senza nome)');
+    var cs   = computeUnitStatus(id, categoryKey);
+
+    /* title */
+    var titleEl = el('rsDetailTitle');
+    if (titleEl) titleEl.textContent = name;
+
+    /* info card */
+    var infoEl = el('rsDetailInfo');
+    if (infoEl) {
+      infoEl.innerHTML =
+        '<div class="rs-detail-row"><span class="rs-detail-label">Nome</span><span>' + esc(name) + '</span></div>' +
+        '<div class="rs-detail-row"><span class="rs-detail-label">Tipo / Categoria</span><span>' + esc(categoryLabel(categoryKey)) + '</span></div>' +
+        '<div class="rs-detail-row"><span class="rs-detail-label">Stato attuale</span>' +
+          '<span class="rs-pill ' + rsCss(cs) + '" style="font-size:.78rem">' + esc(rsLabel(cs)) + '</span>' +
+        '</div>';
+    }
+
+    /* history — lookup via bikeAssignments[categoryKey][i]._unitId */
+    var histEl = el('rsDetailHistory');
+    if (!histEl) return;
+
+    var linked = getRentals().filter(function(rental) {
+      var rows = (rental.bikeAssignments && rental.bikeAssignments[categoryKey]) || [];
+      return rows.some(function(a) {
+        var norm = (typeof normalizeAssignment === 'function') ? normalizeAssignment(a) : a;
+        return norm._unitId === id;
+      });
+    });
+
+    linked.sort(function(a, b) {
+      return (b.startDate || '').localeCompare(a.startDate || '');
+    });
+
+    if (!linked.length) {
+      histEl.innerHTML = '<p class="rs-empty">Nessun noleggio registrato per questa risorsa.</p>';
+      return;
+    }
+
+    histEl.innerHTML = '';
+    linked.forEach(function(rental) {
+      var statusLabel = RENTAL_STATUS_IT[rental.status] || rental.status || '—';
+      var priceLabel  = (rental.priceTotal != null && rental.priceTotal !== '')
+                        ? Number(rental.priceTotal).toFixed(0) + '\u00a0€' : '—';
+      var row = document.createElement('div');
+      row.className = 'rs-history-item';
+      row.innerHTML =
+        '<div class="rs-history-main">' +
+          '<strong>' + esc(rental.customerName || 'Cliente non specificato') + '</strong>' +
+          '<span class="rs-history-dates">' +
+            esc(fmtShortDate(rental.startDate)) + ' \u2192 ' + esc(fmtShortDate(rental.endDate)) +
+          '</span>' +
+        '</div>' +
+        '<div class="rs-history-meta">' +
+          '<span class="rs-history-status">' + esc(statusLabel) + '</span>' +
+          '<span class="rs-history-price">' + esc(priceLabel) + '</span>' +
+        '</div>';
+      row.addEventListener('click', function() {
+        if (typeof editRental === 'function') editRental(rental.id);
+      });
+      histEl.appendChild(row);
+    });
+  }
+
+  /* ── Expose for showPage hook ── */
+  window._rsRenderList   = renderRisorse;
+  window._rsRenderDetail = renderRisorsaDetail;
+})();
+</script>
+
 <script>
 /* ── Back-navigation history ─────────────────────────────────────────────────
    Wraps the global showPage() to keep a navStack of page IDs.
@@ -4149,6 +4764,1213 @@ renderHome();
   try { history.replaceState({ rentixPage: 'homePage' }, ''); } catch (_) {}
 
   _refreshBackBtn();
+})();
+</script>
+
+
+<style>
+/* ── Rental Requests ────────────────────────────────────────────────────── */
+.req-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--danger);
+  color: #fff;
+  font-size: .58rem;
+  font-weight: 900;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px;
+  margin-left: 6px;
+  vertical-align: middle;
+  line-height: 1;
+  pointer-events: none;
+}
+.req-setup-card {
+  background: rgba(255,176,32,.05);
+  border: 1px solid rgba(255,176,32,.22);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+.req-sql-pre {
+  background: #0d0d0d;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  font-size: .68rem;
+  font-family: "SF Mono", "Fira Code", monospace;
+  color: var(--muted);
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin: 0;
+  max-height: 240px;
+  overflow-y: auto;
+}
+.req-link-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.req-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 15px;
+  cursor: pointer;
+  transition: border-color .14s ease;
+}
+.req-card:active { border-color: rgba(255,212,0,.3); transform: scale(.99); }
+.req-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.req-card h3 { margin: 0 0 3px; font-size: 1rem; }
+.req-card-meta { color: var(--muted); font-size: .83rem; margin: 0 0 4px; }
+.req-avail-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: .7rem;
+  font-weight: 900;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.req-avail-ok  { background: rgba(61,220,132,.12);  color: #3ddc84; }
+.req-avail-no  { background: rgba(255,92,92,.12);   color: #ff8585; }
+.req-avail-unk { background: rgba(167,167,167,.1);  color: var(--muted); }
+.req-status-pill {
+  font-size: .7rem;
+  font-weight: 900;
+  padding: 5px 10px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.req-s-pending  { background: rgba(255,212,0,.12);  color: var(--yellow); }
+.req-s-accepted { background: rgba(61,220,132,.12); color: #3ddc84; }
+.req-s-rejected { background: rgba(255,92,92,.12);  color: #ff8585; }
+.req-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.req-card-price { font-weight: 800; font-size: .95rem; }
+.req-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  font-size: .9rem;
+}
+.req-detail-row:last-child { border-bottom: 0; }
+.req-detail-label { color: var(--muted); font-size: .83rem; flex-shrink: 0; min-width: 80px; }
+.req-detail-value { text-align: right; }
+.req-action-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-top: 8px;
+}
+.req-action-btn { min-height: 50px; font-size: .88rem; padding: 10px 8px; }
+@media (max-width: 430px) {
+  .req-action-row { grid-template-columns: 1fr 1fr; }
+  #reqWhatsappBtn { grid-column: 1 / -1; }
+  .req-link-row { flex-direction: column; }
+  .req-link-row .primary-btn { width: 100%; text-align: center; }
+}
+.req-toast {
+  position: fixed;
+  bottom: calc(20px + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%) translateY(70px);
+  background: #2a2a2a;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 22px;
+  font-size: .9rem;
+  font-weight: 700;
+  z-index: 9999;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: transform .28s cubic-bezier(.16,1,.3,1), opacity .28s;
+  opacity: 0;
+}
+.req-toast.req-toast-show { transform: translateX(-50%) translateY(0); opacity: 1; }
+</style>
+
+<script>
+/* ── Rental Requests ──────────────────────────────────────────────────────────
+   Admin panel: load, display, accept, and reject rental requests.
+   Public form lives in /request/{userId} → request.html.
+   ──────────────────────────────────────────────────────────────────────────── */
+(function initRentalRequests() {
+  'use strict';
+
+  /* ══ helpers ═══════════════════════════════════════════════════════════ */
+  function el(id) { return document.getElementById(id); }
+  function esc(v) {
+    var d = document.createElement('div');
+    d.textContent = v == null ? '' : String(v);
+    return d.innerHTML;
+  }
+  function currentUserId() {
+    return window.rentixAccountId || sessionStorage.getItem('rentixActiveAccountId') || '';
+  }
+  function getClient() { return window.rentixSupabase || null; }
+  function fmtDate(d) {
+    if (!d) return '—';
+    try {
+      return new Intl.DateTimeFormat('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' })
+        .format(new Date(d + 'T12:00:00'));
+    } catch (_) { return d; }
+  }
+  function fmtEuro(v) {
+    return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
+      .format(Number(v) || 0);
+  }
+
+  /* ══ Toast ══════════════════════════════════════════════════════════════ */
+  var _toastEl = null;
+  var _toastTimer = null;
+  function showToast(msg) {
+    if (!_toastEl) {
+      _toastEl = document.createElement('div');
+      _toastEl.className = 'req-toast';
+      document.body.appendChild(_toastEl);
+    }
+    _toastEl.textContent = msg;
+    _toastEl.classList.add('req-toast-show');
+    clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(function() { _toastEl.classList.remove('req-toast-show'); }, 2800);
+  }
+
+  /* ══ Setup SQL ══════════════════════════════════════════════════════════ */
+  var SETUP_SQL = [
+    '-- Run once in the Supabase SQL editor',
+    '',
+    '-- 1) Add pricing column to account setup',
+    'ALTER TABLE rentix_account_setup',
+    '  ADD COLUMN IF NOT EXISTS pricing JSONB DEFAULT \'{}\';',
+    '',
+    '-- 2) Create rental requests table',
+    'CREATE TABLE IF NOT EXISTS rentix_rental_requests (',
+    '  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),',
+    '  user_id     TEXT NOT NULL,',
+    '  first_name  TEXT NOT NULL,',
+    '  last_name   TEXT NOT NULL,',
+    '  phone       TEXT NOT NULL,',
+    '  start_date  DATE NOT NULL,',
+    '  end_date    DATE NOT NULL,',
+    '  bike_key    TEXT NOT NULL,',
+    '  quantity    INTEGER NOT NULL DEFAULT 1,',
+    '  accessories JSONB DEFAULT \'{}\',',
+    '  heavy_duty_locks INTEGER DEFAULT 0,',
+    '  standard_locks   INTEGER DEFAULT 0,',
+    '  notes       TEXT DEFAULT \'\',',
+    '  estimated_price NUMERIC DEFAULT 0,',
+    '  status      TEXT DEFAULT \'pending\',',
+    '  created_at  TIMESTAMPTZ DEFAULT NOW(),',
+    '  updated_at  TIMESTAMPTZ DEFAULT NOW()',
+    ');',
+    '',
+    '-- 3) Add vehicles column for multi-type booking support (safe to re-run)',
+    'ALTER TABLE rentix_rental_requests',
+    '  ADD COLUMN IF NOT EXISTS vehicles JSONB DEFAULT \'[]\';',
+    '',
+    '-- 4) Enable Row Level Security',
+    'ALTER TABLE rentix_rental_requests ENABLE ROW LEVEL SECURITY;',
+    '',
+    '-- 4) Authenticated operators manage their own requests',
+    'DROP POLICY IF EXISTS "Operator manages own requests"',
+    '  ON rentix_rental_requests;',
+    'CREATE POLICY "Operator manages own requests"',
+    '  ON rentix_rental_requests FOR ALL TO authenticated',
+    '  USING (user_id = auth.uid()::text)',
+    '  WITH CHECK (user_id = auth.uid()::text);',
+    '',
+    '-- 5) Anyone can submit a new request (public form)',
+    'DROP POLICY IF EXISTS "Public can insert request"',
+    '  ON rentix_rental_requests;',
+    'CREATE POLICY "Public can insert request"',
+    '  ON rentix_rental_requests FOR INSERT TO anon',
+    '  WITH CHECK (true);',
+    '',
+    '-- 6) Public RPC to load operator info for the request form',
+    'CREATE OR REPLACE FUNCTION get_public_operator_info(operator_id TEXT)',
+    'RETURNS JSON LANGUAGE sql SECURITY DEFINER AS $$',
+    '  SELECT row_to_json(t) FROM (',
+    '    SELECT business_name, inventory, accessories, pricing',
+    '    FROM rentix_account_setup',
+    '    WHERE user_id::text = operator_id LIMIT 1',
+    '  ) t;',
+    '$$;',
+  ].join('\n');
+
+  /* ══ State ═════════════════════════════════════════════════════════════ */
+  var _requests = [];
+  var _currentReqId = null;
+  var _loading = false;
+
+  /* ══ Supabase load ══════════════════════════════════════════════════════ */
+  async function loadRequests() {
+    var client = getClient();
+    var uid = currentUserId();
+    if (!client || !uid) { _requests = []; return; }
+    if (_loading) return;
+    _loading = true;
+    try {
+      var result = await client
+        .from('rentix_rental_requests')
+        .select('*')
+        .eq('user_id', uid)
+        .order('created_at', { ascending: false });
+      if (result.error) throw result.error;
+      _requests = Array.isArray(result.data) ? result.data : [];
+    } catch (err) {
+      console.warn('Richieste: errore caricamento', err);
+      _requests = [];
+    } finally {
+      _loading = false;
+    }
+  }
+
+  async function patchStatus(id, status) {
+    var client = getClient();
+    var uid = currentUserId();
+    if (!client || !uid) return false;
+    try {
+      var result = await client
+        .from('rentix_rental_requests')
+        .update({ status: status, updated_at: new Date().toISOString() })
+        .eq('id', id)
+        .eq('user_id', uid);
+      if (result.error) throw result.error;
+      var req = _requests.find(function(r) { return r.id === id; });
+      if (req) req.status = status;
+      return true;
+    } catch (err) {
+      console.warn('Richieste: errore aggiornamento stato', err);
+      return false;
+    }
+  }
+
+  /* ══ Availability check (uses existing maxUsedInRange) ════════════════ */
+  function checkAvailability(req) {
+    var inv = (typeof state !== 'undefined') ? state.inventory : null;
+    if (!inv || typeof maxUsedInRange !== 'function') return null;
+    var vList = Array.isArray(req.vehicles) && req.vehicles.length
+      ? req.vehicles
+      : (req.bike_key ? [{ bike_key: req.bike_key, quantity: req.quantity || 1 }] : []);
+    if (!vList.length) return null;
+    for (var i = 0; i < vList.length; i++) {
+      var v     = vList[i];
+      var item  = inv[v.bike_key];
+      if (!item) return null;
+      var total = Number(item.total) || 0;
+      var qty   = Number(v.quantity) || 1;
+      var used  = maxUsedInRange(req.start_date, req.end_date, v.bike_key, 'bikes');
+      if ((total - used) < qty) return false;
+    }
+    return true;
+  }
+
+  /* ══ Status helpers ════════════════════════════════════════════════════ */
+  var SL = { pending: 'In attesa', accepted: 'Accettata', rejected: 'Rifiutata' };
+  var SC = { pending: 'req-s-pending', accepted: 'req-s-accepted', rejected: 'req-s-rejected' };
+
+  /* ══ Badge ═════════════════════════════════════════════════════════════ */
+  function updateBadge() {
+    var badge = el('requestsBadge');
+    if (!badge) return;
+    var n = _requests.filter(function(r) { return r.status === 'pending'; }).length;
+    badge.textContent = n;
+    badge.style.display = n > 0 ? 'inline-flex' : 'none';
+  }
+
+  /* ══ Personal link ═════════════════════════════════════════════════════ */
+  function getLink() {
+    var uid = currentUserId();
+    if (!uid) return '';
+    var base = window.RENTIX_BASE_URL || window.location.origin;
+    return base + '/request.html?operator=' + encodeURIComponent(uid);
+  }
+  function refreshLinkInput() {
+    var inp = el('reqLinkInput');
+    if (inp) inp.value = getLink() || '(accedi per vedere il tuo link)';
+  }
+
+  /* ══ SQL card ══════════════════════════════════════════════════════════ */
+  function populateSqlCard() {
+    var pre = el('reqSqlText');
+    if (pre && !pre.textContent) pre.textContent = SETUP_SQL;
+  }
+
+  /* ══ Render list ═══════════════════════════════════════════════════════ */
+  async function renderRequests() {
+    refreshLinkInput();
+    populateSqlCard();
+    var container = el('requestsList');
+    if (!container) return;
+    container.innerHTML = '<div class="empty-state" style="padding:24px">Caricamento…</div>';
+    await loadRequests();
+    updateBadge();
+    if (!_requests.length) {
+      container.innerHTML = '<div class="empty-state">Nessuna richiesta ricevuta ancora.<br>Condividi il tuo link personale con i clienti.</div>';
+      return;
+    }
+    var inv = (typeof state !== 'undefined') ? state.inventory : {};
+    container.innerHTML = '';
+    _requests.forEach(function(req) {
+      var avail = checkAvailability(req);
+      var availHtml = avail === null
+        ? '<span class="req-avail-pill req-avail-unk">Controlla disponibilità</span>'
+        : avail
+          ? '<span class="req-avail-pill req-avail-ok">🟢 Disponibile</span>'
+          : '<span class="req-avail-pill req-avail-no">🔴 Non disponibile</span>';
+      var vehicleSummary = (function() {
+        var vList = Array.isArray(req.vehicles) && req.vehicles.length
+          ? req.vehicles
+          : (req.bike_key ? [{ bike_key: req.bike_key, bike_label: (inv && inv[req.bike_key] && inv[req.bike_key].label) || req.bike_key, quantity: req.quantity || 1 }] : []);
+        return vList.map(function(v) {
+          var lbl = v.bike_label || (inv && inv[v.bike_key] && inv[v.bike_key].label) || v.bike_key || '—';
+          return lbl + ' × ' + (v.quantity || 1);
+        }).join(', ') || '—';
+      })();
+      var art = document.createElement('article');
+      art.className = 'req-card';
+      art.innerHTML =
+        '<div class="req-card-top">' +
+          '<div>' +
+            '<h3>' + esc(req.first_name + ' ' + req.last_name) + '</h3>' +
+            '<p class="req-card-meta">' + esc(req.phone) + '</p>' +
+          '</div>' +
+          '<span class="req-status-pill ' + (SC[req.status] || '') + '">' + esc(SL[req.status] || req.status) + '</span>' +
+        '</div>' +
+        '<p class="req-card-meta">📅 ' + esc(fmtDate(req.start_date)) + ' → ' + esc(fmtDate(req.end_date)) + '</p>' +
+        '<p class="req-card-meta" style="margin-bottom:0">🚲 ' + esc(vehicleSummary) + '</p>' +
+        '<div class="req-card-footer">' + availHtml +
+          '<span class="req-card-price">' + esc(fmtEuro(req.estimated_price)) + '</span>' +
+        '</div>';
+      art.addEventListener('click', function() { openDetail(req.id); });
+      container.appendChild(art);
+    });
+  }
+
+  /* ══ Detail page ════════════════════════════════════════════════════════ */
+  function openDetail(id) {
+    _currentReqId = id;
+    renderDetail();
+    if (typeof showPage === 'function') showPage('requestDetailPage');
+  }
+
+  function renderDetail() {
+    if (!_currentReqId) return;
+    var req = _requests.find(function(r) { return r.id === _currentReqId; });
+    if (!req) return;
+
+    /* title + pill */
+    var titleEl = el('reqDetailTitle');
+    if (titleEl) titleEl.textContent = req.first_name + ' ' + req.last_name;
+    var pillEl = el('reqDetailStatusPill');
+    if (pillEl) {
+      pillEl.textContent = SL[req.status] || req.status;
+      pillEl.className = 'req-status-pill ' + (SC[req.status] || '');
+    }
+
+    /* availability */
+    var avail = checkAvailability(req);
+    var availText = avail === null ? '—' : avail ? '🟢 Disponibile' : '🔴 Non disponibile';
+
+    /* vehicle list */
+    var inv = (typeof state !== 'undefined') ? state.inventory : {};
+    var vList = Array.isArray(req.vehicles) && req.vehicles.length
+      ? req.vehicles
+      : (req.bike_key ? [{ bike_key: req.bike_key, bike_label: (inv && inv[req.bike_key] && inv[req.bike_key].label) || req.bike_key, quantity: req.quantity || 1 }] : []);
+    var bikeLabel = vList.map(function(v) {
+      var lbl = v.bike_label || (inv && inv[v.bike_key] && inv[v.bike_key].label) || v.bike_key || '—';
+      return lbl + ' × ' + (v.quantity || 1);
+    }).join('\n') || '—';
+
+    /* accessories — handle both new array format and legacy object format */
+    var accLines = [];
+    var accSubtotal = 0;
+    var accData = req.accessories;
+    if (Array.isArray(accData)) {
+      /* new format: [{id, name, quantity, unit_price, total_price}] */
+      accData.forEach(function(a) {
+        var q = Number(a.quantity) || 0;
+        if (!q) return;
+        var lineTotal = Number(a.total_price) || 0;
+        accSubtotal += lineTotal;
+        accLines.push(q + ' × ' + (a.name || a.id || '?') + ' — ' + fmtEuro(lineTotal));
+      });
+    } else {
+      /* legacy format: {key: qty} */
+      var accInv = (typeof state !== 'undefined') ? state.accessories : {};
+      Object.entries(accData || {}).forEach(function(entry) {
+        var k = entry[0], q = Number(entry[1]) || 0;
+        if (!q) return;
+        var lbl = (accInv && accInv[k] && accInv[k].label) ? accInv[k].label : k;
+        var unitPrice = Number((accInv && accInv[k] && accInv[k].price) || 0);
+        var lineTotal = q * unitPrice;
+        accSubtotal += lineTotal;
+        accLines.push(q + ' × ' + lbl + ' — ' + fmtEuro(lineTotal));
+      });
+      /* legacy lock fields */
+      if (Number(req.standard_locks) > 0) {
+        accLines.push(Number(req.standard_locks) + ' × Lucchetto standard — ' + fmtEuro(0));
+      }
+      if (Number(req.heavy_duty_locks) > 0) {
+        var hdTotal = Number(req.heavy_duty_locks) * 10;
+        accSubtotal += hdTotal;
+        accLines.push(Number(req.heavy_duty_locks) + ' × Lucchetto rinforzato — ' + fmtEuro(hdTotal));
+      }
+    }
+
+    /* price breakdown */
+    var reqDays = (req.start_date && req.end_date)
+      ? Math.round((new Date(req.end_date + 'T12:00:00') - new Date(req.start_date + 'T12:00:00')) / 86400000) + 1
+      : 0;
+    var pricingRef = (typeof state !== 'undefined') ? state.pricing : {};
+    var bikeUnitPrice = (typeof pricePerBikeForDays === 'function') ? pricePerBikeForDays(reqDays, pricingRef) : 0;
+    var vehicleSubtotal = vList.length
+      ? vList.reduce(function(s, v) { return s + bikeUnitPrice * (Number(v.quantity) || 1); }, 0)
+      : bikeUnitPrice * (Number(req.quantity) || 1);
+    var grandTotal = Number(req.estimated_price) || (vehicleSubtotal + accSubtotal);
+
+    /* info rows */
+    var infoEl = el('reqDetailInfo');
+    if (infoEl) {
+      var rows = [
+        ['Nome',                req.first_name + ' ' + req.last_name],
+        ['Telefono',            req.phone],
+        ['Dal',                 fmtDate(req.start_date)],
+        ['Al',                  fmtDate(req.end_date)],
+        ['Tipo mezzo',          bikeLabel],
+        ['Accessori',           accLines.length ? accLines.join('\n') : '—'],
+        ['Subtotale mezzi',     fmtEuro(vehicleSubtotal)],
+        ['Subtotale accessori', fmtEuro(accSubtotal)],
+        ['Preventivo totale',   fmtEuro(grandTotal)],
+        ['Disponibilità',       availText],
+        ['Note',                req.notes || '—'],
+      ];
+      infoEl.innerHTML = rows.map(function(r) {
+        return '<div class="req-detail-row">' +
+          '<span class="req-detail-label">' + esc(r[0]) + '</span>' +
+          '<span class="req-detail-value" style="white-space:pre-line">' + esc(r[1]) + '</span>' +
+          '</div>';
+      }).join('');
+    }
+
+    /* button states */
+    var acceptBtn = el('reqAcceptBtn');
+    var rejectBtn = el('reqRejectBtn');
+    if (acceptBtn) {
+      var canAccept = req.status !== 'accepted' && avail !== false;
+      acceptBtn.disabled = !canAccept;
+      acceptBtn.title = avail === false ? 'Mezzo non disponibile nelle date richieste' : '';
+    }
+    if (rejectBtn) rejectBtn.disabled = req.status === 'rejected';
+  }
+
+  /* ══ Accept ════════════════════════════════════════════════════════════ */
+  async function handleAccept() {
+    var req = _requests.find(function(r) { return r.id === _currentReqId; });
+    if (!req) return;
+
+    /* mark accepted and immediately refresh the detail panel */
+    await patchStatus(req.id, 'accepted');
+    updateBadge();
+    renderDetail();
+
+    /* clear any existing booking draft so the draft system won't overwrite our
+       pre-fill — applyBookingDraft() returns early when no draft is found */
+    try { localStorage.removeItem('rentix_new_booking_draft'); } catch(_e) {}
+
+    /* reset form; the draft guard checks _hasDraft() → false → no re-apply scheduled */
+    if (typeof resetRentalForm === 'function') resetRentalForm();
+
+    setTimeout(function() {
+      function gid(id) { return document.getElementById(id); }
+
+      /* ── customer + date fields ── */
+      if (gid('customerName'))  gid('customerName').value  = (req.first_name + ' ' + req.last_name).trim();
+      if (gid('customerPhone')) gid('customerPhone').value = req.phone || '';
+      if (gid('startDate'))     gid('startDate').value     = req.start_date || '';
+      if (gid('endDate'))       gid('endDate').value       = req.end_date   || '';
+      if (req.pickup_time && gid('pickupTime')) gid('pickupTime').value = req.pickup_time;
+      if (req.return_time && gid('returnTime')) gid('returnTime').value = req.return_time;
+      if (gid('rentalNotes'))   gid('rentalNotes').value   = req.notes || '';
+
+      /* ── vehicle quantities ──────────────────────────────────────────────
+         Dispatching 'input' fires the individual bike qty listener which calls
+         renderAllBikeAssignments() synchronously, so inline-accessory-qty inputs
+         are in the DOM by the time the forEach completes. */
+      var acceptVehicles = Array.isArray(req.vehicles) && req.vehicles.length
+        ? req.vehicles
+        : (req.bike_key ? [{ bike_key: req.bike_key, quantity: req.quantity || 1 }] : []);
+      acceptVehicles.forEach(function(v) {
+        var bikeInput = gid('bike_' + v.bike_key);
+        if (bikeInput) {
+          bikeInput.value = v.quantity;
+          bikeInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      });
+
+      /* ── accessories ─────────────────────────────────────────────────────
+         renderAllBikeAssignments already ran above; use querySelector (first
+         matching input per key) so we set the full requested qty once without
+         multiplying across multiple bike-article rows. */
+      var accData = req.accessories;
+      var accInv  = (typeof state !== 'undefined') ? state.accessories : {};
+      function _setAcc(key, qty) {
+        var inp = document.querySelector('.inline-accessory-qty[data-accessory="' + key + '"]');
+        if (inp && qty > 0) {
+          inp.value = qty;
+          inp.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
+      if (Array.isArray(accData) && accData.length) {
+        accData.forEach(function(a) {
+          var q = Number(a.quantity) || 0;
+          var k = a.id || a.name;
+          if (q && k) _setAcc(k, q);
+        });
+      } else if (accData && typeof accData === 'object') {
+        Object.entries(accData).forEach(function(entry) {
+          var k = entry[0], q = Number(entry[1]) || 0;
+          if (q && accInv[k]) _setAcc(k, q);
+        });
+      }
+
+      /* ── navigate then recalculate ── */
+      if (typeof showPage === 'function') showPage('newRentalPage');
+      if (typeof updateAvailabilityIndicator === 'function') updateAvailabilityIndicator();
+      if (typeof updateRentalPrice === 'function') updateRentalPrice(true);
+    }, 0);
+  }
+
+  /* ══ Reject ════════════════════════════════════════════════════════════ */
+  async function handleReject() {
+    if (!_currentReqId) return;
+    if (!confirm('Rifiutare questa richiesta?')) return;
+    var ok = await patchStatus(_currentReqId, 'rejected');
+    if (ok) {
+      renderDetail();
+      showToast('Richiesta rifiutata.');
+    } else {
+      alert('Errore durante l\'aggiornamento. Riprova.');
+    }
+  }
+
+  /* ══ WhatsApp ══════════════════════════════════════════════════════════ */
+  function handleWhatsApp() {
+    var req = _requests.find(function(r) { return r.id === _currentReqId; });
+    if (!req) return;
+    var phone = String(req.phone || '').replace(/[^\d+]/g, '');
+    if (!phone) { alert('Numero di telefono non disponibile.'); return; }
+
+    /* shared: resolve vehicles and accessories from either new or legacy format */
+    var accInv = (typeof state !== 'undefined') ? state.accessories : {};
+    var waInv  = (typeof state !== 'undefined') ? state.inventory   : {};
+
+    var waVehicles = Array.isArray(req.vehicles) && req.vehicles.length
+      ? req.vehicles
+      : (req.bike_key ? [{ bike_key: req.bike_key, bike_label: (waInv[req.bike_key] && waInv[req.bike_key].label) || req.bike_key, quantity: req.quantity || 1 }] : []);
+
+    var accData = req.accessories;
+    var accLines = [];
+    if (Array.isArray(accData) && accData.length) {
+      accData.forEach(function(a) {
+        var q = Number(a.quantity) || 0;
+        if (q) accLines.push((a.name || a.id) + ' x ' + q);
+      });
+    } else if (accData && typeof accData === 'object') {
+      Object.entries(accData).forEach(function(entry) {
+        var k = entry[0], q = Number(entry[1]) || 0;
+        if (q) accLines.push(((accInv[k] && accInv[k].label) || k) + ' x ' + q);
+      });
+    }
+
+    var lines = [];
+
+    if (req.status === 'accepted') {
+      /* ── Confirmation message (accepted requests only) ─────────────── */
+      /* Local formatter: always two decimal places (e.g. €64,00) */
+      var fmtEuro2 = function(v) {
+        return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR',
+          minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(v) || 0);
+      };
+      /* Build accessory lines for the confirmation message */
+      var accLinesConf = [];
+      if (Array.isArray(accData) && accData.length) {
+        accData.forEach(function(a) {
+          var q = Number(a.quantity) || 0;
+          if (q) accLinesConf.push((a.name || a.id) + ' \xd7 ' + q);
+        });
+      } else if (accData && typeof accData === 'object') {
+        Object.entries(accData).forEach(function(entry) {
+          var k = entry[0], q = Number(entry[1]) || 0;
+          if (q) accLinesConf.push(((accInv[k] && accInv[k].label) || k) + ' \xd7 ' + q);
+        });
+      }
+
+      lines.push('Buongiorno ' + req.first_name + ',');
+      lines.push('');
+      lines.push('le confermiamo che la sua richiesta di noleggio e\' stata accettata e la prenotazione e\' confermata.');
+      lines.push('');
+      lines.push('Di seguito il riepilogo:');
+      lines.push('');
+      lines.push('Ritiro: ' + fmtDate(req.start_date));
+      lines.push('Riconsegna: ' + fmtDate(req.end_date));
+      lines.push('');
+      lines.push('Mezzi prenotati:');
+      waVehicles.forEach(function(v) {
+        var lbl = v.bike_label || (waInv[v.bike_key] && waInv[v.bike_key].label) || v.bike_key || '';
+        if (lbl) lines.push('- ' + lbl + ' \xd7 ' + (v.quantity || 1));
+      });
+      if (accLinesConf.length) {
+        lines.push('');
+        lines.push('Accessori:');
+        accLinesConf.forEach(function(l) { lines.push('- ' + l); });
+      }
+      lines.push('');
+      lines.push('Totale noleggio: ' + fmtEuro2(req.estimated_price));
+      lines.push('');
+      lines.push('La invitiamo a verificare che i dati riportati siano corretti. Per eventuali modifiche o necessita\' puo\' rispondere direttamente a questo messaggio.');
+      lines.push('');
+      lines.push('Grazie per aver scelto Bike & Scooter Lab.');
+      lines.push('');
+      lines.push('Bike & Scooter Lab');
+
+    } else {
+      /* ── Existing summary message (pending / rejected) — unchanged ── */
+      lines.push('Gentile ' + req.first_name + ' ' + req.last_name + ',');
+      lines.push('grazie per la sua richiesta di noleggio!');
+      lines.push('');
+      if (req.start_date && req.end_date) {
+        lines.push('📅 ' + fmtDate(req.start_date) + ' → ' + fmtDate(req.end_date));
+        lines.push('ℹ️ Per restituzioni quando il negozio è chiuso (sabato pomeriggio e domenica), verrà aggiunto un supplemento di €5 per bicicletta. Questo costo NON è incluso nel totale stimato indicato di seguito e, se applicabile, verrà aggiunto separatamente al costo finale del noleggio.');
+      }
+      waVehicles.forEach(function(v) {
+        var lbl = v.bike_label || (waInv[v.bike_key] && waInv[v.bike_key].label) || v.bike_key || '';
+        if (lbl) lines.push('🚲 ' + lbl + ' × ' + (v.quantity || 1));
+      });
+      if (Array.isArray(accData) && accData.length) {
+        accData.forEach(function(a) {
+          var q = Number(a.quantity) || 0;
+          if (!q) return;
+          var lineTotal = Number(a.total_price) || 0;
+          lines.push('  + ' + (a.name || a.id) + ' ×' + q + (lineTotal > 0 ? ' (' + fmtEuro(lineTotal) + ')' : ''));
+        });
+      } else if (accData && typeof accData === 'object') {
+        Object.entries(accData).forEach(function(entry) {
+          var k = entry[0], q = Number(entry[1]) || 0;
+          if (!q) return;
+          var lbl = (accInv[k] && accInv[k].label) ? accInv[k].label : k;
+          var unitPrice = Number((accInv[k] && accInv[k].price) || 0);
+          var lineTotal = q * unitPrice;
+          lines.push('  + ' + lbl + ' ×' + q + (lineTotal > 0 ? ' (' + fmtEuro(lineTotal) + ')' : ''));
+        });
+      }
+      lines.push('ℹ️ I lucchetti standard sono forniti gratuitamente. In caso di smarrimento del lucchetto o della chiave, verrà applicata una penale di €5 al momento della restituzione della bicicletta.');
+      if (Number(req.estimated_price) > 0) {
+        lines.push('');
+        lines.push('💶 Totale stimato: ' + fmtEuro(req.estimated_price));
+      }
+      if (req.notes) {
+        lines.push('');
+        lines.push('📝 ' + req.notes);
+      }
+      lines.push('');
+      lines.push('La contatteremo a breve per conferma.');
+    }
+
+    var message = encodeURIComponent(lines.join('\n'));
+    window.open('https://wa.me/' + phone + '?text=' + message, '_blank');
+  }
+
+  /* ══ Clipboard helpers ═════════════════════════════════════════════════ */
+  function copyToClipboard(text, successMsg) {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text)
+        .then(function() { showToast(successMsg); })
+        .catch(function() { fallback(text, successMsg); });
+    } else { fallback(text, successMsg); }
+  }
+  function fallback(text, msg) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); showToast(msg); } catch (_) { showToast('Copia manuale: ' + text); }
+    document.body.removeChild(ta);
+  }
+
+  /* ══ Event wiring ══════════════════════════════════════════════════════ */
+  function wire() {
+    /* copy link */
+    var copyLinkBtn = el('reqCopyLinkBtn');
+    if (copyLinkBtn) copyLinkBtn.addEventListener('click', function() {
+      var link = getLink();
+      if (!link) { showToast('Effettua il login per copiare il link.'); return; }
+      copyToClipboard(link, 'Link copiato.');
+    });
+
+    /* refresh */
+    var refreshBtn = el('reqRefreshBtn');
+    if (refreshBtn) refreshBtn.addEventListener('click', renderRequests);
+
+    /* show SQL */
+    var showSqlBtn = el('reqShowSqlBtn');
+    if (showSqlBtn) showSqlBtn.addEventListener('click', function() {
+      var block = el('reqSqlBlock');
+      if (!block) return;
+      var isHidden = block.style.display === 'none' || block.style.display === '';
+      block.style.display = isHidden ? 'block' : 'none';
+      showSqlBtn.textContent = isHidden ? 'Nascondi SQL ↑' : 'Mostra SQL da eseguire →';
+    });
+
+    /* copy SQL */
+    var copySqlBtn = el('reqCopySqlBtn');
+    if (copySqlBtn) copySqlBtn.addEventListener('click', function() {
+      var pre = el('reqSqlText');
+      if (pre) copyToClipboard(pre.textContent, 'SQL copiato.');
+    });
+
+    /* accept */
+    var acceptBtn = el('reqAcceptBtn');
+    if (acceptBtn) acceptBtn.addEventListener('click', handleAccept);
+
+    /* reject */
+    var rejectBtn = el('reqRejectBtn');
+    if (rejectBtn) rejectBtn.addEventListener('click', handleReject);
+
+    /* whatsapp */
+    var waBtn = el('reqWhatsappBtn');
+    if (waBtn) waBtn.addEventListener('click', handleWhatsApp);
+  }
+
+  wire();
+
+  /* ══ Expose for showPage hook ══════════════════════════════════════════ */
+  window._reqRenderList   = renderRequests;
+  window._reqRenderDetail = renderDetail;
+})();
+</script>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════════════
+   RENTIX DRAFT SAVING  –  localStorage only, no Supabase changes
+   Keys:
+     rentix_new_booking_draft          – new booking form
+     rentix_vehicle_form_draft         – add-vehicle modal
+     rentix_accessory_draft_<accKey>   – per-accessory edit card
+   ══════════════════════════════════════════════════════════════════════════ */
+(function initRentixDrafts() {
+  'use strict';
+
+  var BOOKING_KEY  = 'rentix_new_booking_draft';
+  var VEHICLE_KEY  = 'rentix_vehicle_form_draft';
+  var ACC_PREFIX   = 'rentix_accessory_draft_';
+
+  /* ── storage helpers ─────────────────────────────────────────────── */
+  function dGet(k)    { try { return JSON.parse(localStorage.getItem(k)); } catch(_) { return null; } }
+  function dSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(_) {} }
+  function dClear(k)  { try { localStorage.removeItem(k); } catch(_) {} }
+
+  /* ── toast banner ────────────────────────────────────────────────── */
+  var _toastEl = null;
+  var _toastT  = null;
+  function toast(msg) {
+    if (!_toastEl) {
+      _toastEl = document.createElement('div');
+      _toastEl.id = '_rentixDraftToast';
+      _toastEl.style.cssText = [
+        'position:fixed',
+        'bottom:80px',
+        'left:50%',
+        'transform:translateX(-50%)',
+        'background:#1d4ed8',
+        'color:#fff',
+        'padding:8px 22px',
+        'border-radius:99px',
+        'font-size:.82rem',
+        'z-index:9999',
+        'pointer-events:none',
+        'opacity:0',
+        'transition:opacity .22s ease',
+        'white-space:nowrap',
+        'max-width:88vw',
+        'text-align:center',
+        'box-shadow:0 2px 12px rgba(0,0,0,.35)'
+      ].join(';');
+      document.body.appendChild(_toastEl);
+    }
+    _toastEl.textContent = msg;
+    _toastEl.style.opacity = '1';
+    clearTimeout(_toastT);
+    _toastT = setTimeout(function() { _toastEl.style.opacity = '0'; }, 3000);
+  }
+
+  /* ── expose helpers for renderAccEditCard ────────────────────────── */
+  window._rentixDraft = {
+    accGet:   function(k) { return dGet(ACC_PREFIX + k); },
+    accSet:   function(k, v) { dSet(ACC_PREFIX + k, v); },
+    accClear: function(k) { dClear(ACC_PREFIX + k); },
+    toast:    toast
+  };
+
+  /* ════════════════════════════════════════════════════════════════════
+     1. NEW BOOKING FORM
+     ════════════════════════════════════════════════════════════════════
+
+     Root cause of the Android bug (confirmed):
+       rentixCloudPhase1.load() calls resetRentalForm() every time cloud
+       data arrives from Supabase.  This wipes the form asynchronously —
+       potentially AFTER draft restoration has already run.
+
+     Fix strategy:
+       A) Wrap window.resetRentalForm so any external call re-applies the
+          draft immediately after the reset (unless it was an explicit user
+          action such as "Pulisci" or a successful save).
+       B) Retry-based applyBookingDraft — keeps retrying until the dynamic
+          bike/accessory controls exist in the DOM.
+       C) Auto-open newRentalPage on page load when a meaningful draft exists
+          (covers the "Android killed the PWA" scenario).
+       D) Re-apply on visibilitychange → visible (covers the rare case where
+          cloud data re-arrives while the form is showing).
+       E) Immediate flush on visibilitychange→hidden / pagehide / blur.
+     ════════════════════════════════════════════════════════════════════ */
+
+  var _bookingTimer      = null;
+  var _explicitClear     = false; /* true only during Pulisci / successful save */
+  var _resetGuardActive  = false; /* prevents re-entrant resetRentalForm wrapping */
+
+  /* ── State helpers ───────────────────────────────────────────────── */
+  function _isNewBookingPageActive() {
+    var p = document.getElementById('newRentalPage');
+    return !!(p && p.classList.contains('active'));
+  }
+  function _isEditingExistingRental() {
+    var el = document.getElementById('rentalId');
+    return !!(el && el.value);
+  }
+  function _hasDraft() { return !!dGet(BOOKING_KEY); }
+  function _hasMeaningfulDraft() {
+    var d = dGet(BOOKING_KEY);
+    if (!d) return false;
+    if (d.customerName || d.customerPhone || d.customerDocument || d.rentalNotes) return true;
+    var bv = d.bikes      ? Object.values(d.bikes)      : [];
+    var av = d.accessories ? Object.values(d.accessories) : [];
+    return bv.some(function(v) { return v > 0; }) || av.some(function(v) { return v > 0; });
+  }
+
+  /* ── Snapshot (save to localStorage) ────────────────────────────── */
+  function snapshotBookingDraft() {
+    if (_isEditingExistingRental()) return;
+
+    var bikes = {};
+    document.querySelectorAll('#bikeFields .qty-input').forEach(function(inp) {
+      if (inp.id && inp.id.indexOf('bike_') === 0) {
+        bikes[inp.id.slice(5)] = Number(inp.value || 0);
+      }
+    });
+
+    var accessories = {};
+    document.querySelectorAll('.inline-accessory-qty').forEach(function(inp) {
+      var k = inp.dataset.accessory;
+      if (k) accessories[k] = (accessories[k] || 0) + Math.max(0, Number(inp.value || 0));
+    });
+
+    var val = function(id) { var el = document.getElementById(id); return el ? el.value : ''; };
+    var d = {
+      customerName:     val('customerName'),
+      customerPhone:    val('customerPhone'),
+      customerDocument: val('customerDocument'),
+      startDate:        val('startDate'),
+      endDate:          val('endDate'),
+      pickupTime:       val('pickupTime'),
+      returnTime:       val('returnTime'),
+      rentalStatus:     val('rentalStatus'),
+      rentalNotes:      val('rentalNotes'),
+      rentalPrice:      val('rentalPrice'),
+      priceManual:      !!window.priceManuallyEdited,
+      bikes:            bikes,
+      accessories:      accessories,
+      ts:               Date.now()
+    };
+
+    dSet(BOOKING_KEY, d);
+    console.log('[RentixDraft] SAVED', new Date().toISOString(), JSON.stringify(d));
+  }
+
+  /* ── Retry-based restore ─────────────────────────────────────────── */
+  function applyBookingDraft(retryCount) {
+    retryCount = retryCount || 0;
+
+    if (_isEditingExistingRental()) {
+      console.log('[RentixDraft] SKIP restore — editing existing rental');
+      return;
+    }
+
+    var d = dGet(BOOKING_KEY);
+    if (!d) {
+      console.log('[RentixDraft] SKIP restore — no draft');
+      return;
+    }
+
+    /* Wait for the dynamic bike qty controls to be present in the DOM */
+    var bikeInputsReady = document.querySelectorAll('#bikeFields .qty-input').length > 0;
+    if (!bikeInputsReady) {
+      if (retryCount < 12) {
+        console.log('[RentixDraft] bike inputs not ready, retry #' + (retryCount + 1));
+        setTimeout(function() { applyBookingDraft(retryCount + 1); }, 250);
+      } else {
+        console.warn('[RentixDraft] gave up waiting for bike inputs after 12 retries');
+      }
+      return;
+    }
+
+    console.log('[RentixDraft] RESTORING', new Date().toISOString(), JSON.stringify(d));
+
+    function set(id, v) {
+      var el = document.getElementById(id);
+      if (el && v !== undefined && v !== null) el.value = v;
+    }
+
+    set('customerName',     d.customerName);
+    set('customerPhone',    d.customerPhone);
+    set('customerDocument', d.customerDocument);
+    set('startDate',        d.startDate);
+    set('endDate',          d.endDate);
+    set('pickupTime',       d.pickupTime);
+    set('returnTime',       d.returnTime);
+    set('rentalStatus',     d.rentalStatus);
+    set('rentalNotes',      d.rentalNotes);
+
+    if (d.bikes) {
+      Object.entries(d.bikes).forEach(function(entry) {
+        var key = entry[0], qty = entry[1];
+        var inp = document.getElementById('bike_' + key);
+        if (inp) {
+          inp.value = qty;
+          inp.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      });
+    }
+
+    setTimeout(function() {
+      if (d.accessories) {
+        Object.entries(d.accessories).forEach(function(entry) {
+          var key = entry[0], qty = entry[1];
+          document.querySelectorAll('.inline-accessory-qty[data-accessory="' + key + '"]').forEach(function(inp) {
+            inp.value = qty;
+            inp.dispatchEvent(new Event('input', { bubbles: true }));
+          });
+        });
+      }
+      if (d.priceManual) {
+        var priceEl = document.getElementById('rentalPrice');
+        if (priceEl) priceEl.value = d.rentalPrice;
+        window.priceManuallyEdited = true;
+        if (typeof updateRentalPrice === 'function') updateRentalPrice();
+      }
+      if (typeof updateAvailabilityIndicator === 'function') updateAvailabilityIndicator();
+      console.log('[RentixDraft] restore complete');
+    }, 80);
+
+    toast('Bozza ripristinata');
+  }
+
+  /* ── CORE FIX: wrap resetRentalForm to survive cloud data re-loads ── */
+  var _origResetRentalForm = window.resetRentalForm;
+  window.resetRentalForm = function rentixGuardedReset() {
+    console.log('[RentixDraft] resetRentalForm() called'
+      + ' explicit=' + _explicitClear
+      + ' page='     + (_isNewBookingPageActive() ? 'newRentalPage' : 'other')
+      + ' editing='  + _isEditingExistingRental()
+      + ' hasDraft=' + _hasDraft());
+
+    _origResetRentalForm();
+
+    /* After the reset: if this was NOT an intentional operator action and a draft
+       exists, re-apply it immediately.  This handles the case where
+       rentixCloudPhase1.load() calls resetRentalForm() after cloud data arrives
+       and wipes whatever the user had entered or we had just restored. */
+    if (!_explicitClear && !_resetGuardActive && !_isEditingExistingRental() && _hasDraft()) {
+      console.log('[RentixDraft] external resetRentalForm — scheduling re-apply');
+      _resetGuardActive = true;
+      setTimeout(function() {
+        applyBookingDraft(0);
+        _resetGuardActive = false;
+      }, 0);
+    }
+  };
+
+  function clearBookingDraft() {
+    console.log('[RentixDraft] CLEARED (explicit)', new Date().toISOString());
+    dClear(BOOKING_KEY);
+  }
+
+  /* ── Auto-save on form input (debounced) ─────────────────────────── */
+  var rentalForm = document.getElementById('rentalForm');
+  if (rentalForm) {
+    ['input', 'change'].forEach(function(evt) {
+      rentalForm.addEventListener(evt, function() {
+        clearTimeout(_bookingTimer);
+        _bookingTimer = setTimeout(snapshotBookingDraft, 600);
+      });
+    });
+  }
+
+  /* ── Successful submit: mark explicit clear so wrapper doesn't re-apply ── */
+  if (rentalForm) {
+    rentalForm.addEventListener('submit', function() {
+      _explicitClear = true;
+      setTimeout(function() {
+        var nameEl = document.getElementById('customerName');
+        if (nameEl && !nameEl.value) clearBookingDraft(); /* form was reset = save succeeded */
+        _explicitClear = false;
+      }, 0);
+    }, true /* capture — fires before the existing submit handler */);
+  }
+
+  /* ── Immediate flush when Android backgrounds / kills the page ───── */
+  function _flushDraft() {
+    clearTimeout(_bookingTimer);
+    snapshotBookingDraft();
+  }
+
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden') {
+      console.log('[RentixDraft] visibilitychange → hidden, flushing');
+      _flushDraft();
+    } else {
+      /* App returned from background: re-apply draft if on newRentalPage.
+         Handles the case where cloud data reloaded and wiped the form while
+         the page was backgrounded or the WebView was soft-killed. */
+      if (!_isEditingExistingRental() && _hasDraft()) {
+        console.log('[RentixDraft] visibilitychange → visible, re-applying draft');
+        setTimeout(function() { applyBookingDraft(0); }, 150);
+      }
+    }
+  });
+
+  window.addEventListener('pagehide', function() {
+    console.log('[RentixDraft] pagehide — flushing');
+    _flushDraft();
+  });
+
+  window.addEventListener('blur', _flushDraft);
+
+  /* ── "Pulisci" button: capture phase so flag is set before resetRentalForm ── */
+  var clearFormBtn = document.getElementById('clearFormBtn');
+  if (clearFormBtn) {
+    clearFormBtn.addEventListener('click', function() {
+      _explicitClear = true;
+      clearBookingDraft();
+      toast('Bozza eliminata');
+      setTimeout(function() { _explicitClear = false; }, 0);
+    }, true /* capture */);
+  }
+
+  /* ── showPage wrapper: restore draft when navigating to newRentalPage ── */
+  var _prevShowPage = window.showPage;
+  window.showPage = function rentixShowPageWithDraft(pageId) {
+    _prevShowPage(pageId);
+    if (pageId === 'newRentalPage') {
+      /* setTimeout(0) lets editRental() set rentalId synchronously first;
+         if rentalId is still empty after that, we restore the draft. */
+      setTimeout(function() { applyBookingDraft(0); }, 0);
+    }
+  };
+
+  /* ── Auto-open newRentalPage on page load when a meaningful draft exists ──
+     Waits long enough for auth + first cloud load + resetRentalForm() to finish,
+     then navigates automatically so the user sees their draft restored.
+     Our resetRentalForm wrapper will re-apply if cloud data arrives later. */
+  setTimeout(function() {
+    if (_hasMeaningfulDraft() && !_isEditingExistingRental()) {
+      console.log('[RentixDraft] meaningful draft on load — opening newRentalPage');
+      if (typeof window.showPage === 'function') {
+        window.showPage('newRentalPage');
+        /* showPage wrapper schedules applyBookingDraft(0) */
+      }
+    }
+  }, 1800);
+
+
+  /* ════════════════════════════════════════════════════════════════════
+     2. ADD VEHICLE MODAL
+     ════════════════════════════════════════════════════════════════════ */
+  var _vehicleTimer = null;
+  var _vehicleModalWasOpen = false;
+
+  function snapshotVehicleDraft() {
+    var keyEl = document.getElementById('bikeTypeKey');
+    if (keyEl && keyEl.value) return; /* editing existing, skip */
+    var label = (document.getElementById('bikeTypeLabel') || {}).value || '';
+    var qty   = (document.getElementById('bikeTypeTotal') || {}).value || '1';
+    if (label) dSet(VEHICLE_KEY, { label: label, qty: qty });
+  }
+
+  function applyVehicleDraft() {
+    var keyEl = document.getElementById('bikeTypeKey');
+    if (keyEl && keyEl.value) return; /* editing existing, skip */
+    var d = dGet(VEHICLE_KEY);
+    if (!d) return;
+    var labelEl = document.getElementById('bikeTypeLabel');
+    var totalEl = document.getElementById('bikeTypeTotal');
+    if (labelEl && d.label) labelEl.value = d.label;
+    if (totalEl && d.qty   !== undefined) totalEl.value = d.qty;
+    toast('Bozza ripristinata');
+  }
+
+  function clearVehicleDraft() { dClear(VEHICLE_KEY); }
+
+  /* Auto-save on input in modal fields */
+  ['bikeTypeLabel', 'bikeTypeTotal'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', function() {
+      clearTimeout(_vehicleTimer);
+      _vehicleTimer = setTimeout(snapshotVehicleDraft, 600);
+    });
+  });
+
+  /* MutationObserver: detect when modal opens (class "hidden" removed) or closes (added) */
+  var bikeModal = document.getElementById('bikeTypeModal');
+  if (bikeModal) {
+    new MutationObserver(function() {
+      var isOpen = !bikeModal.classList.contains('hidden');
+      if (isOpen && !_vehicleModalWasOpen) {
+        /* Modal just opened — restore draft after openBikeTypeModal() has cleared fields */
+        setTimeout(applyVehicleDraft, 0);
+      }
+      if (!isOpen && _vehicleModalWasOpen) {
+        /* Modal just closed (save or cancel) — always clear draft */
+        clearVehicleDraft();
+      }
+      _vehicleModalWasOpen = isOpen;
+    }).observe(bikeModal, { attributes: true, attributeFilter: ['class'] });
+  }
+
 })();
 </script>
 
