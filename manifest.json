@@ -1,0 +1,13 @@
+{
+  "background_color": "#ffffff",
+  "description": "Gestionale mobile per attività di noleggio",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "Rentix Lab",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "Rentix",
+  "start_url": "/",
+  "theme_color": "#111111",
+  "lang": "it"
+}
