@@ -1860,12 +1860,100 @@ body.setup-open { overflow: hidden; }
           </div>
         </div>
 
+        <button type="button" class="req-editor-launch" data-page="clientFormEditorPage">
+          <span class="req-editor-launch-icon">ⓘ</span>
+          <span>
+            <strong>Modifica modulo cliente</strong>
+            <small>Gestisci le informazioni importanti mostrate ai clienti</small>
+          </span>
+          <span class="req-editor-launch-arrow">›</span>
+        </button>
+
         <!-- List -->
         <div class="section-head" style="margin-top:4px;margin-bottom:10px">
           <h3 style="margin:0">Richieste ricevute</h3>
           <button class="secondary-btn compact" id="reqRefreshBtn" style="min-height:36px;padding:7px 12px;font-size:.82rem">🔄 Aggiorna</button>
         </div>
         <div id="requestsList" class="card-list"></div>
+        <div style="height:48px"></div>
+      </section>
+
+      <!-- ══ MODIFICA MODULO CLIENTE · UI FASE 1 ═══════════════════════════ -->
+      <section class="page" id="clientFormEditorPage">
+        <div class="section-head req-editor-head">
+          <div>
+            <p class="eyebrow">GESTIONE MODULO CLIENTE</p>
+            <h2>Informazioni importanti sul noleggio</h2>
+          </div>
+        </div>
+
+        <button type="button" class="req-editor-back" data-page="requestsPage">← Torna a Richieste</button>
+
+        <div class="req-editor-notice">
+          <strong>Editor informativo</strong>
+          <p>Questa schermata è una prima anteprima dell'editor. Le modifiche non sono ancora salvate né collegate al modulo pubblico.</p>
+        </div>
+
+        <div class="req-editor-toolbar">
+          <div>
+            <p class="eyebrow">SEZIONI INFORMATIVE</p>
+            <p class="req-editor-helper">Organizza i contenuti che in futuro saranno mostrati nel modulo cliente.</p>
+          </div>
+          <button type="button" class="primary-btn compact">+ Aggiungi informazione</button>
+        </div>
+
+        <div class="req-editor-list">
+          <article class="req-editor-card">
+            <div class="req-editor-card-head">
+              <div>
+                <p class="req-editor-kicker">INFORMAZIONE 1</p>
+                <h3>Riconsegna a negozio chiuso</h3>
+              </div>
+              <span class="req-editor-active-pill">Attiva</span>
+            </div>
+            <p class="req-editor-label">Testo</p>
+            <p class="req-editor-text">Per la riconsegna a negozio chiuso, ossia il sabato pomeriggio e la domenica, sarà applicato un supplemento di €5 per ogni bicicletta. Questo supplemento non è incluso nel preventivo mostrato in fondo alla pagina e, se dovuto, sarà aggiunto separatamente.</p>
+            <div class="req-editor-status" aria-label="Stato informazione">
+              <span class="req-editor-label">Visibilità</span>
+              <div class="req-editor-status-buttons">
+                <button type="button" class="req-editor-status-btn is-selected" aria-pressed="true">Attiva</button>
+                <button type="button" class="req-editor-status-btn" aria-pressed="false">Disattiva</button>
+              </div>
+            </div>
+            <div class="req-editor-actions">
+              <button type="button" class="secondary-btn compact" disabled aria-label="Sposta informazione in alto">↑ Su</button>
+              <button type="button" class="secondary-btn compact" aria-label="Sposta informazione in basso">↓ Giù</button>
+              <button type="button" class="secondary-btn compact">Modifica</button>
+              <button type="button" class="danger-btn compact">Elimina</button>
+            </div>
+          </article>
+
+          <article class="req-editor-card">
+            <div class="req-editor-card-head">
+              <div>
+                <p class="req-editor-kicker">INFORMAZIONE 2</p>
+                <h3>Lucchetti standard</h3>
+              </div>
+              <span class="req-editor-active-pill">Attiva</span>
+            </div>
+            <p class="req-editor-label">Testo</p>
+            <p class="req-editor-text">I lucchetti standard sono gratuiti. In caso di smarrimento del lucchetto o della chiave, sarà applicato un supplemento di €5 al momento della riconsegna della bicicletta.</p>
+            <div class="req-editor-status" aria-label="Stato informazione">
+              <span class="req-editor-label">Visibilità</span>
+              <div class="req-editor-status-buttons">
+                <button type="button" class="req-editor-status-btn is-selected" aria-pressed="true">Attiva</button>
+                <button type="button" class="req-editor-status-btn" aria-pressed="false">Disattiva</button>
+              </div>
+            </div>
+            <div class="req-editor-actions">
+              <button type="button" class="secondary-btn compact" aria-label="Sposta informazione in alto">↑ Su</button>
+              <button type="button" class="secondary-btn compact" disabled aria-label="Sposta informazione in basso">↓ Giù</button>
+              <button type="button" class="secondary-btn compact">Modifica</button>
+              <button type="button" class="danger-btn compact">Elimina</button>
+            </div>
+          </article>
+        </div>
+
         <div style="height:48px"></div>
       </section>
 
@@ -4925,6 +5013,133 @@ renderHome();
   opacity: 0;
 }
 .req-toast.req-toast-show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+/* ── Customer form information editor · Phase 1 UI ─────────────────────── */
+.req-editor-launch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 0 0 16px;
+  padding: 15px;
+  border: 1px solid rgba(255,212,0,.38);
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(255,212,0,.14), rgba(255,212,0,.04));
+  color: var(--text);
+  text-align: left;
+}
+.req-editor-launch:active { transform: scale(.99); }
+.req-editor-launch-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--yellow);
+  color: #111;
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+.req-editor-launch strong { display: block; color: var(--yellow); font-size: .92rem; }
+.req-editor-launch small { display: block; margin-top: 4px; color: var(--muted); font-size: .78rem; line-height: 1.35; }
+.req-editor-launch-arrow { margin-left: auto; color: var(--yellow); font-size: 1.6rem; line-height: 1; }
+.req-editor-head h2 { max-width: 290px; }
+.req-editor-back {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  margin: -4px 0 16px;
+  padding: 8px 0;
+  border: 0;
+  background: transparent;
+  color: var(--yellow);
+  font-weight: 800;
+}
+.req-editor-notice {
+  margin-bottom: 18px;
+  padding: 13px 15px;
+  border: 1px solid rgba(255,212,0,.2);
+  border-radius: 14px;
+  background: rgba(255,212,0,.06);
+}
+.req-editor-notice strong { color: var(--yellow); font-size: .88rem; }
+.req-editor-notice p { margin: 5px 0 0; color: var(--muted); font-size: .8rem; line-height: 1.45; }
+.req-editor-toolbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.req-editor-toolbar .eyebrow { margin-bottom: 5px; }
+.req-editor-helper { margin: 0; color: var(--muted); font-size: .78rem; line-height: 1.35; }
+.req-editor-toolbar .primary-btn { flex-shrink: 0; white-space: nowrap; }
+.req-editor-list { display: grid; gap: 12px; }
+.req-editor-card {
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--panel);
+}
+.req-editor-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.req-editor-kicker { margin: 0 0 5px; color: var(--muted); font-size: .68rem; font-weight: 900; letter-spacing: .08em; }
+.req-editor-card h3 { margin: 0; font-size: 1rem; }
+.req-editor-active-pill {
+  flex-shrink: 0;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(61,220,132,.12);
+  color: var(--success);
+  font-size: .7rem;
+  font-weight: 900;
+}
+.req-editor-label { margin: 0 0 6px; color: var(--muted); font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+.req-editor-text { margin: 0 0 15px; color: var(--text); font-size: .88rem; line-height: 1.55; }
+.req-editor-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.req-editor-status .req-editor-label { margin: 0; }
+.req-editor-status-buttons { display: flex; gap: 6px; }
+.req-editor-status-btn {
+  min-height: 34px;
+  padding: 6px 9px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--panel-2);
+  color: var(--muted);
+  font-size: .74rem;
+  font-weight: 800;
+}
+.req-editor-status-btn.is-selected {
+  border-color: rgba(61,220,132,.4);
+  background: rgba(61,220,132,.12);
+  color: var(--success);
+}
+.req-editor-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+  margin-top: 12px;
+}
+.req-editor-actions button { min-height: 38px; padding: 7px 5px; font-size: .74rem; }
+@media (max-width: 390px) {
+  .req-editor-toolbar { align-items: stretch; flex-direction: column; }
+  .req-editor-toolbar .primary-btn { width: 100%; }
+  .req-editor-actions { grid-template-columns: repeat(2, 1fr); }
+}
 </style>
 
 <script>
