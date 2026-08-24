@@ -713,7 +713,9 @@ input:focus, select:focus, textarea:focus {
 .reminder-kind.late { background:rgba(255,92,92,.14); color:var(--danger); }
 .reminder-time { color:var(--muted); font-size:.86rem; margin-bottom:7px; }
 .reminder-items { white-space:pre-line; line-height:1.45; font-size:.91rem; }
-.reminder-open { color:var(--yellow); font-weight:850; font-size:.82rem; margin-top:10px; }
+.reminder-actions { display:flex; align-items:center; gap:12px; margin-top:10px; }
+.reminder-open { min-height:auto; padding:0; color:var(--yellow); font-weight:850; font-size:.82rem; background:transparent; border:0; }
+.reminder-delete { min-height:36px; padding:7px 11px; margin-left:auto; font-size:.8rem; }
 .reminder-empty { border:1px dashed var(--border); border-radius:15px; padding:16px; color:var(--muted); text-align:center; }
 
 
@@ -3195,20 +3197,23 @@ function reminderCard(entry) {
     late: { text:"IN RITARDO", cls:"late", icon:"⏰" }
   };
   const meta = labels[entry.type];
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "reminder-card";
-  button.innerHTML = `
+  const card = document.createElement("article");
+  card.className = "reminder-card";
+  card.innerHTML = `
     <div class="reminder-card-top">
       <h4>${meta.icon} ${entry.rental.customerName}</h4>
       <span class="reminder-kind ${meta.cls}">${meta.text}</span>
     </div>
     <div class="reminder-time">${formatDate(entry.date)}${entry.time ? ` · ${entry.time}` : ""}</div>
     <div class="reminder-items"></div>
-    <div class="reminder-open">Apri prenotazione ›</div>`;
-  button.querySelector(".reminder-items").textContent = rentalItemsText(entry.rental);
-  button.addEventListener("click", () => editRental(entry.rental.id));
-  return button;
+    <div class="reminder-actions">
+      <button type="button" class="reminder-open">Apri prenotazione ›</button>
+      <button type="button" class="danger-btn reminder-delete">Elimina</button>
+    </div>`;
+  card.querySelector(".reminder-items").textContent = rentalItemsText(entry.rental);
+  card.querySelector(".reminder-open").addEventListener("click", () => editRental(entry.rental.id));
+  card.querySelector(".reminder-delete").addEventListener("click", () => deleteRental(entry.rental.id));
+  return card;
 }
 
 function renderReminderSection(container, title, entries) {
@@ -3844,7 +3849,11 @@ async function deleteRental(id) {
   saveState();
   renderHome();
   renderCalendar();
-  renderCustomers();
+  renderFleet();
+  renderCustomers(document.getElementById("customerSearch")?.value || "");
+  renderReminders();
+  window._rsRenderList?.();
+  window._rsRenderDetail?.();
 }
 
 $("rentalForm").addEventListener("submit", (e) => {
