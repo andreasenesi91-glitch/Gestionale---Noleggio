@@ -4265,6 +4265,7 @@ renderHome();
       btn.setAttribute("aria-label", `${formatDate(iso)}: ${count} prenotazioni`);
       btn.addEventListener("click", () => {
         document.getElementById("calendarDate").value = iso;
+        selectedHomeDate = iso;
         visibleMonth = new Date(d);
         visibleMonth.setDate(1);
         renderCalendar();
