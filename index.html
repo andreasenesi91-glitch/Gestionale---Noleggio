@@ -1878,7 +1878,7 @@ body.setup-open { overflow: hidden; }
         <div style="height:48px"></div>
       </section>
 
-      <!-- ══ MODIFICA MODULO CLIENTE · UI FASE 1 ═══════════════════════════ -->
+      <!-- ══ MODIFICA MODULO CLIENTE · INFORMAZIONI PUBBLICHE ═══════════════ -->
       <section class="page" id="clientFormEditorPage">
         <div class="section-head req-editor-head">
           <div>
@@ -1891,71 +1891,50 @@ body.setup-open { overflow: hidden; }
 
         <div class="req-editor-notice">
           <strong>Editor informativo</strong>
-          <p>Questa schermata è una prima anteprima dell'editor. Le modifiche non sono ancora salvate né collegate al modulo pubblico.</p>
+          <p id="infoEditorNoticeText">Le modifiche vengono mostrate ai clienti dopo averle salvate.</p>
         </div>
 
         <div class="req-editor-toolbar">
           <div>
             <p class="eyebrow">SEZIONI INFORMATIVE</p>
-            <p class="req-editor-helper">Organizza i contenuti che in futuro saranno mostrati nel modulo cliente.</p>
+            <p class="req-editor-helper">Organizza i contenuti mostrati nel modulo cliente.</p>
           </div>
-          <button type="button" class="primary-btn compact">+ Aggiungi informazione</button>
+          <div class="req-editor-toolbar-actions">
+            <button type="button" class="secondary-btn compact" id="infoSaveBtn" disabled>Salva modifiche</button>
+            <button type="button" class="primary-btn compact" id="infoAddBtn">+ Aggiungi informazione</button>
+          </div>
         </div>
 
-        <div class="req-editor-list">
-          <article class="req-editor-card">
-            <div class="req-editor-card-head">
-              <div>
-                <p class="req-editor-kicker">INFORMAZIONE 1</p>
-                <h3>Riconsegna a negozio chiuso</h3>
-              </div>
-              <span class="req-editor-active-pill">Attiva</span>
-            </div>
-            <p class="req-editor-label">Testo</p>
-            <p class="req-editor-text">Per la riconsegna a negozio chiuso, ossia il sabato pomeriggio e la domenica, sarà applicato un supplemento di €5 per ogni bicicletta. Questo supplemento non è incluso nel preventivo mostrato in fondo alla pagina e, se dovuto, sarà aggiunto separatamente.</p>
-            <div class="req-editor-status" aria-label="Stato informazione">
-              <span class="req-editor-label">Visibilità</span>
-              <div class="req-editor-status-buttons">
-                <button type="button" class="req-editor-status-btn is-selected" aria-pressed="true">Attiva</button>
-                <button type="button" class="req-editor-status-btn" aria-pressed="false">Disattiva</button>
-              </div>
-            </div>
-            <div class="req-editor-actions">
-              <button type="button" class="secondary-btn compact" disabled aria-label="Sposta informazione in alto">↑ Su</button>
-              <button type="button" class="secondary-btn compact" aria-label="Sposta informazione in basso">↓ Giù</button>
-              <button type="button" class="secondary-btn compact">Modifica</button>
-              <button type="button" class="danger-btn compact">Elimina</button>
-            </div>
-          </article>
-
-          <article class="req-editor-card">
-            <div class="req-editor-card-head">
-              <div>
-                <p class="req-editor-kicker">INFORMAZIONE 2</p>
-                <h3>Lucchetti standard</h3>
-              </div>
-              <span class="req-editor-active-pill">Attiva</span>
-            </div>
-            <p class="req-editor-label">Testo</p>
-            <p class="req-editor-text">I lucchetti standard sono gratuiti. In caso di smarrimento del lucchetto o della chiave, sarà applicato un supplemento di €5 al momento della riconsegna della bicicletta.</p>
-            <div class="req-editor-status" aria-label="Stato informazione">
-              <span class="req-editor-label">Visibilità</span>
-              <div class="req-editor-status-buttons">
-                <button type="button" class="req-editor-status-btn is-selected" aria-pressed="true">Attiva</button>
-                <button type="button" class="req-editor-status-btn" aria-pressed="false">Disattiva</button>
-              </div>
-            </div>
-            <div class="req-editor-actions">
-              <button type="button" class="secondary-btn compact" aria-label="Sposta informazione in alto">↑ Su</button>
-              <button type="button" class="secondary-btn compact" disabled aria-label="Sposta informazione in basso">↓ Giù</button>
-              <button type="button" class="secondary-btn compact">Modifica</button>
-              <button type="button" class="danger-btn compact">Elimina</button>
-            </div>
-          </article>
-        </div>
+        <div class="req-editor-list" id="infoEditorList"></div>
 
         <div style="height:48px"></div>
       </section>
+
+      <div class="modal-backdrop hidden" id="infoEditorModal" role="dialog" aria-modal="true" aria-labelledby="infoEditorModalTitle">
+        <div class="modal-card">
+          <div class="section-head no-margin">
+            <div>
+              <p class="eyebrow">SEZIONE INFORMATIVA</p>
+              <h3 id="infoEditorModalTitle">Aggiungi informazione</h3>
+            </div>
+          </div>
+          <form id="infoEditorForm">
+            <label>
+              Titolo
+              <input type="text" id="infoEditorTitle" maxlength="180" required />
+            </label>
+            <label>
+              Testo
+              <textarea id="infoEditorContent" rows="6" maxlength="5000" required></textarea>
+            </label>
+            <p id="infoEditorFormError" class="req-editor-modal-error" role="alert"></p>
+            <div class="info-editor-modal-actions">
+              <button type="button" class="secondary-btn" id="infoEditorCancelBtn">Annulla</button>
+              <button type="submit" class="primary-btn">Salva sezione</button>
+            </div>
+          </form>
+        </div>
+      </div>
 
       <!-- ══ DETTAGLIO RICHIESTA ══════════════════════════════════════════ -->
       <section class="page" id="requestDetailPage">
@@ -5074,7 +5053,8 @@ renderHome();
 }
 .req-editor-toolbar .eyebrow { margin-bottom: 5px; }
 .req-editor-helper { margin: 0; color: var(--muted); font-size: .78rem; line-height: 1.35; }
-.req-editor-toolbar .primary-btn { flex-shrink: 0; white-space: nowrap; }
+.req-editor-toolbar-actions { display: flex; flex-shrink: 0; gap: 7px; }
+.req-editor-toolbar-actions button { white-space: nowrap; }
 .req-editor-list { display: grid; gap: 12px; }
 .req-editor-card {
   padding: 15px;
@@ -5099,6 +5079,10 @@ renderHome();
   color: var(--success);
   font-size: .7rem;
   font-weight: 900;
+}
+.req-editor-active-pill.is-disabled {
+  background: rgba(255,255,255,.08);
+  color: var(--muted);
 }
 .req-editor-label { margin: 0 0 6px; color: var(--muted); font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
 .req-editor-text { margin: 0 0 15px; color: var(--text); font-size: .88rem; line-height: 1.55; }
@@ -5135,9 +5119,29 @@ renderHome();
   margin-top: 12px;
 }
 .req-editor-actions button { min-height: 38px; padding: 7px 5px; font-size: .74rem; }
+.req-editor-empty {
+  padding: 22px 16px;
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.5;
+}
+.req-editor-modal-error {
+  min-height: 20px;
+  margin: -3px 0 10px;
+  color: var(--danger);
+  font-size: .84rem;
+}
+.info-editor-modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1.35fr;
+  gap: 10px;
+}
 @media (max-width: 390px) {
   .req-editor-toolbar { align-items: stretch; flex-direction: column; }
-  .req-editor-toolbar .primary-btn { width: 100%; }
+  .req-editor-toolbar-actions { flex-direction: column; }
+  .req-editor-toolbar-actions button { width: 100%; }
   .req-editor-actions { grid-template-columns: repeat(2, 1fr); }
 }
 </style>
@@ -5802,6 +5806,316 @@ renderHome();
   /* ══ Expose for showPage hook ══════════════════════════════════════════ */
   window._reqRenderList   = renderRequests;
   window._reqRenderDetail = renderDetail;
+})();
+</script>
+
+<script>
+/* ── Customer form information editor ───────────────────────────────────────
+   Isolated from rental requests: this only reads/writes the dedicated
+   rentix_customer_form_info table and never touches request data.
+   ──────────────────────────────────────────────────────────────────────────── */
+(function initCustomerFormInfoEditor() {
+  'use strict';
+
+  var TABLE = 'rentix_customer_form_info';
+  var DEFAULT_ITEMS = [
+    {
+      title: 'Riconsegna a negozio chiuso',
+      content: 'Per la riconsegna a negozio chiuso, ossia il sabato pomeriggio e la domenica, sarà applicato un supplemento di €5 per ogni bicicletta. Questo supplemento non è incluso nel preventivo mostrato in fondo alla pagina e, se dovuto, sarà aggiunto separatamente.'
+    },
+    {
+      title: 'Lucchetti standard',
+      content: 'I lucchetti standard sono gratuiti. In caso di smarrimento del lucchetto o della chiave, sarà applicato un supplemento di €5 al momento della riconsegna della bicicletta.'
+    }
+  ];
+  var items = [];
+  var savedIds = [];
+  var loading = false;
+  var saving = false;
+  var loaded = false;
+  var dirty = false;
+  var loadError = '';
+  var editingIndex = null;
+
+  function el(id) { return document.getElementById(id); }
+  function uid() {
+    return window.rentixAccountId || sessionStorage.getItem('rentixActiveAccountId') || '';
+  }
+  function client() { return window.rentixSupabase || null; }
+  function esc(value) {
+    var d = document.createElement('div');
+    d.textContent = value == null ? '' : String(value);
+    return d.innerHTML;
+  }
+  function newId() {
+    if (window.crypto && typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID();
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random() * 16 | 0;
+      var v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+  function defaults() {
+    return DEFAULT_ITEMS.map(function(item) {
+      return { id: null, title: item.title, content: item.content, enabled: true, sort_order: 0 };
+    });
+  }
+  function notice(text) {
+    var noticeEl = el('infoEditorNoticeText');
+    if (noticeEl) noticeEl.textContent = text;
+  }
+  function markDirty() {
+    dirty = true;
+    var saveBtn = el('infoSaveBtn');
+    if (saveBtn) saveBtn.disabled = saving;
+    notice('Hai modifiche non salvate. Premi “Salva modifiche” per mostrarle ai clienti.');
+  }
+  function normalize(data) {
+    return (Array.isArray(data) ? data : []).map(function(item, index) {
+      return {
+        id: item.id || null,
+        title: String(item.title || ''),
+        content: String(item.content || ''),
+        enabled: item.enabled !== false,
+        sort_order: Number.isFinite(Number(item.sort_order)) ? Number(item.sort_order) : index
+      };
+    }).sort(function(a, b) {
+      return a.sort_order - b.sort_order;
+    }).map(function(item, index) {
+      item.sort_order = index;
+      return item;
+    });
+  }
+  function render() {
+    var list = el('infoEditorList');
+    if (!list) return;
+    if (loading) {
+      list.innerHTML = '<div class="req-editor-empty">Caricamento informazioni…</div>';
+      return;
+    }
+    if (!items.length) {
+      list.innerHTML = '<div class="req-editor-empty">Nessuna informazione configurata.<br>Aggiungi una sezione per mostrarla ai clienti.</div>';
+      return;
+    }
+    list.innerHTML = items.map(function(item, index) {
+      var active = item.enabled;
+      return '<article class="req-editor-card">' +
+        '<div class="req-editor-card-head">' +
+          '<div><p class="req-editor-kicker">INFORMAZIONE ' + (index + 1) + '</p><h3>' + esc(item.title) + '</h3></div>' +
+          '<span class="req-editor-active-pill' + (active ? '' : ' is-disabled') + '">' + (active ? 'Attiva' : 'Disattivata') + '</span>' +
+        '</div>' +
+        '<p class="req-editor-label">Testo</p>' +
+        '<p class="req-editor-text">' + esc(item.content).replace(/\n/g, '<br>') + '</p>' +
+        '<div class="req-editor-status" aria-label="Stato informazione">' +
+          '<span class="req-editor-label">Visibilità</span>' +
+          '<div class="req-editor-status-buttons">' +
+            '<button type="button" class="req-editor-status-btn' + (active ? ' is-selected' : '') + '" data-info-action="toggle" data-info-index="' + index + '" data-info-enabled="true" aria-pressed="' + active + '">Attiva</button>' +
+            '<button type="button" class="req-editor-status-btn' + (!active ? ' is-selected' : '') + '" data-info-action="toggle" data-info-index="' + index + '" data-info-enabled="false" aria-pressed="' + (!active) + '">Disattiva</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="req-editor-actions">' +
+          '<button type="button" class="secondary-btn compact" data-info-action="up" data-info-index="' + index + '"' + (index === 0 ? ' disabled' : '') + ' aria-label="Sposta informazione in alto">↑ Su</button>' +
+          '<button type="button" class="secondary-btn compact" data-info-action="down" data-info-index="' + index + '"' + (index === items.length - 1 ? ' disabled' : '') + ' aria-label="Sposta informazione in basso">↓ Giù</button>' +
+          '<button type="button" class="secondary-btn compact" data-info-action="edit" data-info-index="' + index + '">Modifica</button>' +
+          '<button type="button" class="danger-btn compact" data-info-action="delete" data-info-index="' + index + '">Elimina</button>' +
+        '</div>' +
+      '</article>';
+    }).join('');
+  }
+  function openModal(index) {
+    editingIndex = index;
+    var item = index === null ? { title: '', content: '' } : items[index];
+    if (!item) return;
+    el('infoEditorModalTitle').textContent = index === null ? 'Aggiungi informazione' : 'Modifica informazione';
+    el('infoEditorTitle').value = item.title;
+    el('infoEditorContent').value = item.content;
+    el('infoEditorFormError').textContent = '';
+    el('infoEditorModal').classList.remove('hidden');
+    setTimeout(function() { el('infoEditorTitle').focus(); }, 0);
+  }
+  function closeModal() {
+    editingIndex = null;
+    el('infoEditorModal').classList.add('hidden');
+  }
+  async function loadItems() {
+    var c = client();
+    var operatorId = uid();
+    if (loading) return;
+    loading = true;
+    loaded = false;
+    loadError = '';
+    render();
+    if (!c || !operatorId) {
+      items = defaults();
+      loadError = 'Impossibile identificare l’operatore. Controlla l’accesso e riprova.';
+      loaded = true;
+      loading = false;
+      dirty = true;
+      notice(loadError);
+      render();
+      return;
+    }
+    try {
+      var result = await c.from(TABLE).select('id,user_id,title,content,enabled,sort_order,created_at,updated_at')
+        .eq('user_id', operatorId).order('sort_order', { ascending: true }).order('created_at', { ascending: true });
+      if (result.error) throw result.error;
+      if (Array.isArray(result.data) && result.data.length) {
+        items = normalize(result.data);
+        savedIds = items.map(function(item) { return item.id; }).filter(Boolean);
+        dirty = false;
+        notice('Le informazioni attive vengono mostrate nel modulo cliente.');
+      } else {
+        items = defaults();
+        dirty = true;
+        var seeded = await saveItems(true);
+        if (seeded) {
+          notice('Le due informazioni standard sono state salvate. Puoi modificarle quando vuoi.');
+        } else {
+          loadError = 'Tabella informazioni non disponibile. Esegui il SQL mostrato in Richieste, poi salva le modifiche.';
+          notice(loadError);
+        }
+      }
+    } catch (err) {
+      console.warn('Informazioni modulo cliente: errore caricamento', err);
+      items = defaults();
+      savedIds = [];
+      dirty = true;
+      loadError = 'Impossibile caricare le informazioni salvate. Puoi modificarle e riprovare a salvare.';
+      notice(loadError);
+    } finally {
+      loaded = true;
+      loading = false;
+      render();
+      var saveBtn = el('infoSaveBtn');
+      if (saveBtn) saveBtn.disabled = !dirty || saving;
+    }
+  }
+  async function saveItems(silent) {
+    var c = client();
+    var operatorId = uid();
+    if (!c || !operatorId || saving) return false;
+    saving = true;
+    var saveBtn = el('infoSaveBtn');
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Salvataggio…'; }
+    try {
+      var payload = items.map(function(item, index) {
+        if (!item.title.trim() || !item.content.trim()) throw new Error('Ogni informazione deve avere titolo e testo.');
+        return {
+          id: item.id || newId(),
+          user_id: operatorId,
+          title: item.title.trim(),
+          content: item.content.trim(),
+          enabled: item.enabled !== false,
+          sort_order: index,
+          updated_at: new Date().toISOString()
+        };
+      });
+      items = payload.map(function(row) {
+        return { id: row.id, title: row.title, content: row.content, enabled: row.enabled, sort_order: row.sort_order };
+      });
+      if (payload.length) {
+        var result = await c.from(TABLE).upsert(payload, { onConflict: 'id' });
+        if (result.error) throw result.error;
+      }
+      var currentIds = payload.map(function(row) { return row.id; });
+      var removed = savedIds.filter(function(id) { return currentIds.indexOf(id) === -1; });
+      for (var i = 0; i < removed.length; i++) {
+        var deleted = await c.from(TABLE).delete().eq('id', removed[i]).eq('user_id', operatorId);
+        if (deleted.error) throw deleted.error;
+      }
+      savedIds = currentIds.slice();
+      dirty = false;
+      loadError = '';
+      notice('Le modifiche sono state salvate e saranno visibili ai clienti.');
+      if (!silent && typeof showToast === 'function') showToast('Informazioni salvate.');
+      return true;
+    } catch (err) {
+      console.error('Informazioni modulo cliente: errore salvataggio', err);
+      dirty = true;
+      loadError = 'Salvataggio non riuscito. Controlla la connessione e riprova.';
+      notice(loadError);
+      if (!silent && typeof showToast === 'function') showToast('Salvataggio non riuscito.');
+      return false;
+    } finally {
+      saving = false;
+      if (saveBtn) {
+        saveBtn.disabled = !dirty;
+        saveBtn.textContent = 'Salva modifiche';
+      }
+      render();
+    }
+  }
+  function handleListClick(event) {
+    var button = event.target.closest('[data-info-action]');
+    if (!button) return;
+    var index = Number(button.dataset.infoIndex);
+    var action = button.dataset.infoAction;
+    if (!items[index]) return;
+    if (action === 'edit') return openModal(index);
+    if (action === 'delete') {
+      if (!window.confirm('Eliminare questa informazione? La rimozione sarà applicata dopo “Salva modifiche”.')) return;
+      items.splice(index, 1);
+      markDirty();
+      render();
+      return;
+    }
+    if (action === 'toggle') {
+      items[index].enabled = button.dataset.infoEnabled === 'true';
+      markDirty();
+      render();
+      return;
+    }
+    if (action === 'up' && index > 0) {
+      var previous = items[index - 1];
+      items[index - 1] = items[index];
+      items[index] = previous;
+      markDirty();
+      render();
+      return;
+    }
+    if (action === 'down' && index < items.length - 1) {
+      var next = items[index + 1];
+      items[index + 1] = items[index];
+      items[index] = next;
+      markDirty();
+      render();
+    }
+  }
+
+  el('infoEditorList')?.addEventListener('click', handleListClick);
+  el('infoAddBtn')?.addEventListener('click', function() { openModal(null); });
+  el('infoSaveBtn')?.addEventListener('click', function() { saveItems(false); });
+  el('infoEditorCancelBtn')?.addEventListener('click', closeModal);
+  el('infoEditorModal')?.addEventListener('click', function(event) {
+    if (event.target === el('infoEditorModal')) closeModal();
+  });
+  el('infoEditorForm')?.addEventListener('submit', function(event) {
+    event.preventDefault();
+    var title = el('infoEditorTitle').value.trim();
+    var content = el('infoEditorContent').value.trim();
+    var errorEl = el('infoEditorFormError');
+    if (!title || !content) {
+      errorEl.textContent = 'Inserisci sia il titolo sia il testo.';
+      return;
+    }
+    var item = { id: null, title: title, content: content, enabled: true, sort_order: 0 };
+    if (editingIndex === null) {
+      item.sort_order = items.length;
+      items.push(item);
+    } else {
+      item.id = items[editingIndex].id;
+      item.enabled = items[editingIndex].enabled;
+      item.sort_order = editingIndex;
+      items[editingIndex] = item;
+    }
+    closeModal();
+    markDirty();
+    render();
+  });
+  document.querySelector('.req-editor-launch')?.addEventListener('click', function() {
+    loadItems();
+  });
+  render();
 })();
 </script>
 

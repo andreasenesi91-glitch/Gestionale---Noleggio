@@ -510,15 +510,9 @@
       <p class="info-page-intro">Supplementi, riconsegna, lucchetti e condizioni.</p>
     </div>
 
-    <section class="info-section">
-      <h3>Riconsegna a negozio chiuso</h3>
-      <p>Per la riconsegna a negozio chiuso, ossia il sabato pomeriggio e la domenica, sarà applicato un supplemento di €5 per ogni bicicletta. Questo supplemento non è incluso nel preventivo mostrato in fondo alla pagina e, se dovuto, sarà aggiunto separatamente.</p>
-    </section>
-
-    <section class="info-section">
-      <h3>Lucchetti standard</h3>
-      <p>I lucchetti standard sono gratuiti. In caso di smarrimento del lucchetto o della chiave, sarà applicato un supplemento di €5 al momento della riconsegna della bicicletta.</p>
-    </section>
+    <div id="publicInfoList">
+      <p class="info-page-intro">Caricamento delle informazioni…</p>
+    </div>
   </div>
 
   <!-- Success -->
@@ -556,7 +550,10 @@
     });
   }
 
-  $('infoPageBtn').addEventListener('click', () => showScreen('screenInfo'));
+  $('infoPageBtn').addEventListener('click', () => {
+    showScreen('screenInfo');
+    loadRentalInfo();
+  });
   $('infoBackBtn').addEventListener('click', () => showScreen('screenForm'));
 
   function showError(msg) {
@@ -569,6 +566,49 @@
   let OP_ACCESSORIES = {};
   let OP_PRICING     = {};
   let _client        = null;
+
+  const DEFAULT_RENTAL_INFO = [
+    {
+      title: 'Riconsegna a negozio chiuso',
+      content: 'Per la riconsegna a negozio chiuso, ossia il sabato pomeriggio e la domenica, sarà applicato un supplemento di €5 per ogni bicicletta. Questo supplemento non è incluso nel preventivo mostrato in fondo alla pagina e, se dovuto, sarà aggiunto separatamente.'
+    },
+    {
+      title: 'Lucchetti standard',
+      content: 'I lucchetti standard sono gratuiti. In caso di smarrimento del lucchetto o della chiave, sarà applicato un supplemento di €5 al momento della riconsegna della bicicletta.'
+    }
+  ];
+
+  function renderRentalInfo(items, fallback) {
+    const list = $('publicInfoList');
+    if (!list) return;
+    if (!items.length) {
+      list.innerHTML = '<p class="info-page-intro">Non ci sono informazioni aggiuntive da mostrare.</p>';
+      return;
+    }
+    list.innerHTML = (fallback
+      ? '<p class="info-page-intro">Le informazioni personalizzate non sono disponibili al momento. Sono mostrate le informazioni standard.</p>'
+      : '') + items.map(item =>
+      `<section class="info-section"><h3>${escHtml(item.title)}</h3><p>${escHtml(item.content).replace(/\n/g, '<br>')}</p></section>`
+    ).join('');
+  }
+
+  async function loadRentalInfo() {
+    if (!_client || !OPERATOR_ID) {
+      renderRentalInfo(DEFAULT_RENTAL_INFO, true);
+      return;
+    }
+    try {
+      const { data, error } = await _client.rpc('get_public_customer_form_info', { operator_id: OPERATOR_ID });
+      if (error) throw error;
+      const items = (Array.isArray(data) ? data : [])
+        .filter(item => item && item.enabled !== false && item.title && item.content)
+        .sort((a, b) => Number(a.sort_order || 0) - Number(b.sort_order || 0));
+      renderRentalInfo(items, false);
+    } catch (err) {
+      console.warn('[Rentix] Informazioni cliente non disponibili', err);
+      renderRentalInfo(DEFAULT_RENTAL_INFO, true);
+    }
+  }
 
   /* ── Pricing (same algorithm as admin pricePerBikeForDays) ───────────── */
   const DEFAULT_PRICING = { 1:10, 2:15, 3:18, 4:20, 5:23, 6:25, 7:30, 14:45, 30:70 };
@@ -836,6 +876,7 @@
       if (error) throw error;
       if (!data) { showError('Operatore non trovato. Contatta l\'operatore per un nuovo link.'); return; }
       populateForm(data);
+      loadRentalInfo();
     } catch (err) {
       console.error(err);
       showError('Errore di caricamento. Controlla la connessione e ricarica la pagina.');
