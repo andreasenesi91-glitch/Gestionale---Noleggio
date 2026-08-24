@@ -3746,10 +3746,14 @@ function openCustomerDetail(key) {
       ${Number.isFinite(Number(r.priceTotal)) ? `<p class="rental-price">Totale: ${formatEuro(r.priceTotal)}</p>` : ""}
       ${r.notes ? `<p>${r.notes}</p>` : ""}
       <span class="status-pill status-${r.status}">${statusLabel(r.status)}</span>
-      <button type="button" class="secondary-btn full customer-open-rental" style="margin-top:10px">Apri prenotazione</button>`;
+      <button type="button" class="secondary-btn full customer-open-rental" style="margin-top:10px">Apri prenotazione</button>
+      <button type="button" class="danger-btn full customer-delete-rental" style="margin-top:8px">Elimina prenotazione</button>`;
     card.querySelector(".customer-open-rental").addEventListener("click", () => {
       closeCustomerDetail();
       editRental(r.id);
+    });
+    card.querySelector(".customer-delete-rental").addEventListener("click", () => {
+      deleteRental(r.id).then(() => openCustomerDetail(key));
     });
     holder.appendChild(card);
   });
