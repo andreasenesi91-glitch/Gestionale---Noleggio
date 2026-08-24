@@ -203,6 +203,49 @@ button { cursor: pointer; }
 }
 .stat-card span { color: var(--muted); font-size: .82rem; display: block; margin-bottom: 6px; }
 .stat-card strong { font-size: 1.65rem; }
+.incassi-summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 14px 0 24px;
+}
+.incassi-summary-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+.incassi-summary-card span {
+  display: block;
+  color: var(--muted);
+  font-size: .82rem;
+  margin-bottom: 6px;
+}
+.incassi-summary-card strong { font-size: 1.35rem; color: var(--yellow); }
+.incassi-history-list { display: grid; gap: 10px; }
+.incassi-item {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+  cursor: pointer;
+  transition: transform .11s ease, border-color .14s ease;
+}
+.incassi-item:active { transform: scale(.99); border-color: rgba(255,212,0,.3); }
+.incassi-item-top,
+.incassi-item-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+.incassi-item-top { margin-bottom: 7px; }
+.incassi-item-bottom { align-items: center; margin-top: 10px; }
+.incassi-item-name { font-size: .98rem; }
+.incassi-item-revenue { color: var(--yellow); font-size: .82rem; font-weight: 800; text-align: right; white-space: nowrap; }
+.incassi-item-period { color: var(--muted); font-size: .82rem; line-height: 1.45; }
+.incassi-item-total { color: var(--yellow); font-size: 1rem; font-weight: 900; white-space: nowrap; }
+.incassi-item-status { margin: 0; }
 
 .section-head {
   display: flex;
@@ -1433,6 +1476,7 @@ body.setup-open { overflow: hidden; }
             <button type="button" class="menu-item" data-page="fleetPage"><span>📦</span>Inventario</button>
             <button type="button" class="menu-item" data-page="customersPage"><span>👥</span>Clienti</button>
             <button type="button" class="menu-item" data-page="remindersPage"><span>🔔</span>Promemoria</button>
+            <button type="button" class="menu-item" data-page="incassiPage"><span>💶</span>Incassi</button>
             <button type="button" class="menu-item" data-page="risorsePage"><span>🗂️</span>Risorse<span class="pro-badge">PRO</span></button>
             <button type="button" class="menu-item" data-page="requestsPage"><span>📋</span>Richieste<span class="req-badge" id="requestsBadge" style="display:none">0</span></button>
             <div class="menu-divider"></div>
@@ -1696,6 +1740,39 @@ body.setup-open { overflow: hidden; }
           <button type="button" class="reminder-filter" data-reminder-filter="return">Rientri</button>
         </div>
         <div id="remindersContent"></div>
+      </section>
+
+      <section class="page" id="incassiPage">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">REDDITIVITÀ NOLEGGI</p>
+            <h2>Incassi</h2>
+          </div>
+        </div>
+
+        <div class="incassi-summary-grid">
+          <article class="incassi-summary-card">
+            <span>Oggi</span>
+            <strong id="incassiToday">€0,00</strong>
+          </article>
+          <article class="incassi-summary-card">
+            <span>Questa settimana</span>
+            <strong id="incassiWeek">€0,00</strong>
+          </article>
+          <article class="incassi-summary-card">
+            <span>Questo mese</span>
+            <strong id="incassiMonth">€0,00</strong>
+          </article>
+          <article class="incassi-summary-card">
+            <span>Quest’anno</span>
+            <strong id="incassiYear">€0,00</strong>
+          </article>
+        </div>
+
+        <div class="section-head">
+          <h3>Storico incassi</h3>
+        </div>
+        <div id="incassiHistory" class="incassi-history-list"></div>
       </section>
 
       <section class="page" id="pricingPage">
@@ -2454,10 +2531,11 @@ window.rentixCloudPhase1 = (() => {
 // Sincronizzazione cloud - Fase 3: prenotazioni.
 window.rentixCloudRentals = (() => {
   let loading = false;
+  let revenueFieldAvailable = null;
   const currentUserId = () => window.rentixAccountId || sessionStorage.getItem("rentixActiveAccountId") || "";
 
   function toCloud(rental) {
-    return {
+    const row = {
       id: rental.id,
       user_id: currentUserId(),
       customer_name: rental.customerName || "",
@@ -2477,6 +2555,21 @@ window.rentixCloudRentals = (() => {
       pricing_days: Math.max(1, Number(rental.pricingDays || 1)),
       updated_at: rental.updatedAt || new Date().toISOString()
     };
+    if (revenueFieldAvailable !== false) row.revenue_at = rental.revenueAt || null;
+    return row;
+  }
+
+  async function ensureRevenueField(client, userId) {
+    if (revenueFieldAvailable !== null) return revenueFieldAvailable;
+    const probe = await client.from("rentix_rentals")
+      .select("revenue_at")
+      .eq("user_id", userId)
+      .limit(1);
+    revenueFieldAvailable = !probe.error;
+    if (!revenueFieldAvailable) {
+      console.warn("Incassi: il campo revenue_at non è disponibile. Esegui la migrazione SQL per sincronizzare i timestamp.");
+    }
+    return revenueFieldAvailable;
   }
 
   function fromCloud(row) {
@@ -2498,7 +2591,8 @@ window.rentixCloudRentals = (() => {
       priceManual: Boolean(row.price_manual),
       pricingDays: Math.max(1, Number(row.pricing_days || 1)),
       createdAt: row.created_at || "",
-      updatedAt: row.updated_at || row.created_at || new Date().toISOString()
+      updatedAt: row.updated_at || row.created_at || new Date().toISOString(),
+      revenueAt: row.revenue_at || ""
     };
   }
 
@@ -2506,6 +2600,7 @@ window.rentixCloudRentals = (() => {
     const client = window.rentixSupabase;
     const userId = currentUserId();
     if (!client || !userId || !rental?.id) return false;
+    await ensureRevenueField(client, userId);
     const { error } = await client.from("rentix_rentals").upsert(toCloud(rental), { onConflict: "id" });
     if (error) {
       console.error("Salvataggio prenotazione nel cloud non riuscito", error);
@@ -2544,8 +2639,9 @@ window.rentixCloudRentals = (() => {
   async function migrateLocalRentals() {
     const client = window.rentixSupabase;
     const userId = currentUserId();
-    const localRows = (state.rentals || []).filter(r => r?.id && r?.startDate && r?.endDate).map(toCloud);
     if (!client || !userId) return false;
+    await ensureRevenueField(client, userId);
+    const localRows = (state.rentals || []).filter(r => r?.id && r?.startDate && r?.endDate).map(toCloud);
     if (!localRows.length) return true;
     const { error } = await client.from("rentix_rentals").upsert(localRows, { onConflict: "id" });
     if (error) {
@@ -2562,6 +2658,7 @@ window.rentixCloudRentals = (() => {
     if (!client || !userId || loading) return false;
     loading = true;
     try {
+      await ensureRevenueField(client, userId);
       // Prima leggiamo il cloud. Non carichiamo più alla cieca i dati locali:
       // un telefono con una copia vecchia potrebbe altrimenti sovrascrivere
       // una modifica più recente effettuata da un altro dispositivo.
@@ -2618,6 +2715,7 @@ window.rentixCloudRentals = (() => {
       renderHome();
       renderCalendar();
       renderCustomers(document.getElementById("customerSearch")?.value || "");
+      renderIncassi();
       window.rentixRentalsLastError = null;
       return true;
     } catch (error) {
@@ -2800,6 +2898,7 @@ renderFleet();
   if (pageId === "fleetPage") renderFleet();
   if (pageId === "customersPage") renderCustomers();
   if (pageId === "remindersPage") renderReminders();
+  if (pageId === "incassiPage") renderIncassi();
   if (pageId === "settingsPage") renderSettings();
   if (pageId === "pricingPage") renderPricing();
   if (pageId === "risorsePage") { if (window._rsRenderList) window._rsRenderList(); }
@@ -3223,6 +3322,25 @@ function statusLabel(status) {
   }[status] || status;
 }
 
+function isRevenueStatus(status) {
+  return status === "ritirata" || status === "restituita";
+}
+
+function validRevenueTimestamp(value) {
+  if (!value) return "";
+  const time = Date.parse(value);
+  return Number.isFinite(time) ? new Date(time).toISOString() : "";
+}
+
+function revenueTimestampForTransition(previousRental, nextStatus) {
+  if (!isRevenueStatus(nextStatus)) return "";
+
+  const previousStatus = previousRental?.status || "";
+  const existingTimestamp = validRevenueTimestamp(previousRental?.revenueAt);
+  if (isRevenueStatus(previousStatus)) return existingTimestamp;
+  return new Date().toISOString();
+}
+
 function createRentalCard(rental) {
   const card = $("rentalCardTemplate").content.firstElementChild.cloneNode(true);
   card.querySelector(".rental-name").textContent = rental.customerName;
@@ -3384,6 +3502,103 @@ function renderCalendar() {
   list.innerHTML = "";
   if (!rentals.length) list.innerHTML = `<div class="empty-state">Nessun noleggio in questa data.</div>`;
   rentals.forEach(r => list.appendChild(createRentalCard(r)));
+}
+
+function revenueEntries() {
+  const byId = new Map();
+  state.rentals.forEach(rental => {
+    if (!rental?.id || !isRevenueStatus(rental.status)) return;
+    const timestamp = validRevenueTimestamp(rental.revenueAt);
+    if (!timestamp || byId.has(rental.id)) return;
+    byId.set(rental.id, { rental, timestamp, date: new Date(timestamp) });
+  });
+  return [...byId.values()].sort((a, b) => b.date.getTime() - a.date.getTime());
+}
+
+function startOfLocalDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function revenuePeriodStart(period, now) {
+  const today = startOfLocalDay(now);
+  if (period === "day") return today;
+  if (period === "month") return new Date(today.getFullYear(), today.getMonth(), 1);
+  if (period === "year") return new Date(today.getFullYear(), 0, 1);
+  const mondayOffset = (today.getDay() + 6) % 7;
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - mondayOffset);
+  return monday;
+}
+
+function revenueTotal(entries, start, now) {
+  return entries
+    .filter(entry => entry.date >= start && entry.date <= now)
+    .reduce((sum, entry) => sum + Math.max(0, Number(entry.rental.priceTotal || 0)), 0);
+}
+
+function formatRevenueDate(date) {
+  return new Intl.DateTimeFormat("it-IT", {
+    day: "2-digit", month: "2-digit", year: "numeric"
+  }).format(date);
+}
+
+function formatRevenueTime(date) {
+  return new Intl.DateTimeFormat("it-IT", {
+    hour: "2-digit", minute: "2-digit"
+  }).format(date);
+}
+
+function renderIncassi() {
+  const history = $("incassiHistory");
+  if (!history) return;
+  const now = new Date();
+  const entries = revenueEntries();
+  const summary = {
+    day: revenueTotal(entries, revenuePeriodStart("day", now), now),
+    week: revenueTotal(entries, revenuePeriodStart("week", now), now),
+    month: revenueTotal(entries, revenuePeriodStart("month", now), now),
+    year: revenueTotal(entries, revenuePeriodStart("year", now), now)
+  };
+
+  $("incassiToday").textContent = formatEuro(summary.day);
+  $("incassiWeek").textContent = formatEuro(summary.week);
+  $("incassiMonth").textContent = formatEuro(summary.month);
+  $("incassiYear").textContent = formatEuro(summary.year);
+
+  history.innerHTML = "";
+  if (!entries.length) {
+    history.innerHTML = `<div class="empty-state">Nessun incasso registrato.<br>Gli incassi iniziano quando un noleggio passa a “Ritirata”.</div>`;
+    return;
+  }
+
+  entries.forEach(({ rental, date }) => {
+    const item = document.createElement("article");
+    item.className = "incassi-item";
+    item.tabIndex = 0;
+    item.setAttribute("role", "button");
+    item.innerHTML = `
+      <div class="incassi-item-top">
+        <strong class="incassi-item-name">${escapeHtml(rental.customerName || "Cliente non specificato")}</strong>
+        <span class="incassi-item-revenue">${formatRevenueDate(date)} · ${formatRevenueTime(date)}</span>
+      </div>
+      <div class="incassi-item-period">
+        Periodo: ${escapeHtml(formatDate(rental.startDate))} ${escapeHtml(rental.pickupTime || "")}
+        → ${escapeHtml(formatDate(rental.endDate))} ${escapeHtml(rental.returnTime || "")}
+      </div>
+      <div class="incassi-item-bottom">
+        <span class="status-pill status-${escapeHtml(rental.status)} incassi-item-status">${escapeHtml(statusLabel(rental.status))}</span>
+        <strong class="incassi-item-total">${formatEuro(rental.priceTotal)}</strong>
+      </div>`;
+    const open = () => editRental(rental.id);
+    item.addEventListener("click", open);
+    item.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        open();
+      }
+    });
+    history.appendChild(item);
+  });
 }
 
 
@@ -3903,7 +4118,9 @@ function cycleStatus(id) {
   const rental = state.rentals.find(r => r.id === id);
   if (!rental) return;
   const current = order.indexOf(rental.status);
-  rental.status = order[(current + 1) % order.length];
+  const nextStatus = order[(current + 1) % order.length];
+  rental.revenueAt = revenueTimestampForTransition(rental, nextStatus);
+  rental.status = nextStatus;
   rental.updatedAt = new Date().toISOString();
   saveState();
   window.rentixCloudRentals?.upsertRental?.(rental).then(ok => {
@@ -3911,6 +4128,7 @@ function cycleStatus(id) {
   });
   renderHome();
   renderCalendar();
+  renderIncassi();
 }
 
 async function deleteRental(id) {
@@ -3976,6 +4194,8 @@ $("rentalForm").addEventListener("submit", (e) => {
   };
 
   const index = state.rentals.findIndex(r => r.id === rental.id);
+  const previousRental = index >= 0 ? state.rentals[index] : null;
+  rental.revenueAt = revenueTimestampForTransition(previousRental, rental.status);
   if (index >= 0) state.rentals[index] = rental;
   else state.rentals.push(rental);
 
@@ -3988,6 +4208,7 @@ $("rentalForm").addEventListener("submit", (e) => {
   });
   resetRentalForm();
   showPage("homePage");
+  renderIncassi();
 });
 
 document.addEventListener("click", (e) => {
