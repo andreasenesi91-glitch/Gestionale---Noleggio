@@ -301,6 +301,71 @@
       margin: 0;
     }
 
+    .info-launch {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      margin: 0 0 14px;
+      padding: 15px 16px;
+      border: 1px solid rgba(255, 212, 0, .42);
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(255, 212, 0, .16), rgba(255, 212, 0, .05));
+      color: var(--text);
+      text-align: left;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .16);
+    }
+    .info-launch:active { opacity: .78; }
+    .info-launch-icon {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: var(--yellow);
+      color: #111;
+      font-size: 1.15rem;
+      font-weight: 900;
+    }
+    .info-launch-copy { display: grid; gap: 3px; }
+    .info-launch-title {
+      color: var(--yellow);
+      font-size: .86rem;
+      font-weight: 900;
+      letter-spacing: .03em;
+    }
+    .info-launch-subtitle { color: var(--muted); font-size: .8rem; }
+
+    .info-screen {
+      min-height: calc(100dvh - 116px);
+      padding-bottom: 24px;
+    }
+    .info-page-head { margin-bottom: 18px; }
+    .info-back-btn {
+      display: inline-flex;
+      align-items: center;
+      min-height: 42px;
+      margin-bottom: 20px;
+      padding: 8px 0;
+      border: 0;
+      background: transparent;
+      color: var(--yellow);
+      font-weight: 800;
+    }
+    .info-page-head h2 { margin: 0 0 8px; font-size: 1.45rem; line-height: 1.2; }
+    .info-page-intro { margin: 0; color: var(--muted); line-height: 1.55; }
+    .info-section {
+      margin-bottom: 12px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: linear-gradient(145deg, var(--panel), #111);
+    }
+    .info-section:last-child { margin-bottom: 0; }
+    .info-section h3 { margin: 0 0 8px; font-size: 1rem; color: var(--yellow); }
+    .info-section p { margin: 0; color: var(--text); line-height: 1.6; font-size: .9rem; }
+
     /* ── Form error ──────────────────────────────────────────────────── */
     .form-err {
       background: rgba(255,92,92,.1);
@@ -368,6 +433,14 @@
 
     <form id="reqForm" novalidate>
 
+      <button type="button" id="infoPageBtn" class="info-launch">
+        <span class="info-launch-icon">ⓘ</span>
+        <span class="info-launch-copy">
+          <span class="info-launch-title">INFORMAZIONI IMPORTANTI SUL NOLEGGIO</span>
+          <span class="info-launch-subtitle">Supplementi, riconsegna, lucchetti e condizioni</span>
+        </span>
+      </button>
+
       <!-- Personal data -->
       <div class="form-card">
         <h3>Dati personali</h3>
@@ -399,24 +472,11 @@
         <button type="button" id="addBikeRowBtn" class="add-bike-btn">＋ Aggiungi un'altra bicicletta</button>
       </div>
 
-      <!-- Date info note -->
-      <div class="info-note">
-        <span class="info-note-icon">ℹ️</span>
-        <p class="info-note-text">Per la riconsegna a negozio chiuso, ossia il sabato pomeriggio e la domenica, sarà applicato un supplemento di €5 per ogni bicicletta. Questo supplemento non è incluso nel preventivo mostrato in fondo alla pagina e, se dovuto, sarà aggiunto separatamente.</p>
-      </div>
-
       <!-- Accessories (dynamic, hidden if empty) -->
       <div class="form-card" id="accCard" style="display:none">
         <h3>Accessori</h3>
         <div id="accList"></div>
       </div>
-
-      <!-- Lock info note (always visible) -->
-      <div class="info-note">
-        <span class="info-note-icon">ℹ️</span>
-        <p class="info-note-text">I lucchetti standard sono gratuiti. In caso di smarrimento del lucchetto o della chiave, sarà applicato un supplemento di €5 al momento della riconsegna della bicicletta.</p>
-      </div>
-
 
       <!-- Notes -->
       <div class="form-card">
@@ -439,6 +499,26 @@
       <p class="fine-print">Inviando questa richiesta non si crea una prenotazione confermata.<br>Verrai ricontattato dall'operatore per conferma e pagamento.</p>
 
     </form>
+  </div>
+
+  <!-- Rental information -->
+  <div id="screenInfo" class="screen info-screen">
+    <div class="info-page-head">
+      <button type="button" id="infoBackBtn" class="info-back-btn">← Torna al modulo</button>
+      <p class="sec-lbl">INFORMAZIONI RENTIX</p>
+      <h2>Informazioni importanti sul noleggio</h2>
+      <p class="info-page-intro">Supplementi, riconsegna, lucchetti e condizioni.</p>
+    </div>
+
+    <section class="info-section">
+      <h3>Riconsegna a negozio chiuso</h3>
+      <p>Per la riconsegna a negozio chiuso, ossia il sabato pomeriggio e la domenica, sarà applicato un supplemento di €5 per ogni bicicletta. Questo supplemento non è incluso nel preventivo mostrato in fondo alla pagina e, se dovuto, sarà aggiunto separatamente.</p>
+    </section>
+
+    <section class="info-section">
+      <h3>Lucchetti standard</h3>
+      <p>I lucchetti standard sono gratuiti. In caso di smarrimento del lucchetto o della chiave, sarà applicato un supplemento di €5 al momento della riconsegna della bicicletta.</p>
+    </section>
   </div>
 
   <!-- Success -->
@@ -471,10 +551,13 @@
 
   /* ── Screens ─────────────────────────────────────────────────────────── */
   function showScreen(id) {
-    ['screenLoading', 'screenError', 'screenForm', 'screenSuccess'].forEach(s => {
+    ['screenLoading', 'screenError', 'screenForm', 'screenInfo', 'screenSuccess'].forEach(s => {
       if (s === id) show(s); else hide(s);
     });
   }
+
+  $('infoPageBtn').addEventListener('click', () => showScreen('screenInfo'));
+  $('infoBackBtn').addEventListener('click', () => showScreen('screenForm'));
 
   function showError(msg) {
     if (msg) $('errorMsg').textContent = msg;
