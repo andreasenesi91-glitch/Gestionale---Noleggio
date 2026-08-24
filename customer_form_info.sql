@@ -5,7 +5,7 @@
 
 CREATE TABLE IF NOT EXISTS public.rentix_customer_form_info (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id    TEXT NOT NULL,
+  user_id    UUID NOT NULL,
   title      TEXT NOT NULL,
   content    TEXT NOT NULL,
   enabled    BOOLEAN NOT NULL DEFAULT TRUE,
@@ -13,6 +13,38 @@ CREATE TABLE IF NOT EXISTS public.rentix_customer_form_info (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- The first failed attempt may already have created this table with
+-- user_id TEXT. Convert only valid UUID values; invalid values stop the
+-- migration instead of being discarded.
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'rentix_customer_form_info'
+      AND column_name = 'user_id'
+      AND udt_name <> 'uuid'
+  ) THEN
+    IF EXISTS (
+      SELECT 1
+      FROM public.rentix_customer_form_info
+      WHERE user_id IS NOT NULL
+        AND BTRIM(user_id::text) !~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+    ) THEN
+      RAISE EXCEPTION
+        'Cannot safely convert rentix_customer_form_info.user_id to UUID: at least one stored value is not a valid UUID';
+    END IF;
+
+    ALTER TABLE public.rentix_customer_form_info
+      ALTER COLUMN user_id DROP DEFAULT;
+    ALTER TABLE public.rentix_customer_form_info
+      ALTER COLUMN user_id TYPE UUID
+      USING NULLIF(BTRIM(user_id::text), '')::UUID;
+  END IF;
+END
+$$;
 
 CREATE INDEX IF NOT EXISTS rentix_customer_form_info_user_order_idx
   ON public.rentix_customer_form_info (user_id, sort_order, created_at);
@@ -41,10 +73,14 @@ DROP POLICY IF EXISTS "Operators manage own customer form info"
 CREATE POLICY "Operators manage own customer form info"
   ON public.rentix_customer_form_info
   FOR ALL TO authenticated
-  USING (user_id = auth.uid()::text)
-  WITH CHECK (user_id = auth.uid()::text);
+  USING (user_id = auth.uid())
+  WITH CHECK (user_id = auth.uid());
 
-CREATE OR REPLACE FUNCTION public.get_public_customer_form_info(operator_id TEXT)
+-- Remove a function signature from an earlier TEXT-based attempt, if one
+-- was created before the previous migration failed.
+DROP FUNCTION IF EXISTS public.get_public_customer_form_info(TEXT);
+
+CREATE OR REPLACE FUNCTION public.get_public_customer_form_info(operator_id UUID)
 RETURNS TABLE (
   id UUID,
   title TEXT,
@@ -64,5 +100,5 @@ AS $$
   ORDER BY i.sort_order ASC, i.created_at ASC;
 $$;
 
-REVOKE ALL ON FUNCTION public.get_public_customer_form_info(TEXT) FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION public.get_public_customer_form_info(TEXT) TO anon, authenticated;
+REVOKE ALL ON FUNCTION public.get_public_customer_form_info(UUID) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.get_public_customer_form_info(UUID) TO anon, authenticated;
