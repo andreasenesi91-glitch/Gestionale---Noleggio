@@ -1953,6 +1953,18 @@ body.setup-open { overflow: hidden; }
         </div>
         <div style="height:48px"></div>
       </section>
+
+      <div class="modal-backdrop hidden" id="requestDeleteModal" role="dialog" aria-modal="true" aria-labelledby="requestDeleteModalTitle">
+        <div class="modal-card">
+          <p class="eyebrow">ELIMINA RICHIESTA</p>
+          <h3 id="requestDeleteModalTitle">Eliminare questa richiesta?</h3>
+          <p class="muted" style="line-height:1.5">Vuoi davvero eliminare questa richiesta?<br>L’operazione non può essere annullata.</p>
+          <div class="req-delete-modal-actions">
+            <button type="button" class="secondary-btn" id="requestDeleteCancelBtn">Annulla</button>
+            <button type="button" class="danger-btn" id="requestDeleteConfirmBtn">Elimina</button>
+          </div>
+        </div>
+      </div>
     
 </main>
   </div>
@@ -4948,6 +4960,23 @@ renderHome();
   flex-wrap: wrap;
 }
 .req-card-price { font-weight: 800; font-size: .95rem; }
+.req-card-actions {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.req-delete-btn {
+  width: 100%;
+  min-height: 42px;
+  font-size: .82rem;
+}
+.req-delete-modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 18px;
+}
+.req-delete-modal-actions button { width: 100%; }
 .req-detail-row {
   display: flex;
   justify-content: space-between;
@@ -5258,6 +5287,8 @@ renderHome();
   var _requests = [];
   var _currentReqId = null;
   var _loading = false;
+  var _deleteReqId = null;
+  var _deleting = false;
 
   /* ══ Supabase load ══════════════════════════════════════════════════════ */
   async function loadRequests() {
@@ -5299,6 +5330,67 @@ renderHome();
     } catch (err) {
       console.warn('Richieste: errore aggiornamento stato', err);
       return false;
+    }
+  }
+
+  /* ══ Delete one received request ═══════════════════════════════════════ */
+  function openDeleteConfirm(id) {
+    if (!_requests.some(function(req) { return req.id === id; })) return;
+    _deleteReqId = id;
+    var modal = el('requestDeleteModal');
+    var confirmBtn = el('requestDeleteConfirmBtn');
+    if (confirmBtn) {
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Elimina';
+    }
+    if (modal) modal.classList.remove('hidden');
+    var cancelBtn = el('requestDeleteCancelBtn');
+    if (cancelBtn) setTimeout(function() { cancelBtn.focus(); }, 0);
+  }
+
+  function closeDeleteConfirm() {
+    _deleteReqId = null;
+    var modal = el('requestDeleteModal');
+    if (modal) modal.classList.add('hidden');
+  }
+
+  async function handleDeleteRequest() {
+    var id = _deleteReqId;
+    var client = getClient();
+    var uid = currentUserId();
+    if (!id || _deleting) return;
+    if (!client || !uid) {
+      closeDeleteConfirm();
+      alert('Sessione non disponibile. Accedi di nuovo e riprova.');
+      return;
+    }
+
+    _deleting = true;
+    var confirmBtn = el('requestDeleteConfirmBtn');
+    if (confirmBtn) {
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Eliminazione…';
+    }
+    try {
+      var result = await client
+        .from('rentix_rental_requests')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', uid);
+      if (result.error) throw result.error;
+      _requests = _requests.filter(function(req) { return req.id !== id; });
+      closeDeleteConfirm();
+      await renderRequests();
+      showToast('Richiesta eliminata.');
+    } catch (err) {
+      console.error('Richieste: errore eliminazione', err);
+      alert('Non è stato possibile eliminare la richiesta. Riprova.');
+    } finally {
+      _deleting = false;
+      if (confirmBtn) {
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Elimina';
+      }
     }
   }
 
@@ -5399,8 +5491,16 @@ renderHome();
         '<p class="req-card-meta" style="margin-bottom:0">🚲 ' + esc(vehicleSummary) + '</p>' +
         '<div class="req-card-footer">' + availHtml +
           '<span class="req-card-price">' + esc(fmtEuro(req.estimated_price)) + '</span>' +
+        '</div>' +
+        '<div class="req-card-actions">' +
+          '<button type="button" class="danger-btn req-delete-btn">Elimina richiesta</button>' +
         '</div>';
       art.addEventListener('click', function() { openDetail(req.id); });
+      art.querySelector('.req-delete-btn').addEventListener('click', function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        openDeleteConfirm(req.id);
+      });
       container.appendChild(art);
     });
   }
@@ -5799,6 +5899,16 @@ renderHome();
     /* whatsapp */
     var waBtn = el('reqWhatsappBtn');
     if (waBtn) waBtn.addEventListener('click', handleWhatsApp);
+
+    /* delete received request */
+    var deleteCancelBtn = el('requestDeleteCancelBtn');
+    if (deleteCancelBtn) deleteCancelBtn.addEventListener('click', closeDeleteConfirm);
+    var deleteConfirmBtn = el('requestDeleteConfirmBtn');
+    if (deleteConfirmBtn) deleteConfirmBtn.addEventListener('click', handleDeleteRequest);
+    var deleteModal = el('requestDeleteModal');
+    if (deleteModal) deleteModal.addEventListener('click', function(event) {
+      if (event.target === deleteModal) closeDeleteConfirm();
+    });
   }
 
   wire();
