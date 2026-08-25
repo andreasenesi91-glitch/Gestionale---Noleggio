@@ -1484,9 +1484,9 @@ body.setup-open { overflow: hidden; }
 }
 #newRentalPage #bikeFields .quantity-row-bike {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) 110px;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   padding: 8px 10px;
   border-radius: 12px;
   background: #131313;
@@ -1494,21 +1494,26 @@ body.setup-open { overflow: hidden; }
 }
 #newRentalPage #bikeFields .quantity-row-bike > div:first-child {
   min-width: 0;
+  padding-right: 2px;
 }
 #newRentalPage #bikeFields .quantity-row-bike strong {
   display: block;
-  overflow: hidden;
+  max-width: none;
+  overflow: visible;
   color: var(--text);
   font-size: .87rem;
   line-height: 1.18;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 #newRentalPage #bikeFields .quantity-row-bike small {
   margin-top: 2px;
   color: #8f8f8f;
   font-size: .7rem;
   line-height: 1.18;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 #newRentalPage #bikeFields .quantity-row-bike:focus-within,
 #newRentalPage #bikeFields .quantity-row-bike:has(.qty-input:not([value="0"])) {
@@ -1516,23 +1521,68 @@ body.setup-open { overflow: hidden; }
   background: linear-gradient(90deg, rgba(255,212,0,.08), #131313 48%);
 }
 #newRentalPage #bikeFields .quantity-row-bike .quantity-control {
-  grid-template-columns: 36px 44px 36px;
-  gap: 4px;
+  width: 110px;
+  min-width: 110px;
+  grid-template-columns: 32px 40px 32px;
+  gap: 3px;
   align-self: center;
 }
 #newRentalPage #bikeFields .quantity-row-bike .qty-btn {
-  width: 36px;
+  width: 32px;
   height: 36px;
   border-radius: 10px;
   font-size: 1.05rem;
 }
 #newRentalPage #bikeFields .quantity-row-bike .qty-input {
-  width: 44px;
+  width: 40px;
   height: 36px;
   min-height: 36px;
   padding: 4px;
   border-radius: 9px;
   font-size: .88rem;
+}
+#newRentalPage .accessory-quantity-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 110px;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+#newRentalPage .accessory-quantity-row strong {
+  display: block;
+  min-width: 0;
+  color: var(--text);
+  font-size: .88rem;
+  line-height: 1.18;
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+#newRentalPage .accessory-quantity-row small {
+  display: block;
+  margin-top: 2px;
+  color: #8f8f8f;
+  font-size: .7rem;
+  line-height: 1.18;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+#newRentalPage .accessory-quantity-row .quantity-control {
+  width: 110px;
+  min-width: 110px;
+  grid-template-columns: 32px 40px 32px;
+  gap: 3px;
+  align-self: center;
+}
+#newRentalPage .accessory-quantity-row .qty-btn {
+  width: 32px;
+  height: 36px;
+}
+#newRentalPage .accessory-quantity-row .qty-input {
+  width: 40px;
+  height: 36px;
+  min-height: 36px;
+  padding: 4px;
 }
 #newRentalPage .price-summary-card {
   margin: 10px 0;
@@ -1574,14 +1624,33 @@ body.setup-open { overflow: hidden; }
     padding: 7px 8px;
   }
   #newRentalPage #bikeFields .quantity-row-bike .quantity-control {
-    grid-template-columns: 34px 42px 34px;
+    width: 104px;
+    min-width: 104px;
+    grid-template-columns: 30px 38px 30px;
   }
   #newRentalPage #bikeFields .quantity-row-bike .qty-btn {
-    width: 34px;
+    width: 30px;
     height: 34px;
   }
   #newRentalPage #bikeFields .quantity-row-bike .qty-input {
-    width: 42px;
+    width: 38px;
+    height: 34px;
+    min-height: 34px;
+  }
+  #newRentalPage .accessory-quantity-row {
+    grid-template-columns: minmax(0, 1fr) 104px;
+  }
+  #newRentalPage .accessory-quantity-row .quantity-control {
+    width: 104px;
+    min-width: 104px;
+    grid-template-columns: 30px 38px 30px;
+  }
+  #newRentalPage .accessory-quantity-row .qty-btn {
+    width: 30px;
+    height: 34px;
+  }
+  #newRentalPage .accessory-quantity-row .qty-input {
+    width: 38px;
     height: 34px;
     min-height: 34px;
   }
