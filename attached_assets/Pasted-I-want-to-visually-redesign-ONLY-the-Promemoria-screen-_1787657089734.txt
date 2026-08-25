@@ -1,0 +1,383 @@
+I want to visually redesign ONLY the "Promemoria" screen.
+
+Use the attached mockup image as the PRIMARY visual reference.
+
+The current Promemoria functionality is already working correctly.
+
+This task must be VISUAL / LAYOUT ONLY.
+
+DO NOT rewrite, refactor, rename, remove, replace, or reorganize any existing functional logic.
+
+==================================================
+CRITICAL FUNCTIONAL SAFETY
+==================================================
+
+ABSOLUTELY PRESERVE:
+
+- reminder generation logic
+- delivery reminder logic
+- return reminder logic
+- date/time calculations
+- customer data
+- reservation data
+- rented-item data
+- accessories
+- reservation status logic
+- reminder counts
+- "Tutti" filter
+- "Consegne" filter
+- "Rientri" filter
+- "Apri prenotazione"
+- "Elimina"
+- existing reservation opening behavior
+- existing reminder deletion behavior
+- existing IDs
+- existing event handlers
+- existing data attributes
+- existing navigation
+- Supabase/cloud behavior
+- all persistence/storage behavior
+
+Do NOT change the database schema.
+
+Do NOT modify unrelated screens.
+
+==================================================
+DESIGN GOAL
+==================================================
+
+Make the Promemoria screen visually lighter, cleaner, more compact and fully consistent with the redesigned Home, Calendar, Inventory and Clienti screens.
+
+Use the attached mockup as the visual target.
+
+Maintain:
+- black / very dark background
+- charcoal cards
+- yellow Rentix accent
+- white primary text
+- gray secondary text
+- green/orange/yellow status accents where already appropriate
+- subtle borders
+- restrained rounded corners
+- readable smartphone typography
+
+Do NOT make text too small.
+
+==================================================
+1. HEADER
+==================================================
+
+Keep the existing Rentix header unchanged:
+
+- back button
+- Rentix Lab Lite branding
+- Bike & Scooter Lab
+- menu button
+
+Preserve all current functionality.
+
+Keep:
+
+CENTRO PROMEMORIA
+Promemoria
+
+Reduce unnecessary spacing only if needed.
+
+==================================================
+2. FILTERS
+==================================================
+
+Keep the existing filters exactly as they work now:
+
+- Tutti
+- Consegne
+- Rientri
+
+Visually style them like the attached mockup:
+
+- compact rounded buttons
+- active filter in Rentix yellow
+- inactive filters dark with subtle borders
+- readable text
+- touch-friendly size
+
+Do NOT change:
+- filter logic
+- filter values
+- event handlers
+- reminder counts
+
+==================================================
+3. DAY SECTIONS
+==================================================
+
+Keep the current grouping by day, such as:
+
+Oggi
+Domani
+
+and any other existing date/day grouping.
+
+Display the reminder count on the right in a compact circular badge.
+
+Example:
+
+Oggi                         2
+
+Do NOT change how these counts are calculated.
+
+==================================================
+4. REMINDER CARDS
+==================================================
+
+Redesign each reminder card to match the attached mockup.
+
+Each card should clearly show:
+
+TOP ROW:
+- reminder type icon
+- customer name
+- status badge aligned right
+
+For DELIVERY reminders:
+use the existing delivery state and display:
+"DA CONSEGNARE"
+
+For RETURN reminders:
+use the existing return state and display:
+"DA RIENTRARE"
+
+Do NOT introduce new reminder statuses.
+Map these UI labels onto the current existing logic.
+
+==================================================
+5. DATE AND TIME
+==================================================
+
+Make date and time very easy to scan.
+
+Suggested layout:
+
+calendar icon   mar 25/08/2026   ·   clock icon   09:00
+
+For return:
+calendar icon   mar 25/08/2026   ·   clock icon   19:00
+
+Use existing values only.
+
+Do NOT modify date/time calculations.
+
+==================================================
+6. RENTED ITEMS
+==================================================
+
+Keep ALL currently displayed rented bicycles and accessories.
+
+Use a compact item hierarchy:
+
+• 1 × Donna senza cambio 26 pollici
+  ↳ Lucchetto standard ×1
+
+If multiple bicycles exist, show each as a separate compact item block.
+
+Do NOT remove any item or accessory information.
+
+Use:
+- primary rented item in white
+- accessory line underneath in smaller gray text
+- subtle separators between distinct rented items if useful
+
+Avoid excessive vertical spacing.
+
+==================================================
+7. LONG ITEM NAMES
+==================================================
+
+Avoid aggressive text wrapping.
+
+Give the item-text area as much horizontal width as possible.
+
+Keep primary bicycle names on one line whenever reasonably possible.
+
+If an item has a recommendation, for example:
+
+"Bici 24 pollici"
+"Consigliata per bimbi da 10 a 12 anni"
+
+visually separate the main name from the recommendation where possible:
+
+- main name: white
+- recommendation: smaller gray text
+
+Do NOT truncate important information.
+
+Do NOT use ellipsis for essential item names.
+
+==================================================
+8. OPEN RESERVATION ACTION
+==================================================
+
+Keep the existing:
+
+"Apri prenotazione"
+
+action and its exact current behavior.
+
+Style it as a compact yellow secondary action/link like in the attached mockup.
+
+Do NOT rewrite its handler.
+
+==================================================
+9. DELETE ACTION
+==================================================
+
+Keep the existing:
+
+"Elimina"
+
+action and its exact current reminder-delete behavior.
+
+Make it a compact red destructive button aligned to the right, as shown in the reference.
+
+Do NOT change:
+- which reminder is deleted
+- confirmation behavior, if one already exists
+- reservation data
+- reservation status
+
+Deleting a reminder must NOT accidentally delete the reservation unless that is already the current intended behavior.
+
+==================================================
+10. DELIVERY / RETURN VISUAL ICONS
+==================================================
+
+Use a clear visual distinction between delivery and return reminders.
+
+For example:
+
+Delivery:
+upward/outgoing icon
+
+Return:
+downward/incoming icon
+
+These icons are PRESENTATIONAL ONLY.
+
+Do NOT use them to introduce new logic.
+
+==================================================
+11. CARD DENSITY
+==================================================
+
+Reduce:
+- excessive vertical padding
+- large gaps
+- empty space
+
+The card should remain comfortably readable.
+
+A simple single-item reminder should be significantly shorter than the current version.
+
+A multi-item reminder may be taller, but should still use compact item spacing.
+
+Do not force every card to have the same height.
+
+==================================================
+12. DO NOT CHANGE PROMEMORIA LOGIC
+==================================================
+
+This is critical.
+
+Do NOT change how reminders are created or selected.
+
+Do NOT change:
+- which reservations appear under Oggi
+- which reservations appear under Domani
+- delivery vs return classification
+- reminder dates
+- reminder times
+- status relationships
+- count logic
+- reservation relationships
+
+Only redesign their visual presentation.
+
+==================================================
+13. DO NOT MODIFY OTHER SCREENS
+==================================================
+
+Do NOT modify:
+
+- Home
+- Calendario
+- Nuovo noleggio
+- Inventario
+- Clienti
+- Richieste
+- Incassi
+- Listino
+- public customer form
+- service-worker.js
+- manifest.json
+- Git configuration
+- Supabase schema
+
+Only modify the Promemoria screen presentation.
+
+==================================================
+14. REQUIRED VERIFICATION
+==================================================
+
+Before finishing verify ALL of the following:
+
+1. Promemoria screen loads correctly.
+2. "Tutti" still works.
+3. "Consegne" still works.
+4. "Rientri" still works.
+5. Reminder counts remain unchanged.
+6. Oggi grouping remains correct.
+7. Domani grouping remains correct.
+8. Delivery reminders still show the correct reservations.
+9. Return reminders still show the correct reservations.
+10. Customer names remain correct.
+11. Dates remain correct.
+12. Times remain correct.
+13. All rented bicycles remain visible.
+14. All accessories remain visible.
+15. "Apri prenotazione" still opens the correct reservation.
+16. "Elimina" still acts on the correct reminder only.
+17. Reservation data is not modified merely by viewing Promemoria.
+18. No reminder logic is rewritten.
+19. No database/schema changes are made.
+20. No unrelated screen is modified.
+
+==================================================
+15. IMPLEMENTATION APPROACH
+==================================================
+
+Make the MINIMUM necessary changes.
+
+Prefer:
+- existing reminder render logic
+- existing filter logic
+- existing date grouping
+- existing reservation-link handlers
+- CSS/presentation changes
+- minimal presentation-only markup adjustments
+
+Do NOT create a second reminder system.
+
+Do NOT duplicate business logic.
+
+Do NOT invent new reminder categories.
+
+If any visual requirement in the attached mockup conflicts with existing reminder functionality, preserve the functionality and report the visual limitation instead of changing the logic.
+
+At the end report:
+
+- exactly which file(s) were modified;
+- whether the changes were CSS/markup only;
+- confirm that reminder generation/filter/date logic was unchanged;
+- confirm that "Apri prenotazione" and "Elimina" still use the existing handlers;
+- confirm that no database/schema changes were required;
+- confirm that no unrelated functionality was changed.
