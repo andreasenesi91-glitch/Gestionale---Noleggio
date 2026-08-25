@@ -1,0 +1,432 @@
+I want to redesign ONLY the INVENTORY screen ("Inventario") using the attached image as the visual reference.
+
+IMPORTANT: THIS IS PRIMARILY A VISUAL/UI REDESIGN.
+
+The current Inventory system is already working correctly.
+DO NOT break, simplify, replace, refactor, or recreate the existing inventory logic.
+
+The attached image defines the TARGET VISUAL STYLE and layout direction.
+Adapt it to the existing application and existing data structure rather than rebuilding the feature from scratch.
+
+==================================================
+CRITICAL FUNCTIONAL SAFETY REQUIREMENTS
+==================================================
+
+Preserve ALL existing functionality exactly as it currently works.
+
+In particular, DO NOT change:
+
+- inventory data structure
+- inventory persistence
+- Supabase integration
+- save/load logic
+- availability calculations
+- date-range availability calculations
+- reservation overlap calculations
+- occupied quantity calculations
+- free quantity calculations
+- total quantity calculations
+- relationship between reservations and inventory
+- existing item IDs
+- existing event handlers
+- existing button bindings
+- existing functions
+- existing data attributes
+- existing status logic
+- existing add/edit/delete behavior
+
+DO NOT rename or remove existing IDs, functions, variables, data attributes, event targets, or storage keys unless absolutely required for presentation — and preferably do not change them at all.
+
+DO NOT introduce a new inventory system.
+
+DO NOT replace existing working logic with new logic.
+
+Reuse the current calculations and data already produced by the application.
+
+==================================================
+VERY IMPORTANT: DATE-BASED AVAILABILITY
+==================================================
+
+The date-based availability system is CRITICAL and must remain EXACTLY functional.
+
+The user selects:
+
+DAL [start date]
+AL [end date]
+
+and presses:
+
+"Verifica disponibilità"
+
+The application must continue calculating availability for THAT EXACT DATE RANGE using the existing logic.
+
+Do NOT convert this into simple current-stock availability.
+
+Do NOT calculate availability only for today.
+
+Do NOT change how overlapping reservations affect availability.
+
+For every item, the existing calculation of:
+
+LIBERE
+OCCUPATE
+TOTALI
+
+must remain correct for the selected date interval.
+
+Test this functionality after the redesign.
+
+==================================================
+INFORMATION PRIORITY
+==================================================
+
+The MOST IMPORTANT number on this screen is:
+
+LIBERE
+
+Therefore the visual hierarchy MUST always be:
+
+1. LIBERE
+2. OCCUPATE
+3. TOTALI
+
+Never show "Totali" first.
+
+This applies BOTH to:
+
+A) the global summary at the top
+B) every individual inventory card
+
+Use the following visual emphasis:
+
+LIBERE:
+- first position
+- visually strongest
+- green when > 0
+- larger number
+
+OCCUPATE:
+- second position
+- secondary emphasis
+
+TOTALI:
+- third position
+- neutral emphasis
+
+Example:
+
+LIBERE       OCCUPATE       TOTALI
+   4             1             5
+
+==================================================
+TOP AREA
+==================================================
+
+Keep the existing header and Rentix visual identity.
+
+Maintain:
+
+GESTIONE MEZZI
+Inventario
+
+Keep:
+
++ Aggiungi tipo
+
+Keep the DAL / AL date selectors.
+
+Make them clean, compact and touch-friendly.
+
+Below them keep:
+
+VERIFICA DISPONIBILITÀ
+
+as a prominent yellow full-width action.
+
+==================================================
+GLOBAL SUMMARY
+==================================================
+
+Immediately below "Verifica disponibilità", display three compact summary cards:
+
+LIBERE | OCCUPATE | TOTALI
+
+Again:
+
+LIBERE MUST BE FIRST.
+
+Example:
+
+LIBERE 14
+OCCUPATE 12
+TOTALI 26
+
+These values MUST come from the EXISTING calculations.
+Do not create duplicate calculation logic.
+
+==================================================
+INVENTORY CARDS
+==================================================
+
+The current inventory cards are too tall.
+
+Redesign them to be significantly more compact while keeping the information easy to read on a smartphone.
+
+Target approximately 40–50% less vertical space per card where practical.
+
+Each card should contain:
+
+- item/type name
+- optional description
+- availability status badge
+- selected availability date/range information if currently shown
+- LIBERE
+- OCCUPATE
+- TOTALI
+- access to existing management actions
+
+The first and most visible quantity must ALWAYS be LIBERE.
+
+Suggested hierarchy:
+
+[Item name]                         [Disponibile]
+
+[optional description]
+
+LIBERE          OCCUPATE          TOTALI
+  4                 1                5
+
+Do NOT truncate important bike names unnecessarily.
+
+Names such as:
+
+"Uomo cambio 28 pollici"
+"Uomo senza cambio 28 pollici"
+"Donna cambio 26 pollici"
+"Donna senza cambio 26 pollici"
+
+should remain immediately understandable.
+
+Allow a clean second line when genuinely necessary rather than making the text too small.
+
+==================================================
+STATUS
+==================================================
+
+Preserve the current availability status logic.
+
+If free quantity > 0:
+show the existing equivalent of "Disponibile".
+
+If free quantity = 0:
+show the existing equivalent of "Esaurita".
+
+DO NOT change the underlying rule used by the application.
+
+The badge is only a visual representation of the existing state.
+
+==================================================
+FULL CUSTOMIZATION MUST REMAIN
+==================================================
+
+This is CRITICAL.
+
+The inventory must remain completely editable/customizable exactly as it is now.
+
+The user must still be able to:
+
+- add a new bike/type
+- edit an existing type
+- delete an existing type
+- manage individual vehicles
+- change quantities
+- add/remove/manage vehicles
+- modify inventory configuration
+- add accessories
+- edit accessories
+- delete accessories
+- modify accessory quantities
+- use all existing inventory management functionality
+
+DO NOT remove any management feature just to make the interface cleaner.
+
+If necessary, visually reorganize actions, but preserve their exact functionality.
+
+==================================================
+GESTISCI MEZZI
+==================================================
+
+The existing "Gestisci mezzi" functionality is IMPORTANT.
+
+It must remain fully functional.
+
+The user must still be able to manage the individual vehicles and quantities exactly as before.
+
+You may make access to it visually cleaner or more compact, but DO NOT remove or alter the underlying functionality.
+
+==================================================
+EDIT / DELETE
+==================================================
+
+Keep:
+
+Modifica
+Elimina
+
+They can be made more compact.
+
+"Elimina" should remain visually secondary/danger styled.
+
+Do NOT change their current behavior.
+
+==================================================
+ACCESSORIES
+==================================================
+
+At the bottom of the Inventory screen there is currently:
+
++ Aggiungi accessorio
+
+THIS MUST REMAIN.
+
+Do not remove it.
+
+Accessory management must continue working exactly as before.
+
+Apply the same compact visual language to accessory cards if they are displayed in this screen.
+
+For accessories too, preserve:
+
+- quantities
+- availability
+- date-based availability
+- edit
+- delete
+- existing persistence
+- existing reservation relationships
+
+==================================================
+VISUAL STYLE
+==================================================
+
+Follow the attached reference image closely.
+
+Use the existing Rentix visual identity:
+
+- black / very dark background
+- dark charcoal cards
+- subtle thin borders
+- yellow primary accent
+- green for available/free quantities
+- red only for destructive/unavailable states
+- white primary text
+- gray secondary text
+- rounded corners
+- professional mobile-first appearance
+
+Avoid:
+
+- oversized cards
+- excessive padding
+- unnecessary empty space
+- tiny text
+- excessive borders
+- decorative elements that consume vertical space
+
+The goal is to see substantially more inventory items on one smartphone screen.
+
+==================================================
+MOBILE-FIRST
+==================================================
+
+This application is primarily used on a smartphone.
+
+Optimize specifically for narrow mobile screens.
+
+All buttons must remain comfortably touchable.
+
+Do not solve compactness by making text or buttons too small.
+
+Prefer:
+- reduced unnecessary padding
+- better alignment
+- information on the same row
+- stronger hierarchy
+
+rather than shrinking everything.
+
+==================================================
+DO NOT BUILD UNREQUESTED FEATURES
+==================================================
+
+The attached reference may contain visual examples or elements that do not currently exist in the application.
+
+DO NOT implement new business functionality just because it appears in the mockup.
+
+For example, do not invent:
+- new pricing systems
+- new availability rules
+- new configuration systems
+- new history systems
+- new accessory relationships
+
+unless they already exist in the current application.
+
+The image is a VISUAL REFERENCE.
+
+Existing application functionality is the source of truth.
+
+==================================================
+IMPLEMENTATION STRATEGY
+==================================================
+
+Before editing:
+
+1. Inspect the existing Inventory implementation.
+2. Identify the existing availability calculation functions.
+3. Identify the selected DAL/AL date state.
+4. Identify inventory rendering.
+5. Identify Gestisci mezzi behavior.
+6. Identify edit/delete handlers.
+7. Identify add-type functionality.
+8. Identify accessory management.
+9. Identify persistence/Supabase mappings.
+
+Then perform the redesign by changing as little functional code as possible.
+
+Prefer CSS and minimal markup/layout changes.
+
+Avoid touching JavaScript business logic unless strictly necessary for presentation.
+
+==================================================
+MANDATORY REGRESSION CHECK
+==================================================
+
+After completing the redesign, verify ALL of the following:
+
+1. DAL and AL selectors still work.
+2. "Verifica disponibilità" still works.
+3. Changing the date interval recalculates availability correctly.
+4. Existing reservations still affect occupied/free quantities correctly.
+5. LIBERE values are correct.
+6. OCCUPATE values are correct.
+7. TOTALI values are correct.
+8. Add type still works.
+9. Edit type still works.
+10. Delete type still works.
+11. Gestisci mezzi still works.
+12. Quantities can still be changed.
+13. Individual vehicles can still be managed.
+14. Add accessory still works.
+15. Accessory editing still works.
+16. Accessory quantities still work.
+17. Existing inventory data is preserved.
+18. Supabase/cloud persistence is unchanged.
+19. No existing reservation functionality is affected.
+20. No unrelated screen is modified.
+
+If any existing behavior would need to be changed to achieve the visual design, STOP and preserve the existing behavior instead.
+
+FUNCTIONAL CORRECTNESS AND DATA SAFETY ARE MORE IMPORTANT THAN MATCHING THE MOCKUP PERFECTLY.
+
+Make the redesign only after understanding and preserving the existing working system.
