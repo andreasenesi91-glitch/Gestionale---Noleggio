@@ -1,0 +1,246 @@
+I want to refine ONLY the existing "Prenotazioni cliente" modal/view and add ONE new customer-management action: "Elimina cliente".
+
+IMPORTANT:
+The Clienti screen redesign is now good.
+DO NOT redesign the main Clienti list again.
+
+The current "Prenotazioni cliente" modal is visually outdated compared with the redesigned Clienti screen.
+
+This task includes:
+1. a visual refinement of the existing customer-reservations modal;
+2. one new action: safely delete the customer record.
+
+==================================================
+CRITICAL SAFETY
+==================================================
+
+Preserve all existing:
+- customer data
+- reservation data
+- reservation history
+- Supabase/cloud behavior
+- reservation opening
+- reservation deletion
+- customer-reservation relationships
+- IDs
+- event handlers
+- statuses
+- totals
+- pricing
+- navigation
+
+Do NOT change the database schema unless absolutely required.
+Do NOT refactor unrelated logic.
+
+==================================================
+1. MODAL VISUAL REDESIGN
+==================================================
+
+Keep the existing modal behavior and close button.
+
+Make the modal visually consistent with the redesigned Clienti / Home / Calendar screens:
+
+- dark compact card
+- subtle border
+- restrained rounded corners
+- yellow section labels
+- white primary text
+- gray secondary text
+- readable mobile typography
+- less unnecessary vertical space
+
+Keep:
+
+PRENOTAZIONI CLIENTE
+Customer name
+
+but reduce excessive padding.
+
+==================================================
+2. CUSTOMER INFORMATION
+==================================================
+
+At the top of the modal, show the customer's existing information cleanly.
+
+If phone/document values are missing or meaningless placeholders such as 0, empty, null or undefined:
+
+show:
+"Telefono non inserito"
+"Documento non inserito"
+
+Do NOT modify the stored values.
+
+Do NOT show raw "0" lines.
+
+If a valid phone exists, keep it readable and tappable with the existing phone-dialer behavior.
+
+==================================================
+3. RESERVATION CARDS
+==================================================
+
+Each customer reservation should use the SAME compact visual language as the redesigned Home/Calendar reservation cards.
+
+Keep all existing reservation information:
+
+- start/end date
+- rented bicycles
+- accessories
+- total
+- status
+
+Use:
+- clear dates
+- compact item lines
+- yellow total
+- compact status badge
+
+Do NOT remove any data.
+
+==================================================
+4. RESERVATION ACTIONS
+==================================================
+
+Keep the existing actions:
+
+"Apri prenotazione"
+"Elimina prenotazione"
+
+Preserve their exact current functionality.
+
+Make the buttons more compact.
+
+"Elimina prenotazione" remains destructive/red.
+
+Do NOT alter the existing reservation delete confirmation or delete logic.
+
+==================================================
+5. NEW ACTION: ELIMINA CLIENTE
+==================================================
+
+Add a new destructive action:
+
+"Elimina cliente"
+
+This action deletes the CUSTOMER RECORD only.
+
+CRITICAL:
+Do NOT automatically delete, alter, detach or rewrite existing reservations.
+
+Before implementing this action:
+
+INSPECT the existing customer/reservation relationship and Supabase/local data model.
+
+Determine safely whether deleting a customer that has existing reservations would:
+- break foreign-key/data relationships;
+- remove reservation history;
+- make reservations inaccessible;
+- cascade-delete reservations;
+- corrupt cloud/local data.
+
+If deleting the customer would affect existing reservations or history, DO NOT perform the deletion silently.
+
+In that case:
+- block the delete action;
+- show a clear message explaining that the customer cannot be deleted while linked reservations exist.
+
+Do NOT invent cascading deletion.
+
+If the existing model safely supports deleting only the customer while preserving all reservations, then use the existing safe relationship behavior.
+
+==================================================
+6. CUSTOMER DELETE CONFIRMATION
+==================================================
+
+"Elimina cliente" must NEVER delete immediately.
+
+When tapped, show a dedicated confirmation modal.
+
+Example:
+
+"Eliminare questo cliente?"
+
+"Questa operazione elimina il cliente dall'archivio. Le prenotazioni non devono essere eliminate."
+
+Buttons:
+
+[ Annulla ] [ Elimina cliente ]
+
+Use destructive red styling for the final delete action.
+
+The final delete must be scoped to the currently selected customer's unique ID.
+
+Never delete by customer name or phone number.
+
+==================================================
+7. CUSTOMER WITH EXISTING RESERVATIONS
+==================================================
+
+This is VERY IMPORTANT.
+
+If the selected customer has one or more existing reservations and safe customer-only deletion is NOT supported by the current data model:
+
+DO NOT delete the customer.
+
+Instead show something like:
+
+"Questo cliente ha prenotazioni associate e non può essere eliminato senza alterare lo storico."
+
+Do not delete the reservations.
+
+Do not modify the reservations.
+
+Do not remove historical rental information.
+
+==================================================
+8. CUSTOMER WITHOUT RESERVATIONS
+==================================================
+
+If the customer has no linked reservations and the current data model allows safe deletion:
+
+- delete only that customer;
+- refresh the Clienti list;
+- close the customer modal;
+- do not alter any other customer.
+
+==================================================
+9. DO NOT MODIFY OTHER FEATURES
+==================================================
+
+Do NOT change:
+- main Clienti search
+- phone dialer action
+- Home
+- Calendario
+- Nuovo noleggio
+- Inventario
+- Richieste
+- Incassi
+- reservation status logic
+- pricing
+- availability
+- customer form
+- database schema unless strictly necessary
+
+==================================================
+10. REQUIRED VERIFICATION
+==================================================
+
+Before finishing verify:
+
+1. Customer modal still opens correctly.
+2. Correct customer information is displayed.
+3. Raw missing-value "0" lines are no longer shown.
+4. All customer reservations still appear.
+5. "Apri prenotazione" still works.
+6. "Elimina prenotazione" still works exactly as before.
+7. "Elimina cliente" has a confirmation step.
+8. Customer deletion uses the unique customer ID.
+9. Deleting a customer cannot accidentally delete reservations.
+10. Customers with linked reservations are protected if the data model cannot safely preserve them.
+11. Customer without reservations can be safely deleted if supported.
+12. Clienti list refreshes correctly after deletion.
+13. No unrelated customer or reservation is modified.
+14. No unrelated screen is changed.
+
+IMPORTANT:
+If the existing data model makes safe customer-only deletion impossible, STOP and explain the exact reason instead of implementing a risky workaround.

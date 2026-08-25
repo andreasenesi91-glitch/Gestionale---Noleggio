@@ -1290,11 +1290,270 @@ input:focus, select:focus, textarea:focus {
   .bike-assignment-number { color: var(--yellow); font-size:.75rem; font-weight:900; text-transform:uppercase; display:block; margin-bottom:3px; }
   .bike-assignment-row strong { font-size: .9rem; line-height: 1.2; }
   .bike-assignment-row select { width: 100%; min-width: 0; padding: 10px 30px 10px 10px; }
-  .customer-detail-list { display: grid; gap: 10px; max-height: 62vh; overflow: auto; padding-right: 2px; }
-  .customer-detail-card { padding: 12px; border-radius: 14px; background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.09); }
-  .customer-detail-card h4 { margin: 0 0 5px; }
-  .customer-detail-card p { margin: 4px 0; color: var(--muted); }
-  .customer-detail-card .status-pill { display: inline-flex; margin-top: 5px; }
+  #customerDetailModal {
+    padding: 14px;
+  }
+  #customerDetailModal .customer-detail-modal-card {
+    max-width: 570px;
+    max-height: min(88dvh, 760px);
+    overflow-y: auto;
+    padding: 17px;
+    background: linear-gradient(145deg, #1a1a1a, #121212);
+    border-color: #3b3b3b;
+    border-radius: 20px;
+  }
+  #customerDetailModal .section-head {
+    align-items: flex-start;
+    margin-bottom: 11px;
+  }
+  #customerDetailModal .section-head h3 {
+    margin: 0;
+    font-size: 1.24rem;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+  #customerDetailModal .small-icon {
+    border-radius: 50%;
+    flex: 0 0 auto;
+  }
+  .customer-detail-info {
+    display: grid;
+    gap: 6px;
+    padding: 0 0 13px;
+    border-bottom: 1px solid var(--border);
+  }
+  .customer-detail-info-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    min-width: 0;
+    margin: 0;
+    color: var(--muted);
+    font-size: .91rem;
+    line-height: 1.35;
+  }
+  .customer-detail-info-row > span:last-child {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .customer-detail-info-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 17px;
+    height: 19px;
+    flex: 0 0 17px;
+    color: var(--yellow);
+  }
+  .customer-detail-info-icon svg {
+    width: 17px;
+    height: 17px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+  }
+  .customer-detail-phone-link {
+    color: var(--muted);
+    text-decoration: none;
+    border-radius: 5px;
+  }
+  .customer-detail-phone-link:hover,
+  .customer-detail-phone-link:focus-visible {
+    color: var(--yellow);
+    outline: none;
+  }
+  .customer-detail-phone-link:focus-visible {
+    box-shadow: 0 0 0 3px rgba(255,212,0,.14);
+  }
+  .customer-detail-rentals-head {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 15px 0 10px;
+  }
+  .customer-detail-rentals-head .eyebrow {
+    margin: 0;
+  }
+  .customer-detail-count {
+    display: inline-grid;
+    place-items: center;
+    min-width: 28px;
+    min-height: 25px;
+    padding: 3px 8px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.07);
+    color: var(--text);
+    font-size: .8rem;
+    font-weight: 900;
+  }
+  .customer-detail-list {
+    display: grid;
+    gap: 10px;
+    max-height: none;
+    overflow: visible;
+    padding: 0;
+  }
+  .customer-detail-card {
+    padding: 13px;
+    border: 1px solid #3a3a3a;
+    border-radius: 15px;
+    background: linear-gradient(145deg, #1b1b1b, #151515);
+  }
+  .customer-detail-rental-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 9px;
+  }
+  .customer-detail-date {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    min-width: 0;
+  }
+  .customer-detail-date-icon {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    border: 1px solid rgba(255,212,0,.28);
+    border-radius: 50%;
+    color: var(--yellow);
+  }
+  .customer-detail-date-icon svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+  }
+  .customer-detail-card h4 {
+    margin: 2px 0 0;
+    color: var(--text);
+    font-size: .98rem;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+  .customer-detail-card .status-pill {
+    flex: 0 0 auto;
+    margin: 1px 0 0;
+  }
+  .customer-detail-items,
+  .customer-detail-notes {
+    margin: 9px 0 0 43px;
+    color: var(--muted);
+    font-size: .9rem;
+    line-height: 1.42;
+    white-space: pre-line;
+  }
+  .customer-detail-notes {
+    color: #c1c1c1;
+    font-style: italic;
+  }
+  .customer-detail-total {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 11px 0 0 43px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    color: var(--text);
+    font-size: .92rem;
+    font-weight: 800;
+  }
+  .customer-detail-total strong {
+    color: var(--yellow);
+    font-size: 1rem;
+  }
+  .customer-detail-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .customer-detail-actions button {
+    min-height: 44px;
+    padding: 9px 8px;
+    font-size: .81rem;
+  }
+  .customer-detail-customer-actions {
+    margin-top: 12px;
+    padding-top: 11px;
+    border-top: 1px solid var(--border);
+  }
+  .customer-delete-customer-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 48px;
+  }
+  .customer-delete-customer-btn svg {
+    width: 19px;
+    height: 19px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+  }
+  .customer-delete-safety-note {
+    display: flex;
+    gap: 9px;
+    align-items: flex-start;
+    margin: 10px 0 0;
+    padding: 10px 11px;
+    border: 1px solid rgba(255,212,0,.18);
+    border-radius: 12px;
+    background: rgba(255,212,0,.04);
+    color: var(--muted);
+    font-size: .8rem;
+    line-height: 1.35;
+  }
+  .customer-delete-safety-note strong {
+    color: var(--yellow);
+    font-size: 1rem;
+  }
+  #customerDeleteConfirmModal .modal-card {
+    max-width: 420px;
+    padding: 18px;
+  }
+  .customer-delete-confirm-copy {
+    margin: 10px 0 16px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+  .customer-delete-confirm-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+  }
+  .customer-delete-confirm-actions button:disabled {
+    opacity: .48;
+    cursor: not-allowed;
+  }
+  @media (max-width: 390px) {
+    #customerDetailModal .customer-detail-modal-card {
+      padding: 15px;
+      border-radius: 18px;
+    }
+    .customer-detail-card h4 {
+      font-size: .92rem;
+    }
+    .customer-detail-items,
+    .customer-detail-notes,
+    .customer-detail-total {
+      margin-left: 0;
+    }
+    .customer-detail-actions button {
+      font-size: .76rem;
+    }
+  }
   @media (max-width: 390px) { .bike-assignment-row { grid-template-columns: 1fr; gap: 6px; } }
   .accessory-quantity-list { grid-column: 1 / -1; display: grid; gap: 8px; margin-top: 8px; }
   .accessory-quantity-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0; border-top:1px solid var(--border); }
@@ -3313,7 +3572,7 @@ body.setup-open { overflow: hidden; }
 
 
   <div class="modal-backdrop hidden" id="customerDetailModal">
-    <div class="modal-card">
+    <div class="modal-card customer-detail-modal-card" role="dialog" aria-modal="true" aria-labelledby="customerDetailTitle">
       <div class="section-head no-margin">
         <div>
           <p class="eyebrow">PRENOTAZIONI CLIENTE</p>
@@ -3321,8 +3580,31 @@ body.setup-open { overflow: hidden; }
         </div>
         <button class="icon-btn small-icon" id="closeCustomerDetailBtn">✕</button>
       </div>
-      <div id="customerDetailInfo"></div>
+      <div id="customerDetailInfo" class="customer-detail-info"></div>
+      <div class="customer-detail-rentals-head">
+        <p class="eyebrow">PRENOTAZIONI</p>
+        <span class="customer-detail-count" id="customerDetailRentalCount">0</span>
+      </div>
       <div id="customerDetailRentals" class="customer-detail-list"></div>
+      <div class="customer-detail-customer-actions">
+        <button type="button" class="danger-btn customer-delete-customer-btn" id="deleteCustomerBtn">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 19.5H5.5a2 2 0 0 1-2-2v-9"></path><path d="M15.5 5.5A4.5 4.5 0 1 1 7 5.5a4.5 4.5 0 0 1 8.5 0Z"></path><path d="M18 14v6M15 17h6"></path></svg>
+          Elimina cliente
+        </button>
+      </div>
+      <p class="customer-delete-safety-note" id="customerDeleteSafetyNote"><strong aria-hidden="true">ⓘ</strong><span></span></p>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="customerDeleteConfirmModal">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="customerDeleteConfirmTitle">
+      <p class="eyebrow">AZIONE IRREVERSIBILE</p>
+      <h3 id="customerDeleteConfirmTitle">Eliminare questo cliente?</h3>
+      <p class="customer-delete-confirm-copy" id="customerDeleteConfirmCopy"></p>
+      <div class="customer-delete-confirm-actions">
+        <button type="button" class="secondary-btn" id="cancelCustomerDeleteBtn">Annulla</button>
+        <button type="button" class="danger-btn" id="confirmCustomerDeleteBtn">Elimina cliente</button>
+      </div>
     </div>
   </div>
 
@@ -4064,7 +4346,27 @@ window.rentixCloudCustomers = (() => {
     }
   }
 
-  return { load, upsertCustomer, migrateLocalCustomers };
+  async function deleteCustomer(id) {
+    const client = window.rentixSupabase;
+    const userId = currentUserId();
+    if (!client || !userId || !id) return false;
+    const { data, error } = await client
+      .from("rentix_customers")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", userId)
+      .select("id");
+    if (error || !Array.isArray(data) || data.length !== 1) {
+      const deleteError = error || new Error("Il cliente non è stato eliminato dal cloud.");
+      console.error("Eliminazione cliente dal cloud non riuscita", deleteError);
+      window.rentixCustomersLastError = deleteError;
+      return false;
+    }
+    window.rentixCustomersLastError = null;
+    return true;
+  }
+
+  return { load, upsertCustomer, deleteCustomer, migrateLocalCustomers };
 })();
 
 const $ = (id) => document.getElementById(id);
@@ -5270,6 +5572,8 @@ function customerInitials(name) {
   return initials || "CL";
 }
 
+let activeCustomerDetail = { key: "", customerId: "" };
+
 function renderCustomers(filter = "") {
   const map = new Map();
   (state.customers || []).forEach(c => {
@@ -5377,23 +5681,50 @@ function openCustomerDetail(key) {
   const cloudCustomer = (state.customers || []).find(c => (c.normalized_key || `${(c.name || "").trim()}|${(c.phone || "").trim()}`.toLowerCase()) === key);
   const first = rentals[0];
   const name = first?.customerName || cloudCustomer?.name || "Cliente";
-  const phone = first?.customerPhone || cloudCustomer?.phone || "";
-  const documentValue = first?.customerDocument || cloudCustomer?.document || "";
+  const phone = customerDisplayValue(first?.customerPhone || cloudCustomer?.phone, "");
+  const documentValue = customerDisplayValue(first?.customerDocument || cloudCustomer?.document, "Documento non inserito");
+  activeCustomerDetail = { key, customerId: cloudCustomer?.id || "" };
+  closeCustomerDeleteConfirm();
   $("customerDetailTitle").textContent = name;
-  $("customerDetailInfo").innerHTML = `<p>${phone || "Telefono non inserito"}</p><p>${documentValue || "Documento non inserito"}</p>`;
+  $("customerDetailInfo").innerHTML = `
+    ${phone
+      ? `<a class="customer-detail-info-row customer-detail-phone-link" href="tel:${escapeHtml(phone)}" aria-label="Apri il dialer per ${escapeHtml(phone)}">
+          <span class="customer-detail-info-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7.2 3.8 10 3l2.1 4.9-2.1 1.5a14.4 14.4 0 0 0 4.6 4.6l1.5-2.1L21 14l-.8 2.8c-.4 1.4-1.8 2.3-3.2 2a15.3 15.3 0 0 1-6.8-3.8 15.3 15.3 0 0 1-3.8-6.8c-.3-1.4.6-2.8 2-3.2Z"></path></svg></span>
+          <span>${escapeHtml(phone)}</span>
+        </a>`
+      : `<p class="customer-detail-info-row">
+          <span class="customer-detail-info-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7.2 3.8 10 3l2.1 4.9-2.1 1.5a14.4 14.4 0 0 0 4.6 4.6l1.5-2.1L21 14l-.8 2.8c-.4 1.4-1.8 2.3-3.2 2a15.3 15.3 0 0 1-6.8-3.8 15.3 15.3 0 0 1-3.8-6.8c-.3-1.4.6-2.8 2-3.2Z"></path></svg></span>
+          <span>Telefono non inserito</span>
+        </p>`}
+    <p class="customer-detail-info-row">
+      <span class="customer-detail-info-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M6 4h9l3 3v13H6z"></path><path d="M15 4v4h4M9 12h6M9 16h6"></path></svg></span>
+      <span>${escapeHtml(documentValue)}</span>
+    </p>`;
+  $("customerDetailRentalCount").textContent = rentals.length;
+  $("customerDeleteSafetyNote").querySelector("span").textContent = rentals.length
+    ? "Questo cliente ha prenotazioni associate: l'eliminazione è bloccata per proteggere lo storico."
+    : "Eliminando questo cliente verrà rimosso solo il record dall'archivio.";
   const holder = $("customerDetailRentals");
   holder.innerHTML = "";
-  if (!rentals.length) holder.innerHTML = `<div class="empty-state">Le prenotazioni di questo cliente saranno sincronizzate nella prossima fase.</div>`;
+  if (!rentals.length) holder.innerHTML = `<div class="empty-state">Nessuna prenotazione registrata.</div>`;
   rentals.forEach(r => {
     const card = document.createElement("article");
     card.className = "customer-detail-card";
-    card.innerHTML = `<h4>${formatDate(r.startDate)} → ${formatDate(r.endDate)}</h4>
-      <p>${rentalItemsText(r)}</p>
-      ${Number.isFinite(Number(r.priceTotal)) ? `<p class="rental-price">Totale: ${formatEuro(r.priceTotal)}</p>` : ""}
-      ${r.notes ? `<p>${r.notes}</p>` : ""}
-      <span class="status-pill status-${r.status}">${statusLabel(r.status)}</span>
-      <button type="button" class="secondary-btn full customer-open-rental" style="margin-top:10px">Apri prenotazione</button>
-      <button type="button" class="danger-btn full customer-delete-rental" style="margin-top:8px">Elimina prenotazione</button>`;
+    card.innerHTML = `
+      <div class="customer-detail-rental-top">
+        <div class="customer-detail-date">
+          <span class="customer-detail-date-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><rect x="4" y="5.5" width="16" height="15" rx="1.5"></rect><path d="M8 3.5v4M16 3.5v4M4 10h16"></path></svg></span>
+          <h4>${escapeHtml(formatDate(r.startDate))} → ${escapeHtml(formatDate(r.endDate))}</h4>
+        </div>
+        <span class="status-pill status-${escapeHtml(r.status)}">${escapeHtml(statusLabel(r.status))}</span>
+      </div>
+      <p class="customer-detail-items">${escapeHtml(rentalItemsText(r))}</p>
+      ${Number.isFinite(Number(r.priceTotal)) ? `<div class="customer-detail-total"><span>Totale:</span><strong>${escapeHtml(formatEuro(r.priceTotal))}</strong></div>` : ""}
+      ${r.notes ? `<p class="customer-detail-notes">${escapeHtml(r.notes)}</p>` : ""}
+      <div class="customer-detail-actions">
+        <button type="button" class="secondary-btn customer-open-rental">Apri prenotazione</button>
+        <button type="button" class="danger-btn customer-delete-rental">Elimina prenotazione</button>
+      </div>`;
     card.querySelector(".customer-open-rental").addEventListener("click", () => {
       closeCustomerDetail();
       editRental(r.id);
@@ -5408,6 +5739,52 @@ function openCustomerDetail(key) {
 
 function closeCustomerDetail() {
   $("customerDetailModal").classList.add("hidden");
+  closeCustomerDeleteConfirm();
+}
+
+function closeCustomerDeleteConfirm() {
+  $("customerDeleteConfirmModal").classList.add("hidden");
+}
+
+function openCustomerDeleteConfirm() {
+  const hasReservations = state.rentals.some(r => customerKey(r) === activeCustomerDetail.key);
+  const canDelete = Boolean(activeCustomerDetail.customerId) && !hasReservations;
+  const copy = $("customerDeleteConfirmCopy");
+  const confirmBtn = $("confirmCustomerDeleteBtn");
+
+  if (hasReservations) {
+    copy.textContent = "Questo cliente ha prenotazioni associate e non può essere eliminato senza alterare lo storico. Le prenotazioni non sono state modificate.";
+  } else if (!activeCustomerDetail.customerId) {
+    copy.textContent = "Non è disponibile un ID cliente univoco per un'eliminazione sicura. Nessun dato verrà modificato.";
+  } else {
+    copy.textContent = "Questa operazione elimina il cliente dall'archivio. Non modifica prenotazioni, prezzi o altri clienti.";
+  }
+  confirmBtn.disabled = !canDelete;
+  $("customerDeleteConfirmModal").classList.remove("hidden");
+}
+
+async function confirmCustomerDelete() {
+  const { customerId, key } = activeCustomerDetail;
+  if (!customerId || state.rentals.some(r => customerKey(r) === key)) return;
+
+  const button = $("confirmCustomerDeleteBtn");
+  button.disabled = true;
+  button.textContent = "Eliminazione…";
+  try {
+    const deleteCustomer = window.rentixCloudCustomers?.deleteCustomer;
+    if (typeof deleteCustomer !== "function" || !await deleteCustomer(customerId)) {
+      alert("Non è stato possibile eliminare il cliente dal cloud. Nessun dato è stato modificato.");
+      return;
+    }
+    state.customers = (state.customers || []).filter(customer => customer.id !== customerId);
+    saveState();
+    renderCustomers(document.getElementById("customerSearch")?.value || "");
+    closeCustomerDeleteConfirm();
+    closeCustomerDetail();
+  } finally {
+    button.disabled = false;
+    button.textContent = "Elimina cliente";
+  }
 }
 
 
@@ -5803,6 +6180,12 @@ $("bikeTypeModal").addEventListener("click", (e) => {
 $("closeCustomerDetailBtn").addEventListener("click", closeCustomerDetail);
 $("customerDetailModal").addEventListener("click", (e) => {
   if (e.target === $("customerDetailModal")) closeCustomerDetail();
+});
+$("deleteCustomerBtn").addEventListener("click", openCustomerDeleteConfirm);
+$("cancelCustomerDeleteBtn").addEventListener("click", closeCustomerDeleteConfirm);
+$("confirmCustomerDeleteBtn").addEventListener("click", confirmCustomerDelete);
+$("customerDeleteConfirmModal").addEventListener("click", (e) => {
+  if (e.target === $("customerDeleteConfirmModal")) closeCustomerDeleteConfirm();
 });
 
 $("fleetPrevDayBtn")?.addEventListener("click", () => {
