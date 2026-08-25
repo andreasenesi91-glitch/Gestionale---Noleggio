@@ -1,0 +1,413 @@
+I want to redesign ONLY the "Clienti" screen.
+
+Use the attached reference image as the PRIMARY visual target.
+
+The current app functionality is working correctly.
+
+This task is mainly a visual redesign, with ONE small new interaction:
+tapping a valid customer phone number should open the device phone dialer for that number.
+
+DO NOT refactor or rewrite unrelated logic.
+
+==================================================
+CRITICAL FUNCTIONAL SAFETY
+==================================================
+
+ABSOLUTELY PRESERVE:
+
+- existing customer data
+- existing customer search
+- existing reservation/customer relationship
+- existing customer card click behavior
+- opening a customer's reservations
+- Supabase/cloud customer data
+- customer names
+- phone values
+- document values
+- rental counts
+- last-rental calculation
+- existing IDs
+- existing event handlers
+- existing data attributes
+- existing navigation
+- all existing persistence/storage behavior
+
+Do NOT change the database schema.
+
+Do NOT modify unrelated screens.
+
+Do NOT delete or rename any existing customer fields.
+
+==================================================
+DESIGN GOAL
+==================================================
+
+Make the Clienti screen much more compact, clean and consistent with the redesigned Home / Calendar / Inventory screens.
+
+The current customer cards are too tall and visually heavy.
+
+Use:
+- very dark background
+- charcoal cards
+- yellow accent
+- white primary text
+- gray secondary text
+- subtle borders
+- restrained rounded corners
+- readable mobile-first typography
+
+Do not make the text too small.
+
+==================================================
+1. HEADER
+==================================================
+
+Keep the existing Rentix header unchanged:
+
+- back button
+- Rentix Lab Lite branding
+- Bike & Scooter Lab
+- menu button
+
+Preserve all current functionality.
+
+Keep:
+
+ARCHIVIO
+Clienti
+
+Reduce unnecessary spacing only if needed.
+
+==================================================
+2. SEARCH FIELD
+==================================================
+
+Keep the existing customer search functionality exactly intact.
+
+Visually refine the search field to match the reference:
+
+- slightly more compact vertically
+- search icon on the left
+- placeholder:
+  "Cerca nome o telefono..."
+
+Do NOT change:
+- search logic
+- filtering behavior
+- search input ID
+- listeners
+- values
+
+==================================================
+3. CUSTOMER CARDS
+==================================================
+
+Redesign each customer card to be significantly more compact.
+
+The entire card should continue to open the customer's existing reservation/history view exactly as it does now.
+
+Suggested structure:
+
+LEFT:
+- small circular initials/avatar
+- customer information
+
+RIGHT:
+- subtle yellow chevron
+
+Example:
+
+AF   Amalia Firenze                       >
+     Telefono non inserito
+     Documento non inserito
+     1 noleggio · Ultimo ven 07/08/2026
+
+Use the customer's actual initials derived from the existing name.
+
+The initials are PRESENTATIONAL ONLY.
+Do not alter customer data.
+
+==================================================
+4. CUSTOMER NAME
+==================================================
+
+Keep the customer name prominent and easy to scan.
+
+Use white primary text.
+
+Do not truncate normal customer names unnecessarily.
+
+==================================================
+5. PHONE DISPLAY
+==================================================
+
+If a valid phone number exists:
+
+display it clearly with a small phone icon.
+
+Example:
+
+☎ +39 331 7287588
+
+If no usable phone number exists:
+
+display:
+
+"Telefono non inserito"
+
+Do NOT display raw placeholder values such as:
+- 0
+- empty strings
+- null
+- undefined
+
+IMPORTANT:
+Do not modify the stored phone value.
+This is display formatting only.
+
+==================================================
+6. NEW PHONE TAP ACTION
+==================================================
+
+This is the ONLY new functional interaction requested.
+
+If a valid customer phone number exists:
+
+the phone number itself must be tappable.
+
+Tapping ONLY the phone number / phone row should open the device's normal phone dialer using the existing number.
+
+Use the standard mobile telephone action, for example the equivalent of:
+
+tel:<existing phone number>
+
+IMPORTANT:
+
+- Do NOT automatically place a call.
+- Only open the device dialer with the number ready.
+- Do NOT modify or normalize the stored phone number.
+- Do NOT create a new database field.
+- Do NOT add external calling services.
+
+CRITICAL EVENT BEHAVIOR:
+
+Tapping the phone number MUST NOT also trigger the parent customer-card action.
+
+In other words:
+
+Tap customer card / chevron
+→ open customer's reservations/history.
+
+Tap phone number
+→ open phone dialer ONLY.
+
+Prevent event propagation from the phone action if necessary.
+
+==================================================
+7. DOCUMENT DISPLAY
+==================================================
+
+If a usable document value exists:
+
+display the existing document information.
+
+If no usable document exists:
+
+display:
+
+"Documento non inserito"
+
+Do NOT show meaningless values such as:
+- 0
+- empty
+- null
+- undefined
+
+Do NOT alter the stored document value.
+
+==================================================
+8. RENTAL HISTORY SUMMARY
+==================================================
+
+Show the existing rental count and last-rental information in one compact row.
+
+Example:
+
+1 noleggio · Ultimo ven 07/08/2026
+
+Use correct singular/plural:
+
+1 noleggio
+2 noleggi
+3 noleggi
+etc.
+
+Reuse the existing count and last-rental logic.
+
+Do NOT recalculate this with a new independent business-logic system if an existing helper already provides it.
+
+If there is no rental history, use a clean existing-data-based state such as:
+
+0 noleggi · Nessun noleggio registrato
+
+Do not invent dates.
+
+==================================================
+9. CLOUD CUSTOMER INFORMATION
+==================================================
+
+If the current application already distinguishes/surfaces a cloud-saved customer state such as:
+
+"Cliente salvato nel cloud"
+
+keep that information.
+
+Display it compactly, preferably with a subtle green icon/text as in the reference.
+
+Do NOT invent a cloud state for customers that do not currently have one.
+
+Do NOT change any Supabase/cloud behavior.
+
+==================================================
+10. REMOVE REDUNDANT CTA TEXT
+==================================================
+
+Remove the large repeated text:
+
+"Tocca per vedere le prenotazioni"
+
+from every customer card.
+
+The card itself is already clickable.
+
+Replace that visual cue with a small yellow chevron on the right.
+
+IMPORTANT:
+Do NOT remove the underlying card click behavior.
+
+==================================================
+11. CARD DENSITY
+==================================================
+
+Reduce:
+- vertical padding
+- unnecessary gaps
+- oversized empty space
+
+The goal is to show significantly more customers on one smartphone screen while keeping text comfortably readable.
+
+Do not over-compress the layout.
+
+==================================================
+12. CARD CLICK BEHAVIOR
+==================================================
+
+The current customer card interaction must remain exactly intact.
+
+Tap anywhere on the normal card area:
+→ open the existing reservations/history for that customer.
+
+Tap the right-side chevron:
+→ same existing customer action.
+
+Tap the phone number:
+→ open the phone dialer ONLY.
+
+No other behavior should change.
+
+==================================================
+13. DO NOT ADD CUSTOMER EDITING
+==================================================
+
+Do NOT add new customer edit/delete functions unless they already exist on this screen.
+
+Do NOT invent:
+- edit customer
+- delete customer
+- WhatsApp
+- SMS
+- email
+- notes
+- contact sync
+
+This task is not for adding unrelated customer-management features.
+
+==================================================
+14. DO NOT MODIFY OTHER SCREENS
+==================================================
+
+Do NOT modify:
+
+- Home
+- Calendario
+- Nuovo noleggio
+- Inventario
+- Richieste
+- Incassi
+- Parco bici
+- Listino
+- Promemoria
+- public customer form
+- service-worker.js
+- manifest.json
+- Git configuration
+- Supabase schema
+
+Only modify the Clienti screen presentation and the minimum phone-tap behavior described above.
+
+==================================================
+15. REQUIRED VERIFICATION
+==================================================
+
+Before finishing, verify all of the following:
+
+1. Clienti screen loads correctly.
+2. Customer search still works exactly as before.
+3. Searching by name still works.
+4. Searching by phone still works.
+5. Every customer still displays the correct name.
+6. Existing valid phone numbers display correctly.
+7. Missing phone values display "Telefono non inserito" instead of 0/null/empty values.
+8. Existing document values still display correctly.
+9. Missing documents display "Documento non inserito".
+10. Rental counts remain correct.
+11. Last-rental dates remain correct.
+12. Cloud customer state remains correct.
+13. Tapping a customer card still opens that customer's existing reservations/history.
+14. Tapping the yellow chevron performs the same customer-card action.
+15. Tapping a valid phone number opens the device dialer.
+16. Tapping the phone number does NOT also open the customer reservation view.
+17. No stored customer data is modified by viewing or tapping the card.
+18. No database/schema changes are made.
+19. No unrelated screen is modified.
+20. No existing functionality is removed.
+
+==================================================
+16. IMPLEMENTATION APPROACH
+==================================================
+
+Make the MINIMUM necessary changes.
+
+Prefer:
+- existing customer render logic
+- existing customer click handler
+- existing rental-count helper
+- existing last-rental calculation
+- CSS/presentation changes
+- a simple phone-link/tap handler using the existing phone value
+
+Do NOT duplicate customer business logic.
+
+Do NOT create a second customer data model.
+
+If the current "0" values are actually meaningful data and not missing-field placeholders, STOP and report that before changing their display.
+
+At the end, report:
+
+- exactly which file(s) were modified;
+- whether the changes were CSS/markup only plus the phone-tap action;
+- how missing phone/document values are detected;
+- how the phone tap avoids triggering the parent card click;
+- confirm that search and customer reservation navigation are unchanged;
+- confirm that no database/schema changes were required;
+- confirm that no unrelated functionality was changed.

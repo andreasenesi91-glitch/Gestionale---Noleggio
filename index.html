@@ -1083,9 +1083,198 @@ input:focus, select:focus, textarea:focus {
 
 
 <style>
-  .customer-card { cursor: pointer; transition: transform .15s ease, border-color .15s ease; }
-  .customer-card:active { transform: scale(.99); }
-  .customer-card-hint { color: var(--yellow) !important; font-weight: 800; }
+  #customersPage {
+    padding-top: 8px;
+  }
+  #customersPage .section-head {
+    margin-top: 10px;
+    margin-bottom: 14px;
+  }
+  #customersPage .section-head .eyebrow {
+    margin-bottom: 5px;
+  }
+  #customersPage .customer-search-wrap {
+    position: relative;
+    margin-bottom: 14px;
+  }
+  #customersPage .customer-search-icon {
+    position: absolute;
+    left: 17px;
+    top: 50%;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    color: #a8a8a8;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  #customersPage .customer-search-icon svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+  }
+  #customersPage .search-input {
+    min-height: 48px;
+    margin: 0;
+    padding-left: 52px;
+    border-radius: 14px;
+    background: #151515;
+    font-size: .98rem;
+  }
+  #customersPage .card-list {
+    gap: 10px;
+  }
+  #customersPage .customer-card {
+    display: block;
+    padding: 14px 13px 14px 14px;
+    background: linear-gradient(145deg, #191919, #111);
+    border-color: #353535;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: transform .15s ease, border-color .15s ease;
+  }
+  #customersPage .customer-card:hover,
+  #customersPage .customer-card:focus-visible {
+    border-color: rgba(255,212,0,.48);
+    outline: none;
+  }
+  #customersPage .customer-card:active {
+    transform: scale(.99);
+  }
+  #customersPage .customer-card-main {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 18px;
+    align-items: center;
+    gap: 11px;
+  }
+  #customersPage .customer-avatar {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(255,212,0,.48);
+    border-radius: 50%;
+    color: var(--yellow);
+    font-size: .98rem;
+    font-weight: 900;
+    letter-spacing: -.03em;
+  }
+  #customersPage .customer-card-content {
+    min-width: 0;
+  }
+  #customersPage .customer-card h3 {
+    margin: 0 0 6px;
+    color: var(--text);
+    font-size: 1.04rem;
+    font-weight: 850;
+    line-height: 1.18;
+    overflow-wrap: anywhere;
+  }
+  #customersPage .customer-meta {
+    display: grid;
+    gap: 3px;
+  }
+  #customersPage .customer-meta-row {
+    display: flex;
+    align-items: flex-start;
+    min-width: 0;
+    gap: 8px;
+    margin: 0;
+    color: var(--muted);
+    font-size: .86rem;
+    line-height: 1.3;
+  }
+  #customersPage .customer-meta-row > span:last-child {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  #customersPage .customer-meta-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 16px;
+    height: 18px;
+    flex: 0 0 16px;
+    color: #b5b5b5;
+  }
+  #customersPage .customer-meta-icon svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+  }
+  #customersPage .customer-phone-link {
+    color: var(--muted);
+    text-decoration: none;
+    border-radius: 5px;
+  }
+  #customersPage .customer-phone-link:hover,
+  #customersPage .customer-phone-link:focus-visible {
+    color: var(--yellow);
+    outline: none;
+  }
+  #customersPage .customer-phone-link:focus-visible {
+    box-shadow: 0 0 0 3px rgba(255,212,0,.14);
+  }
+  #customersPage .customer-cloud-row {
+    color: var(--success);
+  }
+  #customersPage .customer-cloud-row .customer-meta-icon {
+    color: var(--success);
+  }
+  #customersPage .customer-rental-row {
+    color: var(--text);
+  }
+  #customersPage .customer-rental-row .customer-meta-icon {
+    color: var(--yellow);
+  }
+  #customersPage .customer-rental-row strong {
+    font-weight: 800;
+  }
+  #customersPage .customer-rental-separator {
+    color: #707070;
+    padding: 0 5px;
+  }
+  #customersPage .customer-last-rental {
+    color: var(--muted);
+    font-weight: 500;
+  }
+  #customersPage .customer-chevron {
+    align-self: center;
+    color: var(--yellow);
+    font-size: 2rem;
+    font-weight: 300;
+    line-height: 1;
+    transform: translateY(-1px);
+  }
+  #customersPage .customer-empty {
+    margin-top: 2px;
+  }
+  @media (max-width: 390px) {
+    #customersPage .customer-card-main {
+      grid-template-columns: 40px minmax(0, 1fr) 16px;
+      gap: 9px;
+    }
+    #customersPage .customer-avatar {
+      width: 40px;
+      height: 40px;
+      font-size: .9rem;
+    }
+    #customersPage .customer-card h3 {
+      font-size: 1rem;
+    }
+    #customersPage .customer-meta-row {
+      font-size: .82rem;
+    }
+  }
 
   .bike-assignment-master-list { display:grid; gap:12px; margin-top:14px; }
   .bike-assignment-category { display:grid; gap:10px; }
@@ -2755,7 +2944,12 @@ body.setup-open { overflow: hidden; }
             <h2>Clienti</h2>
           </div>
         </div>
-        <input class="search-input" id="customerSearch" placeholder="Cerca nome o telefono..." />
+        <div class="customer-search-wrap">
+          <span class="customer-search-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false"><circle cx="11" cy="11" r="6.7"></circle><path d="m16 16 5 5"></path></svg>
+          </span>
+          <input class="search-input" id="customerSearch" placeholder="Cerca nome o telefono..." />
+        </div>
         <div id="customersList" class="card-list"></div>
       </section>
 
@@ -5065,6 +5259,17 @@ function customerKey(rental) {
   return `${(rental.customerName || "").trim()}|${(rental.customerPhone || "").trim()}`.toLowerCase();
 }
 
+function customerDisplayValue(value, fallback) {
+  const text = String(value ?? "").trim();
+  return !text || /^(?:0|null|undefined)$/i.test(text) ? fallback : text;
+}
+
+function customerInitials(name) {
+  const parts = String(name || "Cliente").trim().split(/\s+/).filter(Boolean);
+  const initials = parts.slice(0, 2).map(part => part[0]).join("").toUpperCase();
+  return initials || "CL";
+}
+
 function renderCustomers(filter = "") {
   const map = new Map();
   (state.customers || []).forEach(c => {
@@ -5076,7 +5281,8 @@ function renderCustomers(filter = "") {
       phone: c.phone || "",
       document: c.document || "",
       count: 0,
-      lastDate: ""
+       lastDate: "",
+       cloudSaved: true
     });
   });
   state.rentals.forEach(r => {
@@ -5088,7 +5294,8 @@ function renderCustomers(filter = "") {
         phone: r.customerPhone || "",
         document: r.customerDocument || "",
         count: 0,
-        lastDate: r.startDate
+        lastDate: r.startDate,
+        cloudSaved: false
       });
     }
     const item = map.get(key);
@@ -5104,7 +5311,7 @@ function renderCustomers(filter = "") {
     .sort((a, b) => a.name.localeCompare(b.name));
 
   if (!customers.length) {
-    list.innerHTML = `<div class="empty-state">Nessun cliente trovato.</div>`;
+    list.innerHTML = `<div class="empty-state customer-empty">Nessun cliente trovato.</div>`;
     return;
   }
 
@@ -5113,15 +5320,53 @@ function renderCustomers(filter = "") {
     card.className = "customer-card";
     card.setAttribute("role", "button");
     card.tabIndex = 0;
+    const phone = customerDisplayValue(c.phone, "");
+    const documentValue = customerDisplayValue(c.document, "Documento non inserito");
+    const rentalSummary = c.count
+      ? `${c.count} ${c.count === 1 ? "noleggio" : "noleggi"}`
+      : "0 noleggi";
     card.innerHTML = `
-      <h3>${c.name}</h3>
-      <p>${c.phone || "Telefono non inserito"}</p>
-      <p>${c.document || "Documento non inserito"}</p>
-      <p>${c.count ? `${c.count} noleggi · ultimo ${formatDate(c.lastDate)}` : "Cliente salvato nel cloud"}</p>
-      <p class="customer-card-hint">Tocca per vedere le prenotazioni ›</p>`;
+      <div class="customer-card-main">
+        <span class="customer-avatar" aria-hidden="true">${escapeHtml(customerInitials(c.name))}</span>
+        <div class="customer-card-content">
+          <h3>${escapeHtml(c.name)}</h3>
+          <div class="customer-meta">
+            ${phone
+              ? `<a class="customer-meta-row customer-phone-link" href="tel:${escapeHtml(phone)}" aria-label="Apri il dialer per ${escapeHtml(phone)}">
+                  <span class="customer-meta-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false"><path d="M7.2 3.8 10 3l2.1 4.9-2.1 1.5a14.4 14.4 0 0 0 4.6 4.6l1.5-2.1L21 14l-.8 2.8c-.4 1.4-1.8 2.3-3.2 2a15.3 15.3 0 0 1-6.8-3.8 15.3 15.3 0 0 1-3.8-6.8c-.3-1.4.6-2.8 2-3.2Z"></path></svg>
+                  </span><span>${escapeHtml(phone)}</span>
+                </a>`
+              : `<p class="customer-meta-row">
+                  <span class="customer-meta-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false"><path d="M7.2 3.8 10 3l2.1 4.9-2.1 1.5a14.4 14.4 0 0 0 4.6 4.6l1.5-2.1L21 14l-.8 2.8c-.4 1.4-1.8 2.3-3.2 2a15.3 15.3 0 0 1-6.8-3.8 15.3 15.3 0 0 1-3.8-6.8c-.3-1.4.6-2.8 2-3.2Z"></path></svg>
+                  </span><span>Telefono non inserito</span>
+                </p>`}
+            <p class="customer-meta-row">
+              <span class="customer-meta-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false"><path d="M6 4h9l3 3v13H6z"></path><path d="M15 4v4h4M9 12h6M9 16h6"></path></svg>
+              </span><span>${escapeHtml(documentValue)}</span>
+            </p>
+            ${c.cloudSaved ? `<p class="customer-meta-row customer-cloud-row">
+              <span class="customer-meta-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false"><path d="M7.2 18.3h10.1a3.7 3.7 0 0 0 .5-7.4A5.8 5.8 0 0 0 6.7 9.8a4.3 4.3 0 0 0 .5 8.5Z"></path></svg>
+              </span><span>Cliente salvato nel cloud</span>
+            </p>` : ""}
+            <p class="customer-meta-row customer-rental-row">
+              <span class="customer-meta-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false"><rect x="4" y="5.5" width="16" height="15" rx="1.5"></rect><path d="M8 3.5v4M16 3.5v4M4 10h16"></path></svg>
+              </span><strong>${rentalSummary}<span class="customer-rental-separator">·</span><span class="customer-last-rental">${c.count ? `Ultimo ${escapeHtml(formatDate(c.lastDate))}` : "Nessun noleggio registrato"}</span></strong>
+            </p>
+          </div>
+        </div>
+        <span class="customer-chevron" aria-hidden="true">›</span>
+      </div>`;
     const open = () => openCustomerDetail(c.key);
     card.addEventListener("click", open);
     card.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") open(); });
+    const phoneLink = card.querySelector(".customer-phone-link");
+    phoneLink?.addEventListener("click", e => e.stopPropagation());
+    phoneLink?.addEventListener("keydown", e => e.stopPropagation());
     list.appendChild(card);
   });
 }
