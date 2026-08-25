@@ -2003,6 +2003,226 @@ body.setup-open { overflow: hidden; }
   }
 }
 
+/* Inventory dashboard: compact presentation only, scoped to #fleetPage. */
+#fleetPage {
+  padding-bottom: 18px;
+}
+#fleetPage > .section-head:first-child {
+  margin-bottom: 10px;
+}
+#fleetPage > .section-head:first-child h2 {
+  font-size: 1.42rem;
+  line-height: 1.1;
+}
+#fleetPage > .section-head:first-child .primary-btn {
+  min-height: 44px;
+  padding: 9px 12px;
+  border-radius: 11px;
+}
+#fleetPage .fleet-range-controls {
+  margin-bottom: 8px;
+}
+#fleetPage .fleet-range-center {
+  gap: 7px;
+}
+#fleetPage .fleet-date-field {
+  gap: 4px;
+}
+#fleetPage .fleet-date-field span {
+  padding-left: 1px;
+  font-size: .65rem;
+}
+#fleetPage .fleet-date-field input {
+  min-height: 44px;
+  padding: 9px;
+  border-radius: 11px;
+  font-size: .84rem;
+}
+#fleetPage .fleet-range-search {
+  min-height: 44px;
+  margin-bottom: 10px;
+  border-radius: 11px;
+  font-size: .82rem;
+}
+#fleetPage .fleet-summary-grid {
+  gap: 6px;
+  margin-bottom: 10px;
+}
+#fleetPage .fleet-summary-card {
+  min-height: 64px;
+  padding: 8px 7px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 12px;
+  background: #151515;
+}
+#fleetPage .fleet-summary-card span {
+  color: #dedede;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+#fleetPage .fleet-summary-card strong {
+  margin-top: 3px;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+#fleetPage .fleet-summary-free {
+  border-color: rgba(61,220,132,.25);
+}
+#fleetPage .fleet-summary-free span,
+#fleetPage .fleet-summary-free strong {
+  color: var(--success);
+}
+#fleetPage .fleet-summary-used strong {
+  color: var(--yellow);
+}
+#fleetPage #fleetList,
+#fleetPage #fleetAccessoriesList {
+  gap: 8px;
+}
+#fleetPage .fleet-card {
+  padding: 10px;
+  border-radius: 14px;
+}
+#fleetPage .fleet-card-top {
+  gap: 8px;
+  align-items: center;
+}
+#fleetPage .fleet-card-top > div {
+  min-width: 0;
+}
+#fleetPage .fleet-card-top h3 {
+  margin-bottom: 3px;
+  font-size: .94rem;
+  line-height: 1.14;
+  overflow-wrap: anywhere;
+}
+#fleetPage .fleet-card-top .muted {
+  margin: 0;
+  font-size: .69rem;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+#fleetPage .fleet-card-top .availability-badge {
+  flex: 0 0 auto;
+  padding: 5px 7px;
+  font-size: .68rem;
+}
+#fleetPage .fleet-numbers {
+  gap: 5px;
+  margin-top: 8px;
+}
+#fleetPage .fleet-number {
+  min-height: 50px;
+  padding: 7px 3px 6px;
+  border-radius: 10px;
+}
+#fleetPage .fleet-number span {
+  margin-bottom: 4px;
+  color: #d0d0d0;
+  font-size: .66rem;
+  line-height: 1;
+  text-transform: uppercase;
+}
+#fleetPage .fleet-number strong {
+  font-size: 1.18rem;
+  line-height: 1;
+}
+#fleetPage .fleet-number-free {
+  border-color: rgba(61,220,132,.22);
+}
+#fleetPage .fleet-number-free span,
+#fleetPage .fleet-number-free strong {
+  color: var(--success);
+}
+#fleetPage .fleet-number-used strong {
+  color: var(--yellow);
+}
+#fleetPage .fleet-card-actions {
+  gap: 5px;
+  margin-top: 8px;
+}
+#fleetPage .fleet-card-actions-three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+#fleetPage .fleet-card-actions-three .manage-units-btn {
+  grid-column: auto;
+}
+#fleetPage .fleet-card-actions button {
+  min-height: 44px;
+  padding: 7px 6px;
+  border-radius: 9px;
+  font-size: .75rem;
+}
+#fleetPage .fleet-card-actions-three .manage-units-btn {
+  border-color: rgba(255,212,0,.32);
+  color: var(--yellow);
+}
+#fleetPage > .section-head[style] {
+  margin-top: 14px !important;
+  margin-bottom: 8px;
+}
+#fleetPage > .section-head[style] h3 {
+  font-size: 1rem;
+}
+#fleetPage #fleetAccessoriesList > .secondary-btn {
+  min-height: 44px;
+  margin-top: 4px !important;
+  border: 0;
+  border-radius: 11px;
+  background: var(--yellow);
+  color: #111;
+  font-size: .8rem;
+  font-weight: 900;
+}
+#fleetPage #fleetAccessoriesList > .secondary-btn:active {
+  transform: scale(.99);
+}
+
+@media (max-width: 380px) {
+  #fleetPage .fleet-range-center {
+    gap: 5px;
+  }
+  #fleetPage .fleet-date-field input {
+    padding-right: 7px;
+    padding-left: 7px;
+    font-size: .79rem;
+  }
+  #fleetPage .fleet-summary-grid {
+    gap: 4px;
+  }
+  #fleetPage .fleet-summary-card {
+    padding-right: 5px;
+    padding-left: 5px;
+  }
+  #fleetPage .fleet-summary-card span {
+    font-size: .62rem;
+  }
+  #fleetPage .fleet-summary-card strong {
+    font-size: 1.28rem;
+  }
+  #fleetPage .fleet-card {
+    padding: 9px;
+  }
+  #fleetPage .fleet-card-top h3 {
+    font-size: .89rem;
+  }
+  #fleetPage .fleet-card-top .availability-badge {
+    padding-right: 6px;
+    padding-left: 6px;
+    font-size: .64rem;
+  }
+  #fleetPage .fleet-card-actions {
+    gap: 4px;
+  }
+  #fleetPage .fleet-card-actions button {
+    padding-right: 4px;
+    padding-left: 4px;
+    font-size: .7rem;
+  }
+}
+
 </style>
 
 </head>
@@ -2502,17 +2722,17 @@ body.setup-open { overflow: hidden; }
         <button class="primary-btn fleet-range-search" id="fleetSearchBtn">Verifica disponibilità</button>
 
         <div class="fleet-summary-grid">
-          <article class="stat-card">
-            <span>Totali</span>
-            <strong id="fleetTotalCount">0</strong>
+          <article class="stat-card fleet-summary-card fleet-summary-free">
+            <span>Libere</span>
+            <strong id="fleetFreeCount">0</strong>
           </article>
-          <article class="stat-card">
+          <article class="stat-card fleet-summary-card fleet-summary-used">
             <span>Occupate</span>
             <strong id="fleetUsedCount">0</strong>
           </article>
-          <article class="stat-card">
-            <span>Libere</span>
-            <strong id="fleetFreeCount">0</strong>
+          <article class="stat-card fleet-summary-card fleet-summary-total">
+            <span>Totali</span>
+            <strong id="fleetTotalCount">0</strong>
           </article>
         </div>
 
@@ -4577,10 +4797,10 @@ function renderFleet() {
           ${free > 0 ? "Disponibile" : "Esaurita"}
         </span>
       </div>
-      <div class="fleet-numbers">
-        <div class="fleet-number"><span>Totali</span><strong>${total}</strong></div>
-        <div class="fleet-number"><span>Occupate</span><strong>${used}</strong></div>
-        <div class="fleet-number"><span>Libere</span><strong>${free}</strong></div>
+       <div class="fleet-numbers">
+         <div class="fleet-number fleet-number-free"><span>Libere</span><strong>${free}</strong></div>
+         <div class="fleet-number fleet-number-used"><span>Occupate</span><strong>${used}</strong></div>
+         <div class="fleet-number fleet-number-total"><span>Totali</span><strong>${total}</strong></div>
       </div>
       <div class="fleet-card-actions fleet-card-actions-three">
         <button class="secondary-btn manage-units-btn">Gestisci mezzi</button>
@@ -4621,10 +4841,10 @@ function renderFleet() {
           ${free > 0 ? "Disponibile" : "Esaurito"}
         </span>
       </div>
-      <div class="fleet-numbers">
-        <div class="fleet-number"><span>Totali</span><strong>${total}</strong></div>
-        <div class="fleet-number"><span>Occupati</span><strong>${used}</strong></div>
-        <div class="fleet-number"><span>Liberi</span><strong>${free}</strong></div>
+       <div class="fleet-numbers">
+         <div class="fleet-number fleet-number-free"><span>Liberi</span><strong>${free}</strong></div>
+         <div class="fleet-number fleet-number-used"><span>Occupati</span><strong>${used}</strong></div>
+         <div class="fleet-number fleet-number-total"><span>Totali</span><strong>${total}</strong></div>
       </div>
       <div class="fleet-card-actions">
         <button class="secondary-btn acc-edit-btn">Modifica</button>
