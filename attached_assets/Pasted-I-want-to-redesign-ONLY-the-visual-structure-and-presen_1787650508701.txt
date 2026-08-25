@@ -1,0 +1,500 @@
+I want to redesign ONLY the visual structure and presentation of the existing "Calendario" screen.
+
+IMPORTANT:
+The current Calendar functionality is already working correctly.
+
+This task must NOT break or rewrite the existing calendar logic.
+
+Use the attached mockup image as the PRIMARY visual reference.
+
+The final screen should match that reference as closely as reasonably possible on smartphone, while preserving all existing business logic and data behavior.
+
+==================================================
+CRITICAL SAFETY REQUIREMENT
+==================================================
+
+DO NOT refactor, rewrite, rename, replace, or reorganize existing functional logic.
+
+ABSOLUTELY PRESERVE:
+
+- calendar date calculations
+- month navigation
+- selected-date state
+- reservation date ranges
+- pickup dates
+- return dates
+- reservation statuses
+- availability calculations
+- fleet/inventory calculations
+- pricing
+- Supabase reads/writes
+- reservation filtering
+- reservation editing
+- reservation deletion
+- status changes
+- existing IDs
+- existing data attributes
+- existing event handlers
+- existing database field names
+- existing navigation
+- existing reservation data model
+
+Do NOT change the database schema.
+
+Do NOT modify unrelated screens.
+
+Prefer presentation-only markup/CSS changes and reuse the existing data/functions.
+
+If existing functions already calculate the required information, reuse them instead of recreating the logic.
+
+==================================================
+DESIGN GOAL
+==================================================
+
+Redesign the Calendar screen so that selecting a date behaves visually like a DAILY DASHBOARD.
+
+The user should immediately understand:
+
+1. which rentals start / are still booked for that day;
+2. which rentals are currently out during that day;
+3. which rentals must be returned that day.
+
+The current availability list should no longer dominate the screen.
+
+==================================================
+1. HEADER
+==================================================
+
+Keep the existing Rentix header unchanged:
+
+- back button
+- Rentix Lab Lite branding
+- Bike & Scooter Lab
+- menu button
+
+Preserve all current functionality.
+
+Below the header keep:
+
+PROGRAMMAZIONE
+Calendario
+
+Keep "+ Nuovo" in yellow.
+
+Do not change its current action.
+
+==================================================
+2. MONTH CALENDAR
+==================================================
+
+Keep the existing monthly calendar functionality exactly intact.
+
+Visually reproduce the attached reference:
+
+- month name centered;
+- previous month button on the left;
+- next month button on the right;
+- weekday headings;
+- compact day grid;
+- current selected day clearly highlighted in yellow;
+- dark cards/background;
+- readable typography slightly larger than the previous version.
+
+Do NOT change:
+- month calculations;
+- date selection behavior;
+- disabled/outside-month dates;
+- existing date values;
+- click behavior.
+
+==================================================
+3. YELLOW DAY INDICATOR DOTS
+==================================================
+
+IMPORTANT:
+The small yellow dot underneath a calendar date must NOT be decorative.
+
+Show the yellow dot ONLY if that date has at least ONE relevant rental activity.
+
+A date is considered active if at least one reservation:
+
+A) is scheduled to start / be collected on that date;
+OR
+
+B) has already started and the rental period includes that date;
+OR
+
+C) is scheduled to be returned on that date.
+
+If there are NO relevant reservations for that date, show NO yellow dot.
+
+Do NOT generate dots for every date.
+
+Use existing reservation date/status data.
+
+Do NOT create duplicate reservation logic or modify the reservation records.
+
+The selected date should still use the large yellow selected-day styling independently from the activity dot.
+
+==================================================
+4. SELECTED DAY HEADER
+==================================================
+
+Under the calendar display:
+
+GIORNO SELEZIONATO
+
+and the selected date, for example:
+
+Martedì 25 Agosto 2026
+
+Keep the existing "+ Prenota" button on the right.
+
+Preserve the current "+ Prenota" action exactly.
+
+==================================================
+5. DAILY SUMMARY CARDS
+==================================================
+
+Directly underneath the selected date, add THREE compact summary cards.
+
+Use the visual style from the attached reference.
+
+CARD 1:
+"Prenotate"
+
+Meaning:
+reservations that have NOT yet been collected and whose pickup/start date is the selected date.
+
+Subtitle:
+"Da ritirare"
+
+CARD 2:
+"Ritirate"
+
+Meaning:
+rentals that are currently out on the selected date.
+
+This includes rentals whose rental period contains the selected date and that are in the existing active/collected state.
+
+Reuse the CURRENT application's existing status terminology and internal values.
+
+Do NOT rename existing statuses.
+
+If the application internally uses "Ritirata" for the active/collected status, use that existing status.
+
+Subtitle:
+"Attualmente fuori"
+
+CARD 3:
+"Da restituire"
+
+Meaning:
+rentals whose return date is the selected date and which still need to be returned according to the current existing status logic.
+
+Subtitle:
+"Da rientrare oggi"
+
+Each card must show the number of matching reservations.
+
+IMPORTANT:
+Use the existing reservation data and status logic.
+Do not modify reservation statuses or automatically change any reservation.
+
+==================================================
+6. SUMMARY CARD FILTERING
+==================================================
+
+The three summary cards must be clickable.
+
+Clicking a card should filter the reservation list underneath.
+
+Examples:
+
+Click "Prenotate"
+→ show only the selected day's Prenotate.
+
+Click "Ritirate"
+→ show only rentals currently out on that selected day.
+
+Click "Da restituire"
+→ show only rentals due back that selected day.
+
+The selected filter should be visually clear.
+
+Default behavior:
+Choose the most sensible current behavior while preserving existing logic.
+
+Prefer:
+- "Prenotate" as the default filter if there are any;
+otherwise
+- the first category with results.
+
+If implementing this default would require risky logic changes, keep a neutral "Tutte" view instead.
+
+Do NOT alter any reservation data.
+
+==================================================
+7. "PRENOTAZIONI DEL GIORNO"
+==================================================
+
+Below the summary cards show:
+
+"Prenotazioni del giorno"
+
+The reservation cards must visually match the compact card style already used successfully on the Home screen.
+
+Use slightly larger, easy-to-read text as shown in the latest attached mockup.
+
+Each card should keep:
+
+- customer name
+- current status badge
+- rental period
+- rented bicycles
+- accessories
+- current total
+- Modifica
+- Cambia stato
+- Elimina
+
+Use the SAME current actions and handlers.
+
+Do NOT create duplicate edit/delete/status functions.
+
+Reuse the existing ones.
+
+==================================================
+8. RESERVATION CARD DESIGN
+==================================================
+
+Follow the latest attached mockup closely.
+
+Typography:
+
+- customer name: prominent and clearly readable;
+- dates: medium-size gray text;
+- rented items/accessories: medium-size gray text;
+- total: clearly visible yellow;
+- status: compact badge;
+- action buttons: readable and touch-friendly.
+
+The reservation-card text should be SLIGHTLY LARGER than in the previous Calendar design.
+
+Do not make it excessively small just to fit more content.
+
+Keep:
+
+[ Modifica ] [ Cambia stato ] [ Elimina ]
+
+in a compact horizontal row where possible.
+
+"Elimina" must remain destructive/red and keep the existing confirmation behavior.
+
+==================================================
+9. DAILY AVAILABILITY
+==================================================
+
+Move the detailed availability section BELOW the reservation list.
+
+Do NOT remove the availability feature.
+
+Instead display a compact expandable control:
+
+"Vedi disponibilità del giorno"
+
+Subtitle:
+"Mostra quante bici e accessori sono disponibili"
+
+By default, the detailed availability list should be collapsed.
+
+When tapped:
+- expand the existing availability information;
+- show all bicycle/accessory availability values for the selected day.
+
+When tapped again:
+- collapse it.
+
+IMPORTANT:
+Reuse the existing availability calculations.
+
+Do NOT change how availability is calculated.
+
+Do NOT alter inventory quantities.
+
+Do NOT modify the fleet.
+
+This is only a show/hide presentation change.
+
+==================================================
+10. AVAILABILITY EXPANDED VIEW
+==================================================
+
+When expanded, display the availability list in compact rows:
+
+Main item name left.
+Availability count right.
+
+Example:
+
+Uomo cambio 28 pollici          4 libere su 5
+
+If an item includes recommendation text:
+
+Bici bimbo 20 pollici
+Consigliata per bimbi da 5 a 10 anni      2 libere su 2
+
+Use:
+- white primary item name;
+- gray smaller secondary description;
+- clear availability on the right.
+
+Avoid excessive line wrapping.
+
+Do NOT truncate important item names.
+
+==================================================
+11. IMPORTANT CATEGORY LOGIC
+==================================================
+
+Before implementing the three daily categories, INSPECT the existing reservation statuses and date logic.
+
+Do NOT assume new status names.
+
+Map the UI labels:
+
+"Prenotate"
+"Ritirate"
+"Da restituire"
+
+onto the EXISTING application statuses/date rules.
+
+Do NOT introduce duplicate statuses.
+
+Do NOT alter existing state transitions.
+
+Do NOT change how Home currently calculates its own counts.
+
+Reuse existing helpers whenever possible.
+
+==================================================
+12. EXISTING MULTI-DAY RENTALS
+==================================================
+
+Multi-day rentals must be handled correctly.
+
+Example:
+
+Rental starts 20 August
+Rental ends 27 August
+Current status = active/collected.
+
+When selecting 25 August:
+it must appear under "Ritirate / Attualmente fuori".
+
+It must NOT appear as a new "Prenotata" for 25 August.
+
+When selecting 27 August:
+if still not returned, it should also qualify for "Da restituire" according to the existing return logic.
+
+Avoid duplicate cards inside the SAME filtered list.
+
+==================================================
+13. NO DATA CASES
+==================================================
+
+If a selected day has no entries in a category:
+
+show count 0.
+
+If the currently selected category has no results, show a clean empty state such as:
+
+"Nessuna prenotazione in questa categoria."
+
+Do not generate fake data.
+
+==================================================
+14. DO NOT MODIFY OTHER SCREENS
+==================================================
+
+Do NOT visually or functionally modify:
+
+- Home
+- Nuovo noleggio
+- reservation creation form
+- Richieste
+- Incassi
+- Clienti
+- Parco bici
+- Listino
+- Promemoria
+- public customer request form
+- service-worker.js
+- manifest.json
+- Git configuration
+- Supabase schema
+
+Only change the Calendario screen presentation and the minimum presentation/filter state necessary for this daily dashboard.
+
+==================================================
+15. REQUIRED FUNCTIONAL VERIFICATION
+==================================================
+
+Before finishing, test all of these cases:
+
+1. Calendar loads correctly.
+2. Previous month still works.
+3. Next month still works.
+4. Selecting a date still works.
+5. Selected date is highlighted correctly.
+6. Yellow dots appear ONLY on dates with relevant rental activity.
+7. A date with zero rental activity has NO yellow dot.
+8. "+ Nuovo" still works.
+9. "+ Prenota" still works.
+10. Prenotate count is correct for the selected day.
+11. Ritirate count is correct for the selected day.
+12. Da restituire count is correct for the selected day.
+13. Multi-day active rentals appear under Ritirate on intermediate dates.
+14. Rentals due back on the selected day appear under Da restituire.
+15. Clicking each summary card filters the reservation list correctly.
+16. No reservation is duplicated within a filtered list.
+17. Reservation data shown is unchanged.
+18. Modifica still works.
+19. Cambia stato still works.
+20. Elimina still works with its existing confirmation flow.
+21. Availability calculations remain exactly correct.
+22. "Vedi disponibilità del giorno" expands/collapses without recalculating or altering data.
+23. No reservation, inventory, pricing, or database data is modified merely by viewing the Calendar.
+24. No unrelated screen is changed.
+
+==================================================
+16. IMPLEMENTATION APPROACH
+==================================================
+
+Make the MINIMUM necessary changes.
+
+Prefer:
+- existing reservation helpers
+- existing Home filtering/count logic if safely reusable
+- existing calendar date state
+- CSS/presentation changes
+- lightweight UI-only filter state
+
+Avoid:
+- rewrites
+- duplicated business logic
+- new database tables
+- schema changes
+- new status values
+- unnecessary refactoring
+
+If you discover that any requested category cannot be derived safely from the existing data model, STOP and report the exact limitation instead of inventing logic.
+
+At the end report:
+
+- exactly which file(s) were modified;
+- which existing functions/helpers were reused;
+- how "Prenotate", "Ritirate", and "Da restituire" are mapped to the existing reservation logic;
+- how the yellow activity dots are calculated;
+- confirm that no database/schema changes were required;
+- confirm that no unrelated functionality was changed.
