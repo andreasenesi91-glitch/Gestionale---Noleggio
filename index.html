@@ -1433,6 +1433,160 @@ body.setup-open { overflow: hidden; }
   #homePage .card-actions .delete-btn { min-width: 53px; }
 }
 
+/* New rental: compact mobile presentation only. */
+#newRentalPage > .sticky-head {
+  margin: 0 0 9px;
+  padding: 5px 0;
+}
+#newRentalPage > .sticky-head .eyebrow {
+  margin-bottom: 2px;
+}
+#newRentalPage > .sticky-head #clearFormBtn {
+  min-height: 38px;
+  padding: 8px 11px;
+  border-radius: 11px;
+}
+#newRentalPage #rentalForm {
+  padding: 12px;
+  margin-bottom: 12px;
+}
+#newRentalPage #rentalForm label {
+  margin-bottom: 8px;
+  font-size: .82rem;
+}
+#newRentalPage #rentalForm input,
+#newRentalPage #rentalForm select,
+#newRentalPage #rentalForm textarea {
+  margin-top: 4px;
+  min-height: 46px;
+  padding: 10px 12px;
+  border-radius: 11px;
+}
+#newRentalPage #rentalForm textarea {
+  min-height: 86px;
+  line-height: 1.35;
+}
+#newRentalPage #rentalForm > .two-cols {
+  gap: 8px;
+}
+#newRentalPage .subsection {
+  margin-top: 2px;
+  padding-top: 10px;
+}
+#newRentalPage .subsection > .section-head {
+  margin: 0 0 8px;
+}
+#newRentalPage .subsection .section-head h3 {
+  margin-top: 0;
+}
+#newRentalPage .quantity-list {
+  gap: 6px;
+}
+#newRentalPage #bikeFields .quantity-row-bike {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: #131313;
+  transition: border-color .14s ease, background .14s ease;
+}
+#newRentalPage #bikeFields .quantity-row-bike > div:first-child {
+  min-width: 0;
+}
+#newRentalPage #bikeFields .quantity-row-bike strong {
+  display: block;
+  overflow: hidden;
+  color: var(--text);
+  font-size: .87rem;
+  line-height: 1.18;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#newRentalPage #bikeFields .quantity-row-bike small {
+  margin-top: 2px;
+  color: #8f8f8f;
+  font-size: .7rem;
+  line-height: 1.18;
+}
+#newRentalPage #bikeFields .quantity-row-bike:focus-within,
+#newRentalPage #bikeFields .quantity-row-bike:has(.qty-input:not([value="0"])) {
+  border-color: rgba(255,212,0,.36);
+  background: linear-gradient(90deg, rgba(255,212,0,.08), #131313 48%);
+}
+#newRentalPage #bikeFields .quantity-row-bike .quantity-control {
+  grid-template-columns: 36px 44px 36px;
+  gap: 4px;
+  align-self: center;
+}
+#newRentalPage #bikeFields .quantity-row-bike .qty-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  font-size: 1.05rem;
+}
+#newRentalPage #bikeFields .quantity-row-bike .qty-input {
+  width: 44px;
+  height: 36px;
+  min-height: 36px;
+  padding: 4px;
+  border-radius: 9px;
+  font-size: .88rem;
+}
+#newRentalPage .price-summary-card {
+  margin: 10px 0;
+  padding: 12px;
+  border-radius: 15px;
+}
+#newRentalPage .price-days {
+  margin-top: 3px;
+  font-size: .82rem;
+}
+#newRentalPage .price-total-row {
+  gap: 8px;
+  margin-top: 10px;
+}
+#newRentalPage .price-input-wrap input {
+  min-height: 46px;
+  font-size: 1.2rem;
+}
+#newRentalPage .price-auto-note {
+  margin-top: 6px;
+  font-size: .76rem;
+}
+#newRentalPage #rentalStatus,
+#newRentalPage #rentalNotes {
+  margin-top: 4px;
+}
+#newRentalPage #rentalForm > .primary-btn.full {
+  margin-top: 6px;
+}
+
+@media (max-width: 380px) {
+  #newRentalPage #rentalForm {
+    padding: 10px;
+  }
+  #newRentalPage #rentalForm > .two-cols {
+    gap: 6px;
+  }
+  #newRentalPage #bikeFields .quantity-row-bike {
+    padding: 7px 8px;
+  }
+  #newRentalPage #bikeFields .quantity-row-bike .quantity-control {
+    grid-template-columns: 34px 42px 34px;
+  }
+  #newRentalPage #bikeFields .quantity-row-bike .qty-btn {
+    width: 34px;
+    height: 34px;
+  }
+  #newRentalPage #bikeFields .quantity-row-bike .qty-input {
+    width: 42px;
+    height: 34px;
+    min-height: 34px;
+  }
+}
+
 </style>
 
 </head>
