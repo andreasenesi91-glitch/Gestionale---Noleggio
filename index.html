@@ -1351,7 +1351,7 @@ body.setup-open { overflow: hidden; }
 }
 #homePage .card-list { gap: 8px; }
 #homePage .rental-card {
-  padding: 12px;
+  padding: 8px 10px;
   border-radius: 14px;
   box-shadow: none;
 }
@@ -1361,21 +1361,21 @@ body.setup-open { overflow: hidden; }
 }
 #homePage .rental-card h3 {
   margin-bottom: 0;
-  font-size: 1rem;
-  line-height: 1.2;
+  font-size: .96rem;
+  line-height: 1.12;
 }
 #homePage .rental-meta {
-  margin: 3px 0 0;
+  margin: 2px 0 0;
   color: #919191;
-  font-size: .76rem;
-  line-height: 1.35;
+  font-size: .7rem;
+  line-height: 1.15;
 }
 #homePage .rental-items {
   position: relative;
-  margin: 9px 0 5px;
-  padding-left: 19px;
-  font-size: .84rem;
-  line-height: 1.35;
+  margin: 5px 0 2px;
+  padding-left: 17px;
+  font-size: .78rem;
+  line-height: 1.12;
 }
 #homePage .rental-items::before {
   position: absolute;
@@ -1383,32 +1383,44 @@ body.setup-open { overflow: hidden; }
   left: 0;
   color: var(--yellow);
   content: "▦";
-  font-size: .84rem;
+  font-size: .78rem;
   font-weight: 900;
 }
 #homePage .rental-notes {
-  margin: 5px 0 0;
-  font-size: .79rem;
-  line-height: 1.35;
+  margin: 2px 0 0;
+  font-size: .73rem;
+  line-height: 1.15;
 }
 #homePage .rental-price {
-  margin: 8px 0 0;
-  font-size: .94rem;
+  margin: 4px 0 0;
+  font-size: .88rem;
   line-height: 1.2;
 }
 #homePage .status-pill {
-  padding: 5px 8px;
-  font-size: .68rem;
+  padding: 4px 7px;
+  font-size: .64rem;
 }
 #homePage .card-actions {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) auto;
   gap: 6px;
-  margin-top: 10px;
+  margin-top: 6px;
 }
 #homePage .card-actions button {
-  min-height: 38px;
-  padding: 8px 6px;
-  border-radius: 11px;
-  font-size: .77rem;
+  min-height: 36px;
+  padding: 6px 7px;
+  border-radius: 10px;
+  font-size: .73rem;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+#homePage .card-actions .delete-btn {
+  grid-column: auto;
+  min-width: 58px;
+  padding-right: 8px;
+  padding-left: 8px;
+  background: transparent;
+  border-color: rgba(255,92,92,.24);
+  color: #d97b7b;
 }
 
 @media (max-width: 380px) {
@@ -1416,6 +1428,9 @@ body.setup-open { overflow: hidden; }
   #homePage .hero-card > .primary-btn { padding-left: 9px; padding-right: 9px; }
   #homePage .stat-card { min-height: 66px; padding: 9px; }
   #homePage .stat-card-icon { flex-basis: 22px; width: 22px; height: 22px; }
+  #homePage .card-actions { gap: 4px; }
+  #homePage .card-actions button { padding-right: 5px; padding-left: 5px; font-size: .7rem; }
+  #homePage .card-actions .delete-btn { min-width: 53px; }
 }
 
 </style>
