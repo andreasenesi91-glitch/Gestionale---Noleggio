@@ -1655,6 +1655,354 @@ body.setup-open { overflow: hidden; }
   }
 }
 
+/* Calendar daily dashboard: presentation-only, scoped to the Calendar page. */
+#calendarPage > .section-head {
+  margin: 8px 0 10px;
+}
+#calendarPage > .section-head h2 {
+  font-size: 1.45rem;
+  line-height: 1.1;
+}
+#calendarPage > .section-head .primary-btn {
+  min-height: 40px;
+  padding: 9px 13px;
+  border-radius: 12px;
+}
+#calendarPage .month-calendar {
+  margin-bottom: 12px;
+  padding: 10px;
+  border-radius: 15px;
+  box-shadow: 0 8px 22px rgba(0,0,0,.2);
+}
+#calendarPage .month-header {
+  grid-template-columns: 44px 1fr 44px;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+#calendarPage .month-header strong {
+  font-size: 1.12rem;
+}
+#calendarPage .month-arrow {
+  min-height: 40px;
+  border-radius: 11px;
+}
+#calendarPage .today-jump {
+  display: none;
+}
+#calendarPage .weekdays {
+  margin-bottom: 4px;
+  color: #e0e0e0;
+  font-size: .7rem;
+}
+#calendarPage .calendar-grid {
+  gap: 4px;
+}
+#calendarPage .calendar-day {
+  display: flex;
+  min-height: 48px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 4px 2px;
+  border-radius: 10px;
+  font-size: .9rem;
+}
+#calendarPage .calendar-day .day-number {
+  line-height: 1;
+}
+#calendarPage .calendar-day.today {
+  border-color: rgba(255,212,0,.65);
+}
+#calendarPage .calendar-day.selected {
+  box-shadow: 0 3px 10px rgba(255,212,0,.16);
+}
+#calendarPage .calendar-activity-dot {
+  display: block;
+  width: 6px;
+  height: 6px;
+  flex: 0 0 6px;
+  border-radius: 999px;
+  background: var(--yellow);
+}
+#calendarPage .calendar-day.selected .calendar-activity-dot {
+  background: #111;
+}
+#calendarPage .selected-day-head {
+  margin: 10px 0 8px;
+}
+#calendarPage .selected-day-head .eyebrow {
+  margin-bottom: 3px;
+}
+#calendarPage .selected-day-head h3 {
+  font-size: 1.15rem;
+  line-height: 1.12;
+}
+#calendarPage .selected-day-head .primary-btn {
+  min-height: 40px;
+  padding: 9px 12px;
+  border-radius: 12px;
+}
+#calendarPage .calendar-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0 0 13px;
+}
+#calendarPage .calendar-summary-card {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 6px;
+  min-width: 0;
+  min-height: 78px;
+  padding: 9px 7px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 13px;
+  background: #151515;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  appearance: none;
+}
+#calendarPage .calendar-summary-card:active {
+  transform: scale(.985);
+}
+#calendarPage .calendar-summary-card.selected {
+  border-color: rgba(255,212,0,.72);
+  box-shadow: 0 0 0 2px rgba(255,212,0,.1);
+}
+#calendarPage .calendar-summary-icon {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  grid-row: 1 / 3;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 900;
+}
+#calendarPage .calendar-summary-icon-booked {
+  background: rgba(72,132,255,.35);
+  color: #c9dcff;
+}
+#calendarPage .calendar-summary-icon-collected {
+  background: rgba(61,220,132,.28);
+  color: #c9f7cf;
+}
+#calendarPage .calendar-summary-icon-return {
+  background: rgba(255,145,28,.35);
+  color: #ffe1b8;
+}
+#calendarPage .calendar-summary-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+#calendarPage .calendar-summary-copy strong {
+  overflow-wrap: normal;
+  font-size: .72rem;
+  line-height: 1.08;
+}
+#calendarPage .calendar-summary-copy small {
+  color: #d1d1d1;
+  font-size: .62rem;
+  line-height: 1.08;
+}
+#calendarPage .calendar-summary-count {
+  align-self: end;
+  color: var(--text);
+  font-size: 1.45rem;
+  line-height: 1;
+}
+#calendarPage .calendar-list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 8px;
+}
+#calendarPage .calendar-list-heading h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+#calendarPage .calendar-filter-label {
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(72,132,255,.13);
+  color: #7faeff;
+  font-size: .68rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+#calendarPage #calendarRentals {
+  gap: 8px;
+}
+#calendarPage #calendarRentals .rental-card {
+  padding: 11px 12px;
+  border-radius: 14px;
+  box-shadow: none;
+}
+#calendarPage #calendarRentals .rental-card-top {
+  gap: 8px;
+}
+#calendarPage #calendarRentals .rental-card h3 {
+  margin-bottom: 3px;
+  font-size: 1rem;
+  line-height: 1.12;
+}
+#calendarPage #calendarRentals .rental-meta,
+#calendarPage #calendarRentals .rental-items {
+  margin-bottom: 5px;
+  font-size: .76rem;
+  line-height: 1.25;
+}
+#calendarPage #calendarRentals .rental-price {
+  margin: 3px 0 0;
+  color: var(--yellow);
+  font-size: .9rem;
+  font-weight: 900;
+}
+#calendarPage #calendarRentals .rental-notes {
+  margin: 3px 0 0;
+  font-size: .74rem;
+}
+#calendarPage #calendarRentals .status-pill {
+  padding: 5px 8px;
+  font-size: .64rem;
+}
+#calendarPage #calendarRentals .card-actions {
+  gap: 6px;
+  margin-top: 7px;
+}
+#calendarPage #calendarRentals .card-actions button {
+  min-height: 36px;
+  padding: 7px 6px;
+  border-radius: 10px;
+  font-size: .73rem;
+}
+#calendarPage .calendar-availability-disclosure {
+  margin-top: 12px;
+}
+#calendarPage .availability-toggle {
+  display: flex;
+  width: 100%;
+  min-height: 46px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid rgba(255,212,0,.55);
+  border-radius: 11px;
+  background: rgba(255,212,0,.05);
+  color: var(--yellow);
+  text-align: left;
+}
+#calendarPage .availability-toggle-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+#calendarPage .availability-toggle-copy strong {
+  font-size: .82rem;
+  line-height: 1.1;
+}
+#calendarPage .availability-toggle-copy small {
+  color: #bdbdbd;
+  font-size: .68rem;
+  line-height: 1.1;
+}
+#calendarPage .availability-toggle-chevron {
+  flex: 0 0 auto;
+  font-size: 1.15rem;
+  line-height: 1;
+  transition: transform .15s ease;
+}
+#calendarPage .availability-toggle.expanded .availability-toggle-chevron {
+  transform: rotate(180deg);
+}
+#calendarPage .availability-panel {
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  border-radius: 13px;
+}
+#calendarPage .availability-panel h3 {
+  margin-bottom: 4px;
+  font-size: .9rem;
+}
+#calendarPage .availability-line {
+  align-items: baseline;
+  gap: 12px;
+  padding: 7px 0;
+  font-size: .76rem;
+}
+#calendarPage .availability-line span {
+  min-width: 0;
+  color: var(--text);
+}
+#calendarPage .availability-line strong {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: .72rem;
+  text-align: right;
+}
+#calendarPage .empty-state {
+  padding: 25px 14px;
+}
+
+@media (max-width: 380px) {
+  #calendarPage .month-calendar {
+    padding: 8px;
+  }
+  #calendarPage .month-header {
+    grid-template-columns: 40px 1fr 40px;
+  }
+  #calendarPage .calendar-grid {
+    gap: 3px;
+  }
+  #calendarPage .calendar-day {
+    min-height: 46px;
+    font-size: .83rem;
+  }
+  #calendarPage .calendar-summary {
+    gap: 4px;
+  }
+  #calendarPage .calendar-summary-card {
+    grid-template-columns: 25px minmax(0, 1fr);
+    column-gap: 5px;
+    min-height: 72px;
+    padding: 8px 5px;
+  }
+  #calendarPage .calendar-summary-icon {
+    width: 25px;
+    height: 25px;
+    font-size: .86rem;
+  }
+  #calendarPage .calendar-summary-copy strong {
+    font-size: .66rem;
+  }
+  #calendarPage .calendar-summary-copy small {
+    font-size: .58rem;
+  }
+  #calendarPage .calendar-summary-count {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: end;
+    font-size: 1.25rem;
+  }
+  #calendarPage #calendarRentals .card-actions {
+    gap: 4px;
+  }
+  #calendarPage #calendarRentals .card-actions button {
+    padding-right: 4px;
+    padding-left: 4px;
+    font-size: .69rem;
+  }
+}
+
 </style>
 
 </head>
@@ -2086,8 +2434,47 @@ body.setup-open { overflow: hidden; }
           </div>
           <button class="primary-btn compact" id="newForSelectedDateBtn">+ Prenota</button>
         </div>
-        <div id="dayAvailability" class="availability-panel"></div>
+        <div class="calendar-summary" id="calendarSummary" aria-label="Riepilogo del giorno">
+          <button type="button" class="calendar-summary-card" id="calendarBookedCard" data-calendar-filter="booked">
+            <span class="calendar-summary-icon calendar-summary-icon-booked" aria-hidden="true">▣</span>
+            <span class="calendar-summary-copy">
+              <strong>Prenotate</strong>
+              <small>Da ritirare</small>
+            </span>
+            <strong class="calendar-summary-count" id="calendarBookedCount">0</strong>
+          </button>
+          <button type="button" class="calendar-summary-card" id="calendarCollectedCard" data-calendar-filter="collected">
+            <span class="calendar-summary-icon calendar-summary-icon-collected" aria-hidden="true">♧</span>
+            <span class="calendar-summary-copy">
+              <strong>Ritirate</strong>
+              <small>Attualmente fuori</small>
+            </span>
+            <strong class="calendar-summary-count" id="calendarCollectedCount">0</strong>
+          </button>
+          <button type="button" class="calendar-summary-card" id="calendarReturnCard" data-calendar-filter="return">
+            <span class="calendar-summary-icon calendar-summary-icon-return" aria-hidden="true">↻</span>
+            <span class="calendar-summary-copy">
+              <strong>Da restituire</strong>
+              <small>Da rientrare oggi</small>
+            </span>
+            <strong class="calendar-summary-count" id="calendarReturnCount">0</strong>
+          </button>
+        </div>
+        <div class="calendar-list-heading">
+          <h3>Prenotazioni del giorno</h3>
+          <span class="calendar-filter-label" id="calendarFilterLabel">Tutte</span>
+        </div>
         <div id="calendarRentals" class="card-list"></div>
+        <div class="calendar-availability-disclosure">
+          <button type="button" class="availability-toggle" id="toggleDayAvailability" aria-expanded="false" aria-controls="dayAvailability">
+            <span class="availability-toggle-copy">
+              <strong>Vedi disponibilità del giorno</strong>
+              <small>Mostra quante bici e accessori sono disponibili</small>
+            </span>
+            <span class="availability-toggle-chevron" aria-hidden="true">⌄</span>
+          </button>
+          <div id="dayAvailability" class="availability-panel" hidden></div>
+        </div>
       </section>
 
 
@@ -3908,10 +4295,81 @@ function renderHome() {
       .forEach(r => list.appendChild(createRentalCard(r)));
   }
 }
+
+let calendarFilter = "all";
+let calendarFilterDate = "";
+let calendarAvailabilityOpen = false;
+
+function calendarDailyGroups(date) {
+  const rentals = activeRentalsForDate(date);
+  return {
+    booked: rentals.filter(rental => rental.startDate === date && rental.status === "prenotata"),
+    collected: rentals.filter(rental => rental.status === "ritirata"),
+    return: rentals.filter(rental => rental.endDate === date && rental.status !== "restituita")
+  };
+}
+
+function calendarFilterRentals(date, groups) {
+  if (calendarFilter === "booked") return groups.booked;
+  if (calendarFilter === "collected") return groups.collected;
+  if (calendarFilter === "return") return groups.return;
+  return activeRentalsForDate(date);
+}
+
+function resolveCalendarFilter(date, groups) {
+  if (calendarFilterDate === date && calendarFilter !== "all") return;
+  calendarFilterDate = date;
+  if (groups.booked.length) calendarFilter = "booked";
+  else if (groups.collected.length) calendarFilter = "collected";
+  else if (groups.return.length) calendarFilter = "return";
+  else calendarFilter = "all";
+}
+
+function updateCalendarSummary(groups) {
+  const filters = [
+    ["booked", "calendarBookedCount"],
+    ["collected", "calendarCollectedCount"],
+    ["return", "calendarReturnCount"]
+  ];
+  filters.forEach(([key, countId]) => {
+    const card = document.querySelector(`[data-calendar-filter="${key}"]`);
+    const count = document.getElementById(countId);
+    if (count) count.textContent = groups[key].length;
+    if (card) {
+      card.classList.toggle("selected", calendarFilter === key);
+      card.setAttribute("aria-pressed", String(calendarFilter === key));
+    }
+  });
+  const label = {
+    all: "Tutte",
+    booked: "Prenotate",
+    collected: "Ritirate",
+    return: "Da restituire"
+  }[calendarFilter] || "Tutte";
+  const labelEl = document.getElementById("calendarFilterLabel");
+  if (labelEl) labelEl.textContent = label;
+}
+
+function setCalendarAvailabilityOpen(open) {
+  calendarAvailabilityOpen = Boolean(open);
+  const panel = document.getElementById("dayAvailability");
+  const toggle = document.getElementById("toggleDayAvailability");
+  if (panel) panel.hidden = !calendarAvailabilityOpen;
+  if (toggle) {
+    toggle.setAttribute("aria-expanded", String(calendarAvailabilityOpen));
+    toggle.classList.toggle("expanded", calendarAvailabilityOpen);
+  }
+}
+
 function renderCalendar() {
   const date = $("calendarDate").value || todayISO();
   $("calendarDate").value = date;
-  const rentals = activeRentalsForDate(date);
+  const groups = calendarDailyGroups(date);
+  resolveCalendarFilter(date, groups);
+  const rentals = calendarFilterRentals(date, groups)
+    .slice()
+    .sort((a, b) => (a.pickupTime || "").localeCompare(b.pickupTime || ""));
+  updateCalendarSummary(groups);
 
   const avail = $("dayAvailability");
   avail.innerHTML = `<h3>Disponibilità ${formatDate(date)}</h3>`;
@@ -3925,10 +4383,11 @@ function renderCalendar() {
     const free = Math.max(0, item.total - used);
     avail.innerHTML += `<div class="availability-line"><span>${item.label}</span><strong>${free} liberi su ${item.total}</strong></div>`;
   });
+  setCalendarAvailabilityOpen(calendarAvailabilityOpen);
 
   const list = $("calendarRentals");
   list.innerHTML = "";
-  if (!rentals.length) list.innerHTML = `<div class="empty-state">Nessun noleggio in questa data.</div>`;
+  if (!rentals.length) list.innerHTML = `<div class="empty-state">Nessuna prenotazione in questa categoria.</div>`;
   rentals.forEach(r => list.appendChild(createRentalCard(r)));
 }
 
@@ -4986,15 +5445,15 @@ renderHome();
       const d = new Date(start);
       d.setDate(start.getDate()+i);
       const iso = isoFromParts(d.getFullYear(), d.getMonth(), d.getDate());
-      const count = monthBookingCount(iso);
+      const hasActivity = monthBookingCount(iso) > 0;
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "calendar-day";
       if (d.getMonth() !== m) btn.classList.add("other-month");
       if (iso === todayISO()) btn.classList.add("today");
       if (iso === selected) btn.classList.add("selected");
-      btn.innerHTML = `<span class="day-number">${d.getDate()}</span>${count ? `<span class="booking-count">${count}</span>` : ""}`;
-      btn.setAttribute("aria-label", `${formatDate(iso)}: ${count} prenotazioni`);
+      btn.innerHTML = `<span class="day-number">${d.getDate()}</span>${hasActivity ? `<span class="calendar-activity-dot" aria-hidden="true"></span>` : ""}`;
+      btn.setAttribute("aria-label", `${formatDate(iso)}${hasActivity ? ": attività di noleggio" : ": nessuna attività"}`);
       btn.addEventListener("click", () => {
         document.getElementById("calendarDate").value = iso;
         selectedHomeDate = iso;
@@ -5033,6 +5492,15 @@ renderHome();
     visibleMonth = new Date(todayISO()+"T12:00:00");
     visibleMonth.setDate(1);
     renderCalendar();
+  });
+  document.querySelectorAll("[data-calendar-filter]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      calendarFilter = btn.dataset.calendarFilter || "all";
+      renderCalendar();
+    });
+  });
+  document.getElementById("toggleDayAvailability").addEventListener("click", () => {
+    setCalendarAvailabilityOpen(!calendarAvailabilityOpen);
   });
   document.getElementById("newForSelectedDateBtn").addEventListener("click", () => {
     const chosen = document.getElementById("calendarDate").value || todayISO();
